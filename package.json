@@ -1,0 +1,26 @@
+{
+  "name": "sculpture-client",
+  "version": "1.0.0",
+  "description": "The embedded system code for the sculpture itself",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anyWareSculpture/sculpture-client.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/anyWareSculpture/sculpture-client/issues"
+  },
+  "homepage": "https://github.com/anyWareSculpture/sculpture-client#readme",
+  "dependencies": {
+    "@anyware/game-logic": "^2.0.1",
+    "serialport": "^1.7.4"
+  }
+}
