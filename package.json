@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/anyWareSculpture/sculpture-client#readme",
   "dependencies": {
-    "@anyware/game-logic": "^2.0.1",
+    "@anyware/game-logic": "^2.1.0",
     "serialport": "^1.7.4"
   }
 }

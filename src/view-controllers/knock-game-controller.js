@@ -14,13 +14,11 @@ export default class KnockGameController {
    * This uses a serial port to send serial commands based on the store.
    * @param {Dispatcher} dispatcher - A dispatcher that implements flux's dispatcher API
    * @param {KnockGameStore} knockGameStore - The instance of the knock game store to retrieve data from and bind a change handler to
-   * @param {String} serialPortPath - The path to the serial port
-   * @param {String} [serialPortOptions={}] - Additional options for the SerialPort constructor
    */
-  constructor(dispatcher, knockGameStore, serialPortPath, serialPortOptions={}) {
+  constructor(dispatcher, knockGameStore, serialPort) {
     this.dispatcher = dispatcher;
     this.knockGameStore = knockGameStore;
-    this.serialPort = this._createSerialPort(serialPortPath, serialPortOptions);
+    this.serialPort = serialPort;
 
     this._listenForChanges(this.knockGameStore);
   }
@@ -43,20 +41,11 @@ export default class KnockGameController {
     this.serialPort.write(commandString);
   }
 
-  _createSerialPort(serialPortPath, options) {
-    const serialPort = new SerialPort(serialPortPath, Object.assign({
-      baudrate: DEFAULT_BAUDRATE,
-      parser: serialport.parsers.readline("\n")
-    }, options));
-    serialPort.on("open", this._onSerialPortOpen.bind(this));
-    return serialPort;
-  }
-
-  _onSerialPortOpen(error) {
-    if (error) {
-      throw new Error(`Failed to open serial port: ${error}`);
-    }
-    this.serialPort.on("data", this._handleData.bind(this));
+  /**
+   * Completes all initialization steps assuming the serial port is open
+   */
+  onSerialPortOpen() {
+    
   }
 
   _listenForChanges(store) {
@@ -73,9 +62,5 @@ export default class KnockGameController {
     if (!this.isSerialPortOpen) {
       throw new Error("Serial port must be open before reading/writing");
     }
-  }
-
-  _handleData() {
-    //TODO
   }
 }
