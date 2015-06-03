@@ -13,9 +13,10 @@ export class SerialProtocolCommandParser {
    * @returns {Object} - Two keys: 1. name - the name of the command, 2. data - other data as provided by that command's specific parser
    */
   static parse(commandString) {
-    let [commandName, ...commandArgs] = commandString.split(/\s+/);
+    let commandName, commandArgs;
+    [commandName, ...commandArgs] = commandString.split(/\s+/);
     commandName = commandName.toUpperCase();
-    
+
     const parserFunctions = {
       [HELLO_COMMAND]: SerialProtocolCommandParser.parseHelloArguments,
       [ERROR_COMMAND]: SerialProtocolCommandParser.parseErrorArguments,
@@ -67,7 +68,7 @@ export class SerialProtocolCommandParser {
   static parsePatternArguments(args) {
     return {
       pattern: args.map((numberString) => parseInt(numberString))
-    }
+    };
   }
 }
 
@@ -76,6 +77,7 @@ export class SerialProtocolCommandBuilder {
    * Builds a command string from the given command name and data
    * @param {String} commandName - The name of the command to build, must be one of the recognized names exported as constants
    * @param {Object} commandData - The data to be passed to the appropriate command builder - this exactly matches the format returned by each parse method
+   * @returns {String} The built command string
    */
   static build(commandName, commandData) {
     const builderFunctions = {
@@ -98,30 +100,30 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildHello(data) {
-    return `${HELLO_COMMAND} ${data.supportedGames}`
+    return `${HELLO_COMMAND} ${data.supportedGames}`;
   }
 
   static buildError(data) {
-    return `${ERROR_COMMAND} ${data.message || ""}`
+    return `${ERROR_COMMAND} ${data.message || ""}`;
   }
 
   static buildDebug(data) {
-    return `${DEBUG_COMMAND} ${data.message || ""}`
+    return `${DEBUG_COMMAND} ${data.message || ""}`;
   }
 
   static buildReset(data) {
-    return `${RESET_COMMAND} ${data.debug ? "1" : "0"}`
+    return `${RESET_COMMAND} ${data.debug ? "1" : "0"}`;
   }
 
   static buildInit(data) {
-    return `${INIT_COMMAND} ${data.game} ${data.userId || ""}`
+    return `${INIT_COMMAND} ${data.game} ${data.userId || ""}`;
   }
 
   static buildExit(data) {
-    return `${EXIT_COMMAND} ${data.game}`
+    return `${EXIT_COMMAND} ${data.game}`;
   }
 
   static buildPattern(data) {
-    return `${PATTERN_COMMAND} ${data.pattern.join(" ")}`
+    return `${PATTERN_COMMAND} ${data.pattern.join(" ")}`;
   }
 }

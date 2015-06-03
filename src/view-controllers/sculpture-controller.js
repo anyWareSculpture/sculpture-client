@@ -1,8 +1,10 @@
+const serialport = require("serialport");
+const SerialPort = serialport.SerialPort;
+
 const GameLogic = require("@anyware/game-logic");
 const GameConstants = GameLogic.GameConstants;
-const KnockGameStore = GameLogic.KnockGameStore;
 
-const KnockGameController = require('./knock-game-controller');
+const DEFAULT_BAUDRATE = 115200;
 
 export default class SculptureController {
   /**
@@ -20,7 +22,7 @@ export default class SculptureController {
 
     //TODO: this._listenForChanges(this.sculptureStore);
   }
-  
+
   /**
    * @returns {Boolean} Returns true if the serial port is open
    */

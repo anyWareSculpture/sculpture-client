@@ -1,12 +1,4 @@
-const serialport = require("serialport");
-const SerialPort = serialport.SerialPort;
-
 const GameConstants = require("@anyware/game-logic").GameConstants;
-
-const serialProtocolCommands = require('./serial-protocol-commands');
-const PatternCommand = serialProtocolCommands.PatternCommand;
-
-const DEFAULT_BAUDRATE = 115200;
 
 export default class KnockGameController {
   /**
@@ -22,7 +14,7 @@ export default class KnockGameController {
 
     this._listenForChanges(this.knockGameStore);
   }
-  
+
   /**
    * @returns {Boolean} Returns true if the serial port is open
    */
@@ -37,7 +29,7 @@ export default class KnockGameController {
   sendPattern(pattern) {
     this._assertPortOpen();
 
-    commandString = PatternCommand.build(pattern);
+    const commandString = ""; //TODO: PatternCommand.build(pattern);
     this.serialPort.write(commandString);
   }
 
@@ -45,7 +37,7 @@ export default class KnockGameController {
    * Completes all initialization steps assuming the serial port is open
    */
   onSerialPortOpen() {
-    
+
   }
 
   _listenForChanges(store) {
