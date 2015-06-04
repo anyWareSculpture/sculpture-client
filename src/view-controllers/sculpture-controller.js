@@ -72,7 +72,7 @@ export default class SculptureController {
     const {name, data} = SerialProtocolCommandParser.parse(serialData);
 
     if (name === serialProtocol.HELLO_COMMAND) {
-      this._sendInitKnockGame()
+      this._sendInitKnockGame();
     }
     else if (name === serialProtocol.PATTERN_COMMAND) {
       console.log(`Attempting to detect pattern: ${data.pattern}`); //TODO: Remove

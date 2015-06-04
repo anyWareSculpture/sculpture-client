@@ -64,7 +64,7 @@ export default class KnockGameController {
       this.sendPattern(changes.pattern);
     }
     if (changes.complete) {
-      console.log("Got a valid pattern!"); //TODO: Remove
+      console.log("Knock game complete!"); //TODO: Remove
     }
   }
 
