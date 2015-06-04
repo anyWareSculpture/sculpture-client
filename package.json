@@ -7,6 +7,7 @@
     "test": "test"
   },
   "scripts": {
+    "start": "babel-node src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,7 +21,9 @@
   },
   "homepage": "https://github.com/anyWareSculpture/sculpture-client#readme",
   "dependencies": {
-    "@anyware/game-logic": "^2.1.0",
+    "@anyware/game-logic": "^2.2.3",
+    "@anyware/streaming-client": "^1.2.2",
+    "flux": "^2.0.3",
     "serialport": "^1.7.4"
   },
   "devDependencies": {

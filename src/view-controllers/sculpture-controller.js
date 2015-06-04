@@ -1,6 +1,10 @@
 const serialport = require("serialport");
 const SerialPort = serialport.SerialPort;
 
+const serialProtocol = require('../serial/serial-protocol');
+const SerialProtocolCommandParser = serialProtocol.SerialProtocolCommandParser;
+const SerialProtocolCommandBuilder = serialProtocol.SerialProtocolCommandBuilder;
+
 const GameLogic = require("@anyware/game-logic");
 const GameConstants = GameLogic.GameConstants;
 
@@ -63,7 +67,28 @@ export default class SculptureController {
     }
   }
 
-  _handleData(data) {
-    console.log(data);
+  _handleData(serialData) {
+    console.log(`GOT SERIAL: ${serialData.toString().trim()}`);
+    const {name, data} = SerialProtocolCommandParser.parse(serialData);
+
+    if (name === serialProtocol.HELLO_COMMAND) {
+      this._sendInitKnockGame()
+    }
+    else if (name === serialProtocol.PATTERN_COMMAND) {
+      console.log(`Attempting to detect pattern: ${data.pattern}`); //TODO: Remove
+      //TODO: Clean this up so it's not here
+      this.dispatcher.dispatch({
+        actionType: GameConstants.ACTION_TYPE_DETECT_KNOCK_PATTERN,
+        pattern: data.pattern
+      });
+    }
+  }
+
+  _sendInitKnockGame() {
+    this._assertPortOpen();
+
+    const commandString = SerialProtocolCommandBuilder.build(serialProtocol.INIT_COMMAND, {game: "knock"}); //TODO: get rid of literals
+    console.log(`PUT SERIAL: ${commandString.trim()}`); //TODO: Remove
+    this.serialPort.write(commandString);
   }
 }

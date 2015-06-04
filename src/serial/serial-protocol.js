@@ -14,7 +14,7 @@ export class SerialProtocolCommandParser {
    */
   static parse(commandString) {
     let commandName, commandArgs;
-    [commandName, ...commandArgs] = commandString.split(/\s+/);
+    [commandName, ...commandArgs] = commandString.trim().split(/\s+/);
     commandName = commandName.toUpperCase();
 
     const parserFunctions = {
@@ -29,7 +29,7 @@ export class SerialProtocolCommandParser {
 
     const parserFunction = parserFunctions[commandName];
     if (!parserFunction) {
-      throw new Error(`Unrecognized command name ${commandName}`);
+      throw new Error(`Unrecognized command name '${commandName}'`);
     }
 
     return {
@@ -81,49 +81,49 @@ export class SerialProtocolCommandBuilder {
    */
   static build(commandName, commandData) {
     const builderFunctions = {
-      [HELLO_COMMAND]: SerialProtocolCommandParser.buildHello,
-      [ERROR_COMMAND]: SerialProtocolCommandParser.buildError,
-      [DEBUG_COMMAND]: SerialProtocolCommandParser.buildDebug,
-      [RESET_COMMAND]: SerialProtocolCommandParser.buildReset,
-      [INIT_COMMAND]: SerialProtocolCommandParser.buildInit,
-      [EXIT_COMMAND]: SerialProtocolCommandParser.buildExit,
-      [PATTERN_COMMAND]: SerialProtocolCommandParser.buildPattern
+      [HELLO_COMMAND]: SerialProtocolCommandBuilder.buildHello,
+      [ERROR_COMMAND]: SerialProtocolCommandBuilder.buildError,
+      [DEBUG_COMMAND]: SerialProtocolCommandBuilder.buildDebug,
+      [RESET_COMMAND]: SerialProtocolCommandBuilder.buildReset,
+      [INIT_COMMAND]: SerialProtocolCommandBuilder.buildInit,
+      [EXIT_COMMAND]: SerialProtocolCommandBuilder.buildExit,
+      [PATTERN_COMMAND]: SerialProtocolCommandBuilder.buildPattern
     };
 
     const builderFunction = builderFunctions[commandName];
 
     if (!builderFunction) {
-      throw new Error(`unrecognized command name ${commandName}`);
+      throw new Error(`unrecognized command name '${commandName}'`);
     }
 
     return builderFunction(commandData);
   }
 
   static buildHello(data) {
-    return `${HELLO_COMMAND} ${data.supportedGames}`;
+    return `${HELLO_COMMAND} ${data.supportedGames}\n`;
   }
 
   static buildError(data) {
-    return `${ERROR_COMMAND} ${data.message || ""}`;
+    return `${ERROR_COMMAND} ${data.message || ""}\n`;
   }
 
   static buildDebug(data) {
-    return `${DEBUG_COMMAND} ${data.message || ""}`;
+    return `${DEBUG_COMMAND} ${data.message || ""}\n`;
   }
 
   static buildReset(data) {
-    return `${RESET_COMMAND} ${data.debug ? "1" : "0"}`;
+    return `${RESET_COMMAND} ${data.debug ? "1" : "0"}\n`;
   }
 
   static buildInit(data) {
-    return `${INIT_COMMAND} ${data.game} ${data.userId || ""}`;
+    return `${INIT_COMMAND} ${data.game} ${data.userId || ""}\n`;
   }
 
   static buildExit(data) {
-    return `${EXIT_COMMAND} ${data.game}`;
+    return `${EXIT_COMMAND} ${data.game}\n`;
   }
 
   static buildPattern(data) {
-    return `${PATTERN_COMMAND} ${data.pattern.join(" ")}`;
+    return `${PATTERN_COMMAND} ${data.pattern.join(" ")}\n`;
   }
 }

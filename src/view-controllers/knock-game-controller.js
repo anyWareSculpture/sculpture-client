@@ -1,4 +1,8 @@
-const GameConstants = require("@anyware/game-logic").GameConstants;
+const serialProtocol = require("../serial/serial-protocol");
+const SerialProtocolCommandBuilder = serialProtocol.SerialProtocolCommandBuilder;
+const GameLogic = require("@anyware/game-logic");
+const GameConstants = GameLogic.GameConstants;
+const KnockGameStore = GameLogic.KnockGameStore;
 
 export default class KnockGameController {
   /**
@@ -11,6 +15,8 @@ export default class KnockGameController {
     this.dispatcher = dispatcher;
     this.knockGameStore = knockGameStore;
     this.serialPort = serialPort;
+
+    this.serialPort.on("open", this._onSerialPortOpen.bind(this));
 
     this._listenForChanges(this.knockGameStore);
   }
@@ -29,15 +35,24 @@ export default class KnockGameController {
   sendPattern(pattern) {
     this._assertPortOpen();
 
-    const commandString = ""; //TODO: PatternCommand.build(pattern);
+    const commandString = SerialProtocolCommandBuilder.build(serialProtocol.PATTERN_COMMAND, {pattern: pattern});
+    console.log(`PUT SERIAL: ${commandString.trim()}`); //TODO: Remove
     this.serialPort.write(commandString);
   }
 
   /**
    * Completes all initialization steps assuming the serial port is open
    */
-  onSerialPortOpen() {
-
+  _onSerialPortOpen() {
+    //TODO: Make this better
+    setTimeout(() => {
+      const sendInitPattern = () => {
+        console.log("Sending initial knock pattern..."); //TODO: Remove
+        KnockGameStore.sendInitialKnockPattern(this.dispatcher);
+      };
+      setInterval(sendInitPattern, 20000);
+      sendInitPattern();
+    }, 5000); //TODO: Bad
   }
 
   _listenForChanges(store) {
@@ -47,6 +62,9 @@ export default class KnockGameController {
   _onStoreChange(changes) {
     if (changes.pattern) {
       this.sendPattern(changes.pattern);
+    }
+    if (changes.complete) {
+      console.log("Got a valid pattern!"); //TODO: Remove
     }
   }
 
