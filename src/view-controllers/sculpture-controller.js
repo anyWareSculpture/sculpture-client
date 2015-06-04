@@ -68,8 +68,20 @@ export default class SculptureController {
   }
 
   _handleData(serialData) {
+    if (!serialData.trim()) {
+      return;
+    }
+
     console.log(`GOT SERIAL: ${serialData.toString().trim()}`);
-    const {name, data} = SerialProtocolCommandParser.parse(serialData);
+    let name, data;
+    try {
+      ({name, data} = SerialProtocolCommandParser.parse(serialData));
+    }
+    catch (error) {
+      console.error("ERROR WHILE PARSING SERIAL!");
+      console.error(error.stack || error.message || error);
+      return;
+    }
 
     if (name === serialProtocol.HELLO_COMMAND) {
       this._sendInitKnockGame();
