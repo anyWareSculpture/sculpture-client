@@ -65,6 +65,8 @@ export default class KnockGameController {
     }
     if (changes.complete) {
       console.log("Knock game complete!"); //TODO: Remove
+      
+      this._reinitKnockGame();
     }
   }
 
@@ -72,5 +74,15 @@ export default class KnockGameController {
     if (!this.isSerialPortOpen) {
       throw new Error("Serial port must be open before reading/writing");
     }
+  }
+
+  _reinitKnockGame() {
+    let commandString = SerialProtocolCommandBuilder.buildExit({game: "knock"});
+    console.log(`PUT SERIAL: ${commandString.trim()}`); //TODO: Remove
+    this.serialPort.write(commandString);
+
+    commandString = SerialProtocolCommandBuilder.buildInit({game: "knock"});
+    console.log(`PUT SERIAL: ${commandString.trim()}`); //TODO: Remove
+    this.serialPort.write(commandString);
   }
 }
