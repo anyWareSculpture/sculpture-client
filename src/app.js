@@ -8,7 +8,7 @@ const KnockGameStore = GameLogic.KnockGameStore;
 const SculptureController = require("./view-controllers/sculpture-controller");
 const KnockGameController = require("./view-controllers/knock-game-controller");
 
-const SERIAL_PORT_PATH = "/dev/ttyACM0";
+const SERIAL_PORT_PATH = "/dev/ttyACM1";
 const CLIENT_CONNECTION_OPTIONS = {
   protocol: "ws",
   username: "anyware",

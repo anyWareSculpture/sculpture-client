@@ -50,7 +50,7 @@ export default class KnockGameController {
         console.log("Sending initial knock pattern..."); //TODO: Remove
         KnockGameStore.sendInitialKnockPattern(this.dispatcher);
       };
-      setInterval(sendInitPattern, 20000);
+      setInterval(sendInitPattern, 15000);
       sendInitPattern();
     }, 5000); //TODO: Bad
   }
