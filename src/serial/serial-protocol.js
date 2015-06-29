@@ -81,6 +81,21 @@ export class SerialProtocolCommandParser {
   }
 }
 
+function removeOptionalParts(command) {
+  let text = command.trim();
+  if (!text.endsWith(" -")) {
+    return text;
+  }
+  while (true) {
+    var dashIndex = text.lastIndexOf(" -");
+    if (dashIndex < 0) {
+      break;
+    }
+    text = text.slice(0, dashIndex).trim();
+  }
+  return text;
+}
+
 export class SerialProtocolCommandBuilder {
   /**
    * Builds a command string from the given command name and data
@@ -139,10 +154,18 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildPanelSet(data) {
-    return `${PANEL_SET_COMMAND} ${data.stripId} ${data.panelId} ${data.intensity} ${data.color || "-"} ${data.easing || "-"} ${data.duration || ""}\n`;
+    let command = `${PANEL_SET_COMMAND} ${data.stripId} ${data.panelId} ${data.intensity} ${data.color || "-"} ${data.easing || "-"} ${data.duration || ""}\n`;
+
+    command = removeOptionalParts(command);
+
+    return command;
   }
 
   static buildPanelPulse(data) {
-    return `${PANEL_PULSE_COMMAND} ${data.stripId} ${data.panelId} ${data.intensity} ${data.color || "-"} ${data.easing || "-"} ${data.duration || ""}\n`;
+    let command = `${PANEL_PULSE_COMMAND} ${data.stripId} ${data.panelId} ${data.intensity} ${data.color || "-"} ${data.easing || "-"} ${data.duration || ""}\n`;
+
+    command = removeOptionalParts(command);
+
+    return command;
   }
 }
