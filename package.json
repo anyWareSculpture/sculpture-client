@@ -24,7 +24,8 @@
     "@anyware/game-logic": "^2.3.1",
     "@anyware/streaming-client": "^1.2.2",
     "flux": "^2.0.3",
-    "serialport": "^1.7.4"
+    "serialport": "^1.7.4",
+    "wildcard": "^1.1.2"
   },
   "devDependencies": {
     "@anyware/gulp-utils": "^1.1.1",
