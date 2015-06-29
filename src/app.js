@@ -12,7 +12,7 @@ export default class SculptureApp {
   constructor() {
     this.dispatcher = new Dispatcher();
     this.dispatcher.register((payload) => {
-      this._log(`Send action: ${JSON.stringify(payload)}`);
+      this._log(`Sent action: ${JSON.stringify(payload)}`);
     });
 
     this.client = null;
@@ -52,8 +52,8 @@ export default class SculptureApp {
   }
 
   _setupViews() {
-    this.panelView = new PanelView(this.dispatcher, this.serialManager);
-    this.diskView = new DiskView(this.dispatcher, this.serialManager);
+    this.panelView = new PanelView(this.sculpture, this.dispatcher, this.serialManager);
+    this.diskView = new DiskView(this.sculpture, this.dispatcher, this.serialManager);
   }
 
   _setupStreamingClient() {

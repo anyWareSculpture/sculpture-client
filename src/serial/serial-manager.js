@@ -50,6 +50,8 @@ export default class SerialManager extends events.EventEmitter {
       port.write(command);
     }
 
+    console.log(`Sent command "${command.trim()}" to: ${Array.from(targetPorts)}`);
+
     return targetPorts.size === 0;
   }
 
@@ -125,17 +127,12 @@ export default class SerialManager extends events.EventEmitter {
   _expectInitialization(port) {
     let supportedPatterns = [];
     const collectSupportedPatterns = (data) => {
-      let parsed;
+      let parsed = {};
       try {
         parsed = SerialProtocolCommandParser.parse(data);
       }
       catch (error) {
-        if (error instanceof Error) {
-          supportedPatterns.push(data);
-          port.once('data', collectSupportedPatterns);
-          return;
-        }
-        else {
+        if (!(error instanceof Error)) {
           throw error;
         }
       }
@@ -144,6 +141,9 @@ export default class SerialManager extends events.EventEmitter {
         this._completeInitialization(port, supportedPatterns)
         return;
       }
+
+      supportedPatterns.push(data);
+      port.once('data', collectSupportedPatterns);
     };
 
     const initCommandHandler = (data) => {
@@ -193,6 +193,8 @@ export default class SerialManager extends events.EventEmitter {
       identity: this.identity
     });
     port.write(commandString);
+    //TODO: Update this to INIT and add it to serial-protocol.js
+    port.write("PANEL-INIT\n");
 
     console.log(`Completed initialization of port ${portId}`);
 
@@ -215,6 +217,7 @@ export default class SerialManager extends events.EventEmitter {
     
     if (commandName === serialProtocol.DEBUG_COMMAND) {
       console.log(`DEBUG: ${commandData.message}`);
+      return;
     }
 
     this.emit(SerialManager.EVENT_COMMAND, commandName, commandData);
