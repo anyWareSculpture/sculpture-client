@@ -1,8 +1,6 @@
 const serialport = require('serialport');
 const SerialPort = serialport.SerialPort;
 
-const matchesWildcard = require('wildcard');
-
 export default class SerialManager {
   constructor() {
     this.patterns = {};
@@ -43,6 +41,7 @@ export default class SerialManager {
         console.log(port.comName);
         console.log(port.pnpId);
         console.log(port.manufacturer);
+        console.log(port);
       });
     });   
   }
