@@ -1,3 +1,6 @@
+const serialport = require('serialport');
+const SerialPort = serialport.SerialPort;
+
 const matchesWildcard = require('wildcard');
 
 export default class SerialManager {
@@ -31,6 +34,16 @@ export default class SerialManager {
   }
 
   _setupConnections() {
-    
+    serialport.list(function (err, ports) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      ports.forEach(function(port) {
+        console.log(port.comName);
+        console.log(port.pnpId);
+        console.log(port.manufacturer);
+      });
+    });   
   }
 }

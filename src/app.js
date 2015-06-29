@@ -1,61 +1,95 @@
-const Dispatcher = require("flux").Dispatcher;
+const {Dispatcher} = require("flux");
 
 const StreamingClient = require("@anyware/streaming-client");
-const GameLogic = require("@anyware/game-logic");
-const GameConstants = GameLogic.GameConstants;
-const KnockGameStore = GameLogic.KnockGameStore;
+const {SculptureStore, SculptureActionCreator} = require("@anyware/game-logic");
 
-const SculptureController = require("./view-controllers/sculpture-controller");
-const KnockGameController = require("./view-controllers/knock-game-controller");
+const PanelView = require('./views/panel-view');
+const DiskView = require('./views/disk-view');
 
-const SERIAL_PORT_PATH = "/dev/ttyACM1";
-const CLIENT_CONNECTION_OPTIONS = {
-  protocol: "ws",
-  username: "anyware",
-  password: "anyware",
-  host: "connect.shiftr.io:1884"
-};
+const SerialManager = require('./serial/serial-manager');
 
-if (process.argv[2] && process.argv[3]) {
-  CLIENT_CONNECTION_OPTIONS.username = process.argv[2];
-  CLIENT_CONNECTION_OPTIONS.password = process.argv[3];
-}
-console.log("Using credentials:");
-console.log(CLIENT_CONNECTION_OPTIONS);
-
-// Dispatcher
-const dispatcher = new Dispatcher();
-
-// Connection
-const client = new StreamingClient(CLIENT_CONNECTION_OPTIONS);
-const connectionStatus = () => console.log(`Client connected: ${client.connected}`);
-client.on(StreamingClient.EVENT_CONNECT, connectionStatus);
-client.on(StreamingClient.EVENT_DISCONNECT, connectionStatus);
-client.on(StreamingClient.EVENT_ERROR, (error) => console.error(error.stack || error.message || error));
-
-// Stores
-const knockGameStore = new KnockGameStore(dispatcher);
-
-// Send/receive state updates
-knockGameStore.on(GameConstants.EVENT_CHANGE, (changes) => {
-  if (changes.complete) { //TODO: This is a hack
-    const stateUpdate = {game: changes};
-    console.log("SENDING STATE UPDATE:");
-    console.log(stateUpdate);
-    client.sendStateUpdate(stateUpdate);
-  }
-});
-client.on(StreamingClient.EVENT_STATE_UPDATE, (stateUpdate) => {
-  console.log("RECEIVED STATE UPDATE:");
-  console.log(stateUpdate);
-  if (stateUpdate.game) {
-    dispatcher.dispatch({
-      actionType: GameConstants.ACTION_TYPE_MERGE_GAME_STATE,
-      stateUpdate: stateUpdate.game
+export default class SculptureApp {
+  constructor() {
+    this.dispatcher = new Dispatcher();
+    this.dispatcher.register((payload) => {
+      this._log(`Send action: ${JSON.stringify(payload)}`);
     });
-  }
-});
 
-// View controllers
-const sculptureController = new SculptureController(dispatcher, null, SERIAL_PORT_PATH);
-const knockGameController = new KnockGameController(dispatcher, knockGameStore, sculptureController.serialPort);
+    this.client = null;
+
+    this.panelView = null;
+    this.diskView = null;
+
+    this.serialManager = new SerialManager();
+
+    this.sculpture = new SculptureStore(this.dispatcher);
+    this.sculpture.on(SculptureStore.EVENT_CHANGE, (changes) => {
+      this._log(`Sent state update: ${JSON.stringify(changes)}`);
+
+      this.client.sendStateUpdate(changes);
+    });
+
+    this.sculptureActionCreator = new SculptureActionCreator(this.dispatcher);
+
+    this._setupViews();
+  }
+
+  /**
+   * Connects to the streaming server and sets up the rest of the application
+   */
+  connectAndSetup(options) {
+    this._connectionOptions = options;
+    this._setupStreamingClient();
+  }
+
+  _log(message) {
+    console.log(message);
+  }
+
+  _error(message) {
+    console.error(message);
+  }
+
+  _setupViews() {
+    this.panelView = new PanelView(this.dispatcher, this.serialManager);
+    this.diskView = new DiskView(this.dispatcher, this.serialManager);
+  }
+
+  _setupStreamingClient() {
+    if (this.client) {
+      this.client.close();
+    }
+
+    this._log(`Using username ${this._connectionOptions.username}`);
+
+    this.client = new StreamingClient(this._connectionOptions);
+
+    this.client.on(StreamingClient.EVENT_CONNECT, this._onConnectionStatusChange.bind(this));
+    this.client.on(StreamingClient.EVENT_DISCONNECT, this._onConnectionStatusChange.bind(this));
+
+    this.client.on(StreamingClient.EVENT_ERROR, this._error.bind(this));
+
+    this.client.once(StreamingClient.EVENT_CONNECT, () => {
+      // Temporarily here until the full game transitions are implemented
+      if (!this.sculpture.isPlayingMoleGame) {
+        this._log("Starting mole game...");
+        this.sculpture.startMoleGame();
+      }
+    });
+
+    this.client.on(StreamingClient.EVENT_STATE_UPDATE, this._onStateUpdate.bind(this));
+  }
+
+  _onConnectionStatusChange() {
+    this._log(`Client Connected: ${this.client.connected}`);
+  }
+
+  _onStateUpdate(update, metadata) {
+    update.metadata = metadata;
+
+    this._log(`Got state update: ${JSON.stringify(update)}`);
+
+    this.sculptureActionCreator.sendMergeState(update);
+  }
+}
+

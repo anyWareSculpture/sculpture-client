@@ -7,8 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "start": "babel-node src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "babel-node src/index.js",
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
