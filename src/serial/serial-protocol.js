@@ -1,10 +1,9 @@
 export const HELLO_COMMAND = "HELLO";
 export const ERROR_COMMAND = "ERROR";
 export const DEBUG_COMMAND = "DEBUG";
-export const RESET_COMMAND = "RESET";
-export const INIT_COMMAND = "INIT";
-export const EXIT_COMMAND = "EXIT";
-export const PATTERN_COMMAND = "PATTERN";
+export const SUPPORTED_COMMAND = "SUPPORTED";
+export const END_SUPPORTED_COMMAND = "ENDSUPPORTED";
+export const IDENTITY_COMMAND = "IDENTITY";
 
 export class SerialProtocolCommandParser {
   /**
@@ -21,10 +20,9 @@ export class SerialProtocolCommandParser {
       [HELLO_COMMAND]: SerialProtocolCommandParser.parseHelloArguments,
       [ERROR_COMMAND]: SerialProtocolCommandParser.parseErrorArguments,
       [DEBUG_COMMAND]: SerialProtocolCommandParser.parseDebugArguments,
-      [RESET_COMMAND]: SerialProtocolCommandParser.parseResetArguments,
-      [INIT_COMMAND]: SerialProtocolCommandParser.parseInitArguments,
-      [EXIT_COMMAND]: SerialProtocolCommandParser.parseExitArguments,
-      [PATTERN_COMMAND]: SerialProtocolCommandParser.parsePatternArguments
+      [SUPPORTED_COMMAND]: SerialProtocolCommandParser.parseSupportedArguments,
+      [END_SUPPORTED_COMMAND]: SerialProtocolCommandParser.parseEndSupportedArguments,
+      [IDENTITY_COMMAND]: SerialProtocolCommandParser.parseIdentityArguments
     };
 
     const parserFunction = parserFunctions[commandName];
@@ -50,25 +48,16 @@ export class SerialProtocolCommandParser {
     return {message: args[0] || ""};
   }
 
-  static parseResetArguments(args) {
-    return {debug: args[0]};
+  static parseSupportedArguments(args) {
+    return {};
   }
 
-  static parseInitArguments(args) {
-    return {
-      game: args[0],
-      userId: args[1] || ""
-    };
+  static parseEndSupportedArguments(args) {
+    return {};
   }
 
-  static parseExitArguments(args) {
-    return {game: args};
-  }
-
-  static parsePatternArguments(args) {
-    return {
-      pattern: args.map((numberString) => parseInt(numberString))
-    };
+  static parseIdentityArguments(args) {
+    return {identity: args[0]};
   }
 }
 
@@ -84,10 +73,9 @@ export class SerialProtocolCommandBuilder {
       [HELLO_COMMAND]: SerialProtocolCommandBuilder.buildHello,
       [ERROR_COMMAND]: SerialProtocolCommandBuilder.buildError,
       [DEBUG_COMMAND]: SerialProtocolCommandBuilder.buildDebug,
-      [RESET_COMMAND]: SerialProtocolCommandBuilder.buildReset,
-      [INIT_COMMAND]: SerialProtocolCommandBuilder.buildInit,
-      [EXIT_COMMAND]: SerialProtocolCommandBuilder.buildExit,
-      [PATTERN_COMMAND]: SerialProtocolCommandBuilder.buildPattern
+      [SUPPORTED_COMMAND]: SerialProtocolCommandBuilder.buildSupported,
+      [END_SUPPORTED_COMMAND]: SerialProtocolCommandBuilder.buildEndSupported,
+      [IDENTITY_COMMAND]: SerialProtocolCommandBuilder.buildIdentity
     };
 
     const builderFunction = builderFunctions[commandName];
@@ -111,19 +99,15 @@ export class SerialProtocolCommandBuilder {
     return `${DEBUG_COMMAND} ${data.message || ""}\n`;
   }
 
-  static buildReset(data) {
-    return `${RESET_COMMAND} ${data.debug ? "1" : "0"}\n`;
+  static buildSupported(data) {
+    return `${SUPPORTED_COMMAND}\n`;
   }
 
-  static buildInit(data) {
-    return `${INIT_COMMAND} ${data.game} ${data.userId || ""}\n`;
+  static buildEndSupported(data) {
+    return `${END_SUPPORTED_COMMAND}\n`;
   }
 
-  static buildExit(data) {
-    return `${EXIT_COMMAND} ${data.game}\n`;
-  }
-
-  static buildPattern(data) {
-    return `${PATTERN_COMMAND} ${data.pattern.join(" ")}\n`;
+  static buildIdentity(data) {
+    return `${IDENTITY_COMMAND} ${data.identity}\n`;
   }
 }

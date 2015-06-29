@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "start": "babel-node src/index.js",
+    "start": "babel-node --stage 0 src/index.js",
     "test": "gulp test"
   },
   "repository": {

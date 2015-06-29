@@ -20,7 +20,7 @@ export default class SculptureApp {
     this.panelView = null;
     this.diskView = null;
 
-    this.serialManager = new SerialManager();
+    this.serialManager = new SerialManager(0);
 
     this.sculpture = new SculptureStore(this.dispatcher);
     this.sculpture.on(SculptureStore.EVENT_CHANGE, (changes) => {

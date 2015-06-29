@@ -1,8 +1,27 @@
+const events = require('events');
+
 const serialport = require('serialport');
 const SerialPort = serialport.SerialPort;
 
-export default class SerialManager {
-  constructor() {
+const serialProtocol = require('./serial-protocol');
+const {SerialProtocolCommandParser, SerialProtocolCommandBuilder} = serialProtocol;
+
+const DEFAULT_BAUDRATE = 115200;
+const MAX_INITIALIZATION_ATTEMPTS = 2;
+
+export default class SerialManager extends events.EventEmitter {
+  /**
+   * Fired when the serial manager receives a command from a serial port
+   * Arguments for handler: [commandName, commandData]
+   * @event SerialManager.EVENT_COMMAND
+   */
+  static EVENT_COMMAND = "command";
+
+  constructor(identity) {
+    super();
+
+    this.identity = identity;
+
     this.patterns = {};
     this.ports = {};
 
@@ -17,8 +36,9 @@ export default class SerialManager {
   dispatchCommand(command) {
     const targetPorts = new Set();
     for (let pattern of Object.keys(this.patterns)) {
+      const regex = new RegExp(pattern);
       const portId = this.patterns[pattern];
-      if (matchesWildcard(pattern, command)) {
+      if (regex.test(command)) {
         targetPorts.add(portId);
       }
     }
@@ -32,17 +52,169 @@ export default class SerialManager {
   }
 
   _setupConnections() {
-    serialport.list(function (err, ports) {
+    serialport.list((err, ports) => {
       if (err) {
         console.error(err);
         return;
       }
-      ports.forEach(function(port) {
-        console.log(port.comName);
-        console.log(port.pnpId);
-        console.log(port.manufacturer);
-        console.log(port);
+      ports.forEach((portInfo) => {
+        this._testValidPort(portInfo);
       });
-    });   
+    });
+  }
+
+  _testValidPort(portInfo) {
+    const portPath = portInfo.comName;
+    const port = this._createSerialPort(portPath);
+  }
+
+  _createSerialPort(serialPortPath) {
+    const port = new SerialPort(serialPortPath, {
+      baudrate: DEFAULT_BAUDRATE,
+      parser: serialport.parsers.readline("\n")
+    });
+    port.on("open", (error) => {
+      if (error) {
+        console.log(`Could not open serial port ${serialPortPath}`);
+        return;
+      }
+
+      port.once("data", (data) => {
+        this._handleInitialization(port, data);
+      });
+    });
+  }
+
+  _handleInitialization(port, data, attempt=1) {
+    let parseError = null;
+    let parsed = {};
+    try {
+      parsed = SerialProtocolCommandParser.parse(data);
+    }
+    catch (error) {
+      if (error instanceof Error) {
+        parseError = error;
+      }
+      else {
+        throw error;
+      }
+    }
+
+    if (!parseError && parsed.name !== serialProtocol.HELLO_COMMAND) {
+      parseError = true;
+    }
+
+    if (parseError) {
+      if (attempt >= MAX_INITIALIZATION_ATTEMPTS) {
+        port.close();
+        return;
+      }
+
+      port.once("data", (data) => {
+        this._handleInitialization(port, data, attempt + 1);
+      });
+      return;
+    }
+    
+    console.log(`Got HELLO after ${attempt} attempts`);
+    this._expectInitialization(port);
+  }
+
+  _expectInitialization(port) {
+    let supportedPatterns = [];
+    const collectSupportedPatterns = (data) => {
+      let parsed;
+      try {
+        parsed = SerialProtocolCommandParser.parse(data);
+      }
+      catch (error) {
+        if (error instanceof Error) {
+          supportedPatterns.push(data);
+          port.once('data', collectSupportedPatterns);
+          return;
+        }
+        else {
+          throw error;
+        }
+      }
+
+      if (parsed.name === serialProtocol.END_SUPPORTED_COMMAND) {
+        this._completeInitialization(port, supportedPatterns)
+        return;
+      }
+    };
+
+    const initCommandHandler = (data) => {
+      let parsed;
+      try {
+        parsed = SerialProtocolCommandParser.parse(data);
+      }
+      catch (error) {
+        if (error instanceof Error) {
+          port.close();
+          console.log(`Failed to initialize port ${port.path}`);
+          return;
+        }
+        else {
+          throw error;
+        }
+      }
+
+      if (parsed.name === serialProtocol.DEBUG_COMMAND) {
+        console.log(`DEBUG: ${parsed.data.message}`);
+        port.once("data", initCommandHandler);
+        return;
+      }
+      
+      if (parsed.name === serialProtocol.SUPPORTED_COMMAND) {
+        port.once("data", collectSupportedPatterns);
+      }
+    };
+
+    port.once("data", initCommandHandler);
+  }
+
+  _completeInitialization(port, supportedPatterns) {
+    const portId = port.path;
+
+    this.ports[portId] = port;
+    for (let pattern of supportedPatterns) {
+      pattern = pattern.trim();
+      if (!this.patterns[pattern]) {
+        this.patterns[pattern] = [];
+      }
+
+      this.patterns[pattern].push(portId);
+    }
+
+    const commandString = SerialProtocolCommandBuilder.buildIdentity({
+      identity: this.identity
+    });
+    port.write(commandString);
+
+    console.log(`Completed initialization of port ${portId}`);
+
+    port.on("data", this._handleData.bind(this));
+  }
+
+  _handleData(data) {
+    let commandName, commandData;
+    try {
+      ({name: commandName, data: commandData} = SerialProtocolCommandParser.parse(data));
+    }
+    catch (error) {
+      if (error instanceof Error) {
+        return;
+      }
+      else {
+        throw error;
+      }
+    }
+    
+    if (commandName === serialProtocol.DEBUG_COMMAND) {
+      console.log(`DEBUG: ${commandData.message}`);
+    }
+
+    this.emit(SerialManager.EVENT_COMMAND, commandName, commandData);
   }
 }
