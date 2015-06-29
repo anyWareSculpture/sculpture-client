@@ -73,8 +73,11 @@ export default class SculptureApp {
     this.client.once(StreamingClient.EVENT_CONNECT, () => {
       // Temporarily here until the full game transitions are implemented
       if (!this.sculpture.isPlayingMoleGame) {
-        this._log("Starting mole game...");
-        this.sculpture.startMoleGame();
+        //TODO: Hack! BAD
+        setTimeout(() => {
+          this._log("Starting mole game...");
+          this.sculpture.startMoleGame();
+        }, 3000);
       }
     });
 
