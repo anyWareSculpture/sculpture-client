@@ -20,6 +20,7 @@ export default class SculptureApp {
     this.panelView = null;
     this.diskView = null;
 
+    //TODO: Pass in a real identity
     this.serialManager = new SerialManager(0);
 
     this.sculpture = new SculptureStore(this.dispatcher);

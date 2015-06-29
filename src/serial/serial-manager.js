@@ -37,9 +37,11 @@ export default class SerialManager extends events.EventEmitter {
     const targetPorts = new Set();
     for (let pattern of Object.keys(this.patterns)) {
       const regex = new RegExp(pattern);
-      const portId = this.patterns[pattern];
+      const portIds = this.patterns[pattern];
       if (regex.test(command)) {
-        targetPorts.add(portId);
+        for (let portId of portIds) {
+          targetPorts.add(portId);
+        }
       }
     }
 
