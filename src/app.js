@@ -77,7 +77,7 @@ export default class SculptureApp {
         setTimeout(() => {
           this._log("Starting mole game...");
           this.sculpture.startMoleGame();
-        }, 3000);
+        }, 4000);
       }
     });
 
