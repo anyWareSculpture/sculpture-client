@@ -59,7 +59,8 @@ export default class PanelView {
           const commandString = SerialProtocolCommandBuilder.buildPanelSet({
             stripId: stripId,
             panelId: panelId,
-            intensity: panelChanges.intensity
+            intensity: panelChanges.intensity,
+            color: this.store.data.get('lights').getColor(stripId, panelId)
           });
           this.serialManager.dispatchCommand(commandString);
         }
@@ -69,9 +70,9 @@ export default class PanelView {
             stripId: stripId,
             panelId: panelId,
             intensity: 100,
-            easing: "pulse"
+            color: this.store.data.get('lights').getColor(stripId, panelId)
           });
-          //TODO: this.serialManager.dispatchCommand(commandString);
+          this.serialManager.dispatchCommand(commandString);
         }
       }
     }

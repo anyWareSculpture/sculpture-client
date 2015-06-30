@@ -154,18 +154,18 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildPanelSet(data) {
-    let command = `${PANEL_SET_COMMAND} ${data.stripId} ${data.panelId} ${data.intensity} ${data.color || "-"} ${data.easing || "-"} ${data.duration || ""}\n`;
+    let command = `${PANEL_SET_COMMAND} ${data.stripId} ${data.panelId} ${data.intensity} ${data.color || "-"} ${data.easing || "-"} ${data.duration || ""}`;
 
     command = removeOptionalParts(command);
 
-    return command;
+    return `${command}\n`;
   }
 
   static buildPanelPulse(data) {
-    let command = `${PANEL_PULSE_COMMAND} ${data.stripId} ${data.panelId} ${data.intensity} ${data.color || "-"} ${data.easing || "-"} ${data.duration || ""}\n`;
+    let command = `${PANEL_PULSE_COMMAND} ${data.stripId} ${data.panelId} ${data.intensity} ${data.color || "-"} ${data.easing || "-"} ${data.duration || ""}`;
 
     command = removeOptionalParts(command);
 
-    return command;
+    return `${command}\n`;
   }
 }

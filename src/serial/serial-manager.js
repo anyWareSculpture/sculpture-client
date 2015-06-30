@@ -194,7 +194,7 @@ export default class SerialManager extends events.EventEmitter {
     });
     port.write(commandString);
     //TODO: Update this to INIT and add it to serial-protocol.js
-    port.write("PANEL-INIT\n");
+    port.write("INIT\n");
 
     console.log(`Completed initialization of port ${portId}`);
 
