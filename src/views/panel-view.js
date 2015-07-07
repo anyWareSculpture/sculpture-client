@@ -65,11 +65,11 @@ export default class PanelView {
           this.serialManager.dispatchCommand(commandString);
         }
 
-        if (panelChanges.hasOwnProperty("active") && panelChanges.active) {
-          const commandString = SerialProtocolCommandBuilder.buildPanelPulse({
+        if (panelChanges.hasOwnProperty("active")) {
+          const commandString = SerialProtocolCommandBuilder.buildPanelSet({
             stripId: stripId,
             panelId: panelId,
-            intensity: 100,
+            intensity: panelChanges.active ? 100 : 0,
             color: this.store.data.get('lights').getColor(stripId, panelId)
           });
           this.serialManager.dispatchCommand(commandString);
