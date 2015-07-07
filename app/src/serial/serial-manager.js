@@ -1,6 +1,6 @@
 const events = require('events');
 
-const serialport = require('serialport');
+const serialport = require('browser-serialport');
 const SerialPort = serialport.SerialPort;
 
 const serialProtocol = require('./serial-protocol');

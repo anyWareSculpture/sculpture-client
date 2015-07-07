@@ -1,9 +1,4 @@
-process.on('uncaughtException', (err) => {
-  const currentDate = new Date();
-  const currentDay = currentDate.toDateString();
-  const currentTime = currentDate.toTimeString();
-  console.error(`[${currentDay} ${currentTime}] ${err.stack}\n`);
-});
+require('babelify/polyfill');
 
 const SculptureApp = require('./app');
 
