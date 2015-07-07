@@ -7,6 +7,13 @@ export const IDENTITY_COMMAND = "IDENTITY";
 export const PANEL_COMMAND = "PANEL";
 export const PANEL_SET_COMMAND = "PANEL-SET";
 export const PANEL_PULSE_COMMAND = "PANEL-PULSE";
+export const DISK_COMMAND = "DISK";
+export const DISK_RESET_COMMAND = "DISK-RESET";
+export const DISK_STATE_COMMAND = "DISK-STATE";
+
+const DISK_ARG_POSITION = "POS";
+const DISK_ARG_DIRECTION = "DIR";
+const DISK_ARG_USER = "USER";
 
 export class SerialProtocolCommandParser {
   /**
@@ -28,7 +35,10 @@ export class SerialProtocolCommandParser {
       [IDENTITY_COMMAND]: SerialProtocolCommandParser.parseIdentityArguments,
       [PANEL_COMMAND]: SerialProtocolCommandParser.parsePanelArguments,
       [PANEL_SET_COMMAND]: SerialProtocolCommandParser.parsePanelSetArguments,
-      [PANEL_PULSE_COMMAND]: SerialProtocolCommandParser.parsePanelPulseArguments
+      [PANEL_PULSE_COMMAND]: SerialProtocolCommandParser.parsePanelPulseArguments,
+      [DISK_COMMAND]: SerialProtocolCommandParser.parseDiskArguments,
+      [DISK_RESET_COMMAND]: SerialProtocolCommandParser.parseDiskResetArguments,
+      [DISK_STATE_COMMAND]: SerialProtocolCommandParser.parseDiskStateArguments
     };
 
     const parserFunction = parserFunctions[commandName];
@@ -54,11 +64,11 @@ export class SerialProtocolCommandParser {
     return {message: args.join(" ") || ""};
   }
 
-  static parseSupportedArguments(args) {
+  static parseSupportedArguments() {
     return {};
   }
 
-  static parseEndSupportedArguments(args) {
+  static parseEndSupportedArguments() {
     return {};
   }
 
@@ -79,6 +89,50 @@ export class SerialProtocolCommandParser {
     const [stripId, panelId, intensity, color, easing, duration] = args;
     return {stripId, panelId, intensity, color, easing, duration};
   }
+
+  static parseDiskArguments(args) {
+    // Format: {diskId: ..., position: ..., direction: ..., user: ...}
+    // Any of these properties can be omitted except for diskId which should
+    // always be there but might be undefined or null
+    const parsed = {};
+
+    const argValues = args.values();
+    parsed.diskId = argValues.next();
+
+    let arg;
+    let iteration = argValues.next();
+    while (!iteration.done) {
+      arg = iteration.value;
+
+      let propertyToSet = null;
+      if (arg === DISK_ARG_POSITION) {
+        propertyToSet = "position";
+      }
+      else if (arg === DISK_ARG_DIRECTION) {
+        propertyToSet = "direction";
+      }
+      else if (arg === DISK_ARG_USER) {
+        propertyToSet = "user";
+      }
+      else {
+        throw new Error(`Unrecognized argument to DISK command: ${arg}`);
+      }
+
+      iteration = argValues.next();
+      parsed[propertyToSet] = iteration.value;
+      iteration = argValues.next();
+    }
+
+    return parsed;
+  }
+
+  static parseDiskResetArguments() {
+    return {};
+  }
+
+  static parseDiskStateArguments(args) {
+    return {diskId: args[0], state: args[1]};
+  }
 }
 
 function removeOptionalParts(command) {
@@ -87,7 +141,7 @@ function removeOptionalParts(command) {
     return text;
   }
   while (true) {
-    var dashIndex = text.lastIndexOf(" -");
+    const dashIndex = text.lastIndexOf(" -");
     if (dashIndex < 0) {
       break;
     }
@@ -114,12 +168,15 @@ export class SerialProtocolCommandBuilder {
       [PANEL_COMMAND]: SerialProtocolCommandBuilder.buildPanel,
       [PANEL_SET_COMMAND]: SerialProtocolCommandBuilder.buildPanelSet,
       [PANEL_PULSE_COMMAND]: SerialProtocolCommandBuilder.buildPanelPulse,
+      [DISK_COMMAND]: SerialProtocolCommandBuilder.buildDisk,
+      [DISK_RESET_COMMAND]: SerialProtocolCommandBuilder.buildDiskReset,
+      [DISK_STATE_COMMAND]: SerialProtocolCommandBuilder.buildDiskState
     };
 
     const builderFunction = builderFunctions[commandName];
 
     if (!builderFunction) {
-      throw new Error(`unrecognized command name '${commandName}'`);
+      throw new Error(`Unrecognized command name '${commandName}'`);
     }
 
     return builderFunction(commandData);
@@ -137,11 +194,11 @@ export class SerialProtocolCommandBuilder {
     return `${DEBUG_COMMAND} ${data.message || ""}\n`;
   }
 
-  static buildSupported(data) {
+  static buildSupported() {
     return `${SUPPORTED_COMMAND}\n`;
   }
 
-  static buildEndSupported(data) {
+  static buildEndSupported() {
     return `${END_SUPPORTED_COMMAND}\n`;
   }
 
@@ -167,5 +224,28 @@ export class SerialProtocolCommandBuilder {
     command = removeOptionalParts(command);
 
     return `${command}\n`;
+  }
+
+  static buildDisk(data) {
+    let command = `${DISK_COMMAND}`;
+    if (data.hasOwnProperty("position") && data.position !== null) {
+      command += `${DISK_ARG_POSITION} ${data.position}`;
+    }
+    if (data.hasOwnProperty("direction") && data.direction !== null) {
+      command += `${DISK_ARG_DIRECTION} ${data.direction}`;
+    }
+    if (data.hasOwnProperty("user") && data.user !== null) {
+      command += `${DISK_ARG_USER} ${data.user}`;
+    }
+
+    return `${command}\n`;
+  }
+
+  static buildDiskReset() {
+    return `${DISK_RESET_COMMAND}\n`;
+  }
+
+  static buildDiskState(data) {
+    return `${DISK_STATE_COMMAND} ${data.diskId} ${data.state}`;
   }
 }
