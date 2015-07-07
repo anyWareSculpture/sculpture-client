@@ -11,7 +11,7 @@ const DEFAULT_CLIENT_CONNECTION_OPTIONS = {
   protocol: "ws",
   username: "anyware",
   password: "anyware",
-  host: "connect.shiftr.io:1884"
+  host: "connect.shiftr.io"
 };
 
 const app = new SculptureApp();
