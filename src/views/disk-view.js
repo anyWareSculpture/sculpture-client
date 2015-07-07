@@ -25,6 +25,7 @@ export default class DiskView {
     this.disksActionCreator = new DisksActionCreator(dispatcher);
 
     this._animating = false;
+    this._previousHardwarePositions = {};
 
     this.resetDisks();
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
@@ -65,10 +66,17 @@ export default class DiskView {
 
       const newDiskValues = diskChanges[diskId];
 
+      let position;
+      if (newDiskValues.position !== this._previousHardwarePositions[diskId]) {
+        position = newDiskValues.position;
+      }
+
+      const hardwareDirection = DISK_DIRECTION_TO_HARDWARE_MAP[newDiskValues.direction];
+
       const commandString = SerialProtocolCommandBuilder.buildDisk({
         diskId: hardwareDiskId,
-        position: newDiskValues.position,
-        direction: DISK_DIRECTION_TO_HARDWARE_MAP[newDiskValues.direction],
+        position: position,
+        direction: hardwareDirection,
         user: newDiskValues.user
       });
       this.serialManager.dispatchCommand(commandString);
@@ -76,6 +84,36 @@ export default class DiskView {
   }
 
   _handleCommand(commandName, commandArgs) {
-    console.log(`~#GOT DISK COMMAND: ${commandName} ${JSON.stringify(commandArgs)}`);
+    if (commandName === serialProtocol.DISK_COMMAND) {
+      let {diskId, position, direction} = commandArgs;
+      diskId = this._lookupDiskIdFromHardware(diskId);
+      position = parseInt(position);
+      direction = this._lookupDirectionFromHardware(direction);
+
+      if (!isNaN(position)) {
+        this._previousHardwarePositions[diskId] = position;
+      }
+
+      this.disksActionCreator.sendDiskUpdate(diskId, {
+        position: position,
+        direction: direction
+      });
+    }
+  }
+
+  _lookupDiskIdFromHardware(hardwareDiskId) {
+    for (let diskId of Object.keys(DISK_ID_TO_HARDWARE_MAP)) {
+      if (DISK_ID_TO_HARDWARE_MAP[diskId] === hardwareDiskId) {
+        return diskId;
+      }
+    }
+  }
+
+  _lookupDirectionFromHardware(hardwareDirection) {
+    for (let direction of Object.keys(DISK_DIRECTION_TO_HARDWARE_MAP)) {
+      if (DISK_DIRECTION_TO_HARDWARE_MAP[direction] === hardwareDirection) {
+        return direction;
+      }
+    }
   }
 }

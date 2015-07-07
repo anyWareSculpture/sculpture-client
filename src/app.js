@@ -22,6 +22,9 @@ export default class SculptureApp {
 
     //TODO: Pass in a real identity
     this.serialManager = new SerialManager(0);
+    this.serialManager.on(SerialManager.EVENT_COMMAND, (commandName, commandArgs) => {
+      console.log(`COMMAND '${commandName}': ${JSON.stringify(commandArgs)}`);
+    });
 
     this.sculpture = new SculptureStore(this.dispatcher);
     this.sculpture.on(SculptureStore.EVENT_CHANGE, (changes) => {

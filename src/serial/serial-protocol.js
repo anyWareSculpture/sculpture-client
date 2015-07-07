@@ -228,17 +228,22 @@ export class SerialProtocolCommandBuilder {
 
   static buildDisk(data) {
     let command = `${DISK_COMMAND} ${data.diskId}`;
+    let commandArgs = "";
     if (typeof data.position !== 'undefined' && data.position !== null) {
-      command += ` ${DISK_ARG_POSITION} ${data.position}`;
+      commandArgs += ` ${DISK_ARG_POSITION} ${data.position}`;
     }
     if (typeof data.direction !== 'undefined' && data.direction !== null) {
-      command += ` ${DISK_ARG_DIRECTION} ${data.direction}`;
+      commandArgs += ` ${DISK_ARG_DIRECTION} ${data.direction}`;
     }
     if (typeof data.user !== 'undefined' && data.user !== null) {
-      command += ` ${DISK_ARG_USER} ${data.user}`;
+      commandArgs += ` ${DISK_ARG_USER} ${data.user}`;
     }
 
-    return `${command}\n`;
+    if (!commandArgs) {
+      return;
+    }
+
+    return `${command}${commandArgs}\n`;
   }
 
   static buildDiskReset() {

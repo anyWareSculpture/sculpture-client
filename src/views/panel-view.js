@@ -79,8 +79,6 @@ export default class PanelView {
   }
 
   _handleCommand(commandName, commandArgs) {
-    console.log(`COMMAND '${commandName}': ${JSON.stringify(commandArgs)}`);
-
     if (commandName === serialProtocol.PANEL_COMMAND) {
       const {stripId, panelId, pressed} = commandArgs;
 

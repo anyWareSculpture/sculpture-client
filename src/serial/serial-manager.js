@@ -34,6 +34,10 @@ export default class SerialManager extends events.EventEmitter {
    * @returns {Boolean} Returns true if the command was dispatched to any port.
    */
   dispatchCommand(command) {
+    if (!command) {
+      return false;
+    }
+
     const targetPorts = new Set();
     for (let pattern of Object.keys(this.patterns)) {
       const regex = new RegExp(pattern);
