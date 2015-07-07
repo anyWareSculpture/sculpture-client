@@ -2,11 +2,18 @@
   "name": "anyWare Sculpture",
   "description": "The physical anyWare sculpture",
   "version": "0.1",
-  "manifest_version": 2,
+  "manifest_version":  2,
+  "update_url": "https://clients2.google.com/service/update2/crx",
   "app": {
     "background": {
-      "scripts": ["background.js"]
+      "scripts": ["background.js"],
+      "persistent": false
     }
   },
-  "icons": { "16": "static/app-icons/anyware-16.png", "128": "static/app-icons/anyware-128.png" }
+  "icons": {
+    "16": "static/app-icons/anyware-16.png",
+    "128": "static/app-icons/anyware-128.png"
+  },
+  "kiosk_enabled" : true,
+  "kiosk_only" : true
 }
