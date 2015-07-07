@@ -52,7 +52,7 @@ export default class SerialManager extends events.EventEmitter {
 
     console.log(`Sent command "${command.trim()}" to: ${Array.from(targetPorts)}`);
 
-    return targetPorts.size === 0;
+    return targetPorts.size !== 0;
   }
 
   _setupConnections() {

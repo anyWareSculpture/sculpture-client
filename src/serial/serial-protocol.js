@@ -97,7 +97,7 @@ export class SerialProtocolCommandParser {
     const parsed = {};
 
     const argValues = args.values();
-    parsed.diskId = argValues.next();
+    parsed.diskId = argValues.next().value;
 
     let arg;
     let iteration = argValues.next();
@@ -227,15 +227,15 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildDisk(data) {
-    let command = `${DISK_COMMAND}`;
-    if (data.hasOwnProperty("position") && data.position !== null) {
-      command += `${DISK_ARG_POSITION} ${data.position}`;
+    let command = `${DISK_COMMAND} ${data.diskId}`;
+    if (typeof data.position !== 'undefined' && data.position !== null) {
+      command += ` ${DISK_ARG_POSITION} ${data.position}`;
     }
-    if (data.hasOwnProperty("direction") && data.direction !== null) {
-      command += `${DISK_ARG_DIRECTION} ${data.direction}`;
+    if (typeof data.direction !== 'undefined' && data.direction !== null) {
+      command += ` ${DISK_ARG_DIRECTION} ${data.direction}`;
     }
-    if (data.hasOwnProperty("user") && data.user !== null) {
-      command += `${DISK_ARG_USER} ${data.user}`;
+    if (typeof data.user !== 'undefined' && data.user !== null) {
+      command += ` ${DISK_ARG_USER} ${data.user}`;
     }
 
     return `${command}\n`;
