@@ -13,7 +13,8 @@ const DISK_ID_TO_HARDWARE_MAP = {
 const DISK_DIRECTION_TO_HARDWARE_MAP = {
   [Disk.CLOCKWISE]: -1,
   [Disk.COUNTERCLOCKWISE]: 1,
-  [Disk.STOPPED]: 0
+  [Disk.STOPPED]: 0,
+  [Disk.CONFLICT]: 0
 };
 
 export default class DiskView {
