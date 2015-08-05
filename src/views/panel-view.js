@@ -1,4 +1,4 @@
-const {SculptureStore, MoleGameLogic, PanelsActionCreator, MoleGameActionCreator} = require('@anyware/game-logic');
+const {SculptureStore, MoleGameLogic, PanelsActionCreator, SculptureActionCreator} = require('@anyware/game-logic');
 
 const SerialManager = require('../serial/serial-manager');
 const serialProtocol = require('../serial/serial-protocol');
@@ -11,7 +11,7 @@ export default class PanelView {
     this.serialManager.on(SerialManager.EVENT_COMMAND, this._handleCommand.bind(this));
 
     this.panelsActionCreator = new PanelsActionCreator(dispatcher);
-    this.moleGameActionCreator = new MoleGameActionCreator(dispatcher);
+    this.sculptureActionCreator = new SculptureActionCreator(dispatcher);
 
     this._animating = false;
 
@@ -43,8 +43,12 @@ export default class PanelView {
     if (this._animating) {
       return;
     }
-    this._playAvailableAnimations();
 
+    this._handleStatusChanges(changes);
+    this._handleLightChanges(changes);
+  }
+
+  _handleLightChanges(changes) {
     const lightChanges = changes.lights;
     if (!lightChanges) {
       return;
@@ -86,28 +90,19 @@ export default class PanelView {
     }
   }
 
-  _playAvailableAnimations() {
-    if (this._animating) {
-      return;
-    }
+  _handleStatusChanges(changes) {
+    const status = changes.status;
+    const statusAnimations = {
+      [SculptureStore.STATUS_SUCCESS]: this._playSuccessAnimation.bind(this)
+    };
 
-    if (this.store.isPlayingMoleGame) {
-      const animation = this.store.currentGame.data.get("animation");
-      if (animation) {
-        this._animating = true;
-
-        this._playMoleAnimation(animation);
-      }
+    const animationMethod = statusAnimations[status];
+    if (animationMethod) {
+      animationMethod();
     }
   }
 
-  _playMoleAnimation(animation) {
-    if (animation === MoleGameLogic.ANIMATION_SUCCESS) {
-      this._playMoleSuccessAnimation();
-    }
-  }
-
-  _playMoleSuccessAnimation() {
+  _playSuccessAnimation() {
     const frames = [
       // stripId, panelId, intensity
       [0, 3, 50],
@@ -142,20 +137,25 @@ export default class PanelView {
       this.serialManager.dispatchCommand(commandString);
 
       if (frameIndex >= frames.length - 1) {
-        this._moleGameAnimationComplete();
+        this._animationComplete();
       }
       else {
-        setTimeout(() => playFrame(frameIndex + 1), 200);
+        setTimeout(() => playFrame(frameIndex + 1), 300);
       }
     };
 
     playFrame(0);
   }
 
-  _moleGameAnimationComplete() {
+  _animationComplete() {
     this._animating = false;
-
-    this.showAllPanels();
-    this.moleGameActionCreator.sendFinishAnimation();
+    this.sculptureActionCreator.sendRestoreStatus();
+    
+    //TODO: setTimeout is used here as a hack to compensate
+    //TODO: for the problem with many commands sent at once
+    //TODO: being garbled up together
+    setTimeout(() => {
+      this.showAllPanels();
+    }, 500);
   }
 }
