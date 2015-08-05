@@ -55,7 +55,9 @@ export default class DiskView {
   }
 
   _handleChanges(changes) {
-    //TODO: reset() when level changes
+    if (changes.hasOwnProperty('disk') && changes.disk.hasOwnProperty('level')) {
+      this.resetDisks();
+    }
 
     const diskChanges = changes.disks;
     if (!diskChanges) {

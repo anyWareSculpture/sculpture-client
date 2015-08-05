@@ -79,7 +79,7 @@ export default class SculptureApp {
         //TODO: Hack! BAD
         setTimeout(() => {
           this._log("Starting disk game...");
-          this.sculpture.startDiskGame();
+          this.sculptureActionCreator.sendStartDiskGame();
         }, 4000);
       }
     });
