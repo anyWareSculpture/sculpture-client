@@ -149,7 +149,7 @@ export default class PanelView {
 
   _animationComplete() {
     this._animating = false;
-    this.sculptureActionCreator.sendRestoreStatus();
+    this.sculptureActionCreator.sendFinishStatusAnimation();
     
     //TODO: setTimeout is used here as a hack to compensate
     //TODO: for the problem with many commands sent at once
