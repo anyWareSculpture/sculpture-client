@@ -70,6 +70,7 @@ export default class PanelView {
         }
 
         if (panelChanges.hasOwnProperty("active")) {
+          //TODO: Make this behaviour game specific with a default behaviour
           const commandString = SerialProtocolCommandBuilder.buildPanelSet({
             stripId: stripId,
             panelId: panelId,
