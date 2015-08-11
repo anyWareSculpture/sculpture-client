@@ -78,8 +78,8 @@ export default class SculptureApp {
       if (!this.sculpture.isPlayingMoleGame) {
         //TODO: Hack! BAD
         setTimeout(() => {
-          this._log("Starting mole game...");
-          this.sculptureActionCreator.sendStartMoleGame();
+          this._log("Starting disk game...");
+          this.sculptureActionCreator.sendStartDiskGame();
         }, 4000);
       }
     });
