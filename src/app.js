@@ -76,14 +76,15 @@ export default class SculptureApp {
     this.client.on(StreamingClient.EVENT_ERROR, this._error.bind(this));
 
     this.client.once(StreamingClient.EVENT_CONNECT, () => {
-      // Temporarily here until the full game transitions are implemented
-      if (!this.sculpture.isPlayingMoleGame) {
-        //TODO: Hack! BAD
-        setTimeout(() => {
-          this._log("Starting simon game...");
-          this.sculpture.startSimonGame();
-        }, 4000);
-      }
+      //TODO: HACK! trying to compensate for the serial not connecting
+      setTimeout(() => {
+        //TODO: Temporarily here until the full game transitions are implemented
+        //TODO: This if statement is here to account for reconnections
+        if (!this.sculpture.isPlayingMoleGame) {
+          this._log("Starting mole game...");
+          this.sculptureActionCreator.sendStartMoleGame();
+        }
+      }, 4000);
     });
 
     this.client.on(StreamingClient.EVENT_STATE_UPDATE, this._onStateUpdate.bind(this));
