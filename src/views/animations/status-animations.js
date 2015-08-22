@@ -1,3 +1,4 @@
+const serialProtocol = require('../serial/serial-protocol');
 const {SerialProtocolCommandBuilder} = serialProtocol;
 
 export default class StatusAnimations {
@@ -10,6 +11,20 @@ export default class StatusAnimations {
       [0, 4, 100, "success"],
       [1, 4, 100, "success"],
       [2, 4, 100, "success"]
+    ];
+
+    StatusAnimations.playAnimation(frames, view, completeCallback);
+  }
+
+  static playFailureAnimation(view, completeCallback) {
+    const frames = [
+      // stripId, panelId, intensity, color
+      [0, 3, 50, "error"],
+      [2, 3, 50, "error"],
+      [1, 3, 50, "error"],
+      [0, 4, 100, "error"],
+      [2, 4, 100, "error"],
+      [1, 4, 100, "error"]
     ];
 
     StatusAnimations.playAnimation(frames, view, completeCallback);

@@ -29,7 +29,7 @@ export default class PanelView {
       for (let panelId of panelIds) {
         const intensity = lightArray.getIntensity(stripId, panelId);
         const color = lightArray.getColor(stripId, panelId);
-        
+
         const commandString = SerialProtocolCommandBuilder.buildPanelSet({
           stripId: stripId,
           panelId: panelId,
@@ -96,7 +96,8 @@ export default class PanelView {
   _handleStatusChanges(changes) {
     const status = changes.status;
     const statusAnimations = {
-      [SculptureStore.STATUS_SUCCESS]: this._playSuccessAnimation.bind(this)
+      [SculptureStore.STATUS_SUCCESS]: this._playSuccessAnimation.bind(this),
+      [SculptureStore.STATUS_FAILURE]: this._playFailureAnimation.bind(this)
     };
 
     const animationMethod = statusAnimations[status];
@@ -109,10 +110,14 @@ export default class PanelView {
     StatusAnimations.playSuccessAnimation(this, this._animationComplete.bind(this));
   }
 
+  _playFailureAnimation() {
+    StatusAnimations.playFailureAnimation(this, this._animationComplete.bind(this));
+  }
+
   _animationComplete() {
     this._animating = false;
     this.sculptureActionCreator.sendFinishStatusAnimation();
-    
+
     //TODO: setTimeout is used here as a hack to compensate
     //TODO: for the problem with many commands sent at once
     //TODO: being garbled up together
