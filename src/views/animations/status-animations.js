@@ -30,6 +30,8 @@ export default class StatusAnimations {
   }
 
   static playAnimation(frames, view, completeCallback) {
+    StatusAnimations.clearView(view);
+
     const playFrame = (frameIndex) => {
       if (frameIndex > 0) {
         const [stripId, panelId, intensity, color] = frames[frameIndex - 1];
@@ -64,5 +66,22 @@ export default class StatusAnimations {
     };
 
     setTimeout(() => playFrame(0), 300);
+  }
+
+  static clearView(view) {
+    //TODO: This code relies on there being certain hard coded stripIds
+    //TODO: All of this should be using a config - that would then reflect
+    //TODO: how the light array gets setup in the store
+    for (let stripId of [0, 1, 2]) {
+      for (let panelId = 0; panelId < 10; panelId++) {
+        const commandString = SerialProtocolCommandBuilder.buildPanelSet({
+          stripId: stripId,
+          panelId: panelId,
+          intensity: 0,
+          color: "black"
+        });
+        view.serialManager.dispatchCommand(commandString);
+      }
+    }
   }
 }

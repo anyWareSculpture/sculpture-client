@@ -21,9 +21,12 @@ export default class PanelView {
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
   }
 
-  showAllPanels() {
-    const lightArray = this.store.data.get('lights');
+  get lightArray() {
+    return this.store.data.get('lights');
+  }
 
+  showAllPanels() {
+    const lightArray = this.lightArray;
     for (let stripId of lightArray.stripIds) {
       const panelIds = lightArray.get(stripId).panelIds;
       for (let panelId of panelIds) {
@@ -52,32 +55,45 @@ export default class PanelView {
 
   _handleLightChanges(changes) {
     const lightChanges = changes.lights;
-    if (!lightChanges) {
+    if (!lightChanges || !this.store.isReady) {
       return;
     }
 
+    const lightArray = this.lightArray;
     for (let stripId of Object.keys(lightChanges)) {
       const panels = lightChanges[stripId].panels;
       for (let panelId of Object.keys(panels)) {
         const panelChanges = panels[panelId];
 
-        if (panelChanges.hasOwnProperty("intensity")) {
+        if (panelChanges.hasOwnProperty("intensity") || panelChanges.hasOwnProperty("color")) {
+          const intensity = panelChanges.intensity || lightArray.getIntensity(stripId, panelId);
+          const color = panelChanges.color || lightArray.getColor(stripId, panelId);
           const commandString = SerialProtocolCommandBuilder.buildPanelSet({
             stripId: stripId,
             panelId: panelId,
-            intensity: panelChanges.intensity,
-            color: this.store.data.get('lights').getColor(stripId, panelId)
+            intensity: intensity,
+            color: color
           });
           this.serialManager.dispatchCommand(commandString);
         }
 
         if (panelChanges.hasOwnProperty("active")) {
           //TODO: Make this behaviour game specific with a default behaviour
+          let intensity, color;
+          if (panelChanges.active) {
+            intensity = 100;
+            color = this.store.userColor;
+          }
+          else {
+            intensity = lightArray.getIntensity(stripId, panelId);
+            color = lightArray.getColor(stripId, panelId);
+          }
+
           const commandString = SerialProtocolCommandBuilder.buildPanelSet({
             stripId: stripId,
             panelId: panelId,
-            intensity: panelChanges.active ? 100 : 0,
-            color: this.store.data.get('lights').getColor(stripId, panelId)
+            intensity: intensity,
+            color: color
           });
           this.serialManager.dispatchCommand(commandString);
         }
