@@ -80,9 +80,10 @@ export default class SculptureApp {
       setTimeout(() => {
         //TODO: Temporarily here until the full game transitions are implemented
         //TODO: This if statement is here to account for reconnections
-        if (!this.sculpture.isPlayingMoleGame) {
-          this._log("Starting mole game...");
-          this.sculptureActionCreator.sendStartMoleGame();
+        if (this.sculpture.isPlayingNoGame) {
+          const game = this.config.GAMES_SEQUENCE[0];
+          this._log(`Starting ${game} game...`);
+          this.sculptureActionCreator.sendStartGame(game);
         }
       }, 4000);
     });
