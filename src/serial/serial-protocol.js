@@ -240,7 +240,7 @@ export class SerialProtocolCommandBuilder {
     }
 
     if (!commandArgs) {
-      return;
+      return "";
     }
 
     return `${command}${commandArgs}\n`;

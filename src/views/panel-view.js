@@ -1,4 +1,4 @@
-const {SculptureStore, MoleGameLogic, PanelsActionCreator, SculptureActionCreator} = require('@anyware/game-logic');
+const {SculptureStore, PanelsActionCreator, SculptureActionCreator} = require('@anyware/game-logic');
 
 const SerialManager = require('../serial/serial-manager');
 const serialProtocol = require('../serial/serial-protocol');

@@ -14,7 +14,7 @@ const MAX_INITIALIZATION_ATTEMPTS = 2;
 // is buffered and then sent after the following delay. This has a downside
 // where if this delay is too large, a large backlog of commands may build
 // up. The queue's processing speed is limited by how busy the JavaScript
-// engine is. A delay that is too small may not be respected. 
+// engine is. A delay that is too small may not be respected.
 const DELAY_BETWEEN_SERIAL_COMMANDS = 10; // ms
 
 export default class SerialManager extends events.EventEmitter {
@@ -134,7 +134,7 @@ export default class SerialManager extends events.EventEmitter {
       });
       return;
     }
-    
+
     console.log(`Got HELLO after ${attempt} attempts`);
     this._expectInitialization(port);
   }
@@ -153,7 +153,7 @@ export default class SerialManager extends events.EventEmitter {
       }
 
       if (parsed.name === serialProtocol.END_SUPPORTED_COMMAND) {
-        this._completeInitialization(port, supportedPatterns)
+        this._completeInitialization(port, supportedPatterns);
         return;
       }
 
@@ -182,7 +182,7 @@ export default class SerialManager extends events.EventEmitter {
         port.once("data", initCommandHandler);
         return;
       }
-      
+
       if (parsed.name === serialProtocol.SUPPORTED_COMMAND) {
         port.once("data", collectSupportedPatterns);
       }
@@ -229,7 +229,7 @@ export default class SerialManager extends events.EventEmitter {
         throw error;
       }
     }
-    
+
     if (commandName === serialProtocol.DEBUG_COMMAND) {
       console.log(`DEBUG: ${commandData.message}`);
       return;
