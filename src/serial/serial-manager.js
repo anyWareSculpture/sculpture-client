@@ -17,6 +17,10 @@ const MAX_INITIALIZATION_ATTEMPTS = 2;
 // engine is. A delay that is too small may not be respected.
 const DELAY_BETWEEN_SERIAL_COMMANDS = 10; // ms
 
+/**
+   Finds all available serial ports which supports the anyWare protocol.
+   Maps supported commands, and routes these to the appropriate serial port.
+*/
 export default class SerialManager extends events.EventEmitter {
   /**
    * Fired when the serial manager receives a command from a serial port
