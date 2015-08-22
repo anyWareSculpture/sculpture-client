@@ -22,7 +22,7 @@ export default class SculptureApp {
     this.panelView = null;
     this.diskView = null;
 
-    const serialIdentity = this.config.HARDWARE_USERNAME_MAPPINGS[config.username];
+    const serialIdentity = this.config.HARDWARE_USERNAME_MAPPINGS[this.config.username];
     this.serialManager = new SerialManager(serialIdentity);
     this.serialManager.on(SerialManager.EVENT_COMMAND, (commandName, commandArgs) => {
       console.log(`COMMAND '${commandName}': ${JSON.stringify(commandArgs)}`);
