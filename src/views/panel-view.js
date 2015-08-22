@@ -4,6 +4,8 @@ const SerialManager = require('../serial/serial-manager');
 const serialProtocol = require('../serial/serial-protocol');
 const {SerialProtocolCommandParser, SerialProtocolCommandBuilder} = serialProtocol;
 
+const StatusAnimations = require('./animations/status-animations');
+
 export default class PanelView {
   constructor(store, dispatcher, serialManager) {
     this.store = store;
@@ -104,48 +106,7 @@ export default class PanelView {
   }
 
   _playSuccessAnimation() {
-    const frames = [
-      // stripId, panelId, intensity
-      [0, 3, 50],
-      [1, 3, 50],
-      [2, 3, 50],
-      [0, 4, 100],
-      [1, 4, 100],
-      [2, 4, 100]
-    ];
-
-    const playFrame = (frameIndex) => {
-      if (frameIndex > 0) {
-        const [stripId, panelId, intensity] = frames[frameIndex - 1];
-
-        const commandString = SerialProtocolCommandBuilder.buildPanelSet({
-          stripId: stripId,
-          panelId: panelId,
-          intensity: 0,
-          color: "success"
-        });
-        this.serialManager.dispatchCommand(commandString);
-      }
-
-      const [stripId, panelId, intensity] = frames[frameIndex];
-
-      const commandString = SerialProtocolCommandBuilder.buildPanelSet({
-        stripId: stripId,
-        panelId: panelId,
-        intensity: 100,
-        color: "success"
-      });
-      this.serialManager.dispatchCommand(commandString);
-
-      if (frameIndex >= frames.length - 1) {
-        this._animationComplete();
-      }
-      else {
-        setTimeout(() => playFrame(frameIndex + 1), 300);
-      }
-    };
-
-    playFrame(0);
+    StatusAnimations.playSuccessAnimation(this, this._animationComplete.bind(this));
   }
 
   _animationComplete() {
