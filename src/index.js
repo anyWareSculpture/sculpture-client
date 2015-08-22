@@ -7,6 +7,8 @@ process.on('uncaughtException', (err) => {
   console.error(`[${currentDay} ${currentTime}] ${err.stack}\n`);
 });
 
+const config = require('./config');
+
 const SculptureApp = require('./app');
 
 const DEFAULT_CLIENT_CONNECTION_OPTIONS = {
@@ -16,7 +18,7 @@ const DEFAULT_CLIENT_CONNECTION_OPTIONS = {
   host: "broker.shiftr.io"
 };
 
-const app = new SculptureApp();
+const app = new SculptureApp(config);
 
 const connectionOptions = Object.assign({}, DEFAULT_CLIENT_CONNECTION_OPTIONS);
 

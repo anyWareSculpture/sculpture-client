@@ -1,8 +1,10 @@
-const {SculptureStore, MoleGameLogic, PanelsActionCreator, SculptureActionCreator} = require('@anyware/game-logic');
+const {SculptureStore, PanelsActionCreator, SculptureActionCreator} = require('@anyware/game-logic');
 
 const SerialManager = require('../serial/serial-manager');
 const serialProtocol = require('../serial/serial-protocol');
 const {SerialProtocolCommandParser, SerialProtocolCommandBuilder} = serialProtocol;
+
+const StatusAnimations = require('./animations/status-animations');
 
 export default class PanelView {
   constructor(store, dispatcher, serialManager) {
@@ -19,15 +21,18 @@ export default class PanelView {
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
   }
 
-  showAllPanels() {
-    const lightArray = this.store.data.get('lights');
+  get lightArray() {
+    return this.store.data.get('lights');
+  }
 
+  showAllPanels() {
+    const lightArray = this.lightArray;
     for (let stripId of lightArray.stripIds) {
       const panelIds = lightArray.get(stripId).panelIds;
       for (let panelId of panelIds) {
         const intensity = lightArray.getIntensity(stripId, panelId);
         const color = lightArray.getColor(stripId, panelId);
-        
+
         const commandString = SerialProtocolCommandBuilder.buildPanelSet({
           stripId: stripId,
           panelId: panelId,
@@ -50,32 +55,45 @@ export default class PanelView {
 
   _handleLightChanges(changes) {
     const lightChanges = changes.lights;
-    if (!lightChanges) {
+    if (!lightChanges || !this.store.isReady) {
       return;
     }
 
+    const lightArray = this.lightArray;
     for (let stripId of Object.keys(lightChanges)) {
       const panels = lightChanges[stripId].panels;
       for (let panelId of Object.keys(panels)) {
         const panelChanges = panels[panelId];
 
-        if (panelChanges.hasOwnProperty("intensity")) {
+        if (panelChanges.hasOwnProperty("intensity") || panelChanges.hasOwnProperty("color")) {
+          const intensity = panelChanges.intensity || lightArray.getIntensity(stripId, panelId);
+          const color = panelChanges.color || lightArray.getColor(stripId, panelId);
           const commandString = SerialProtocolCommandBuilder.buildPanelSet({
             stripId: stripId,
             panelId: panelId,
-            intensity: panelChanges.intensity,
-            color: this.store.data.get('lights').getColor(stripId, panelId)
+            intensity: intensity,
+            color: color
           });
           this.serialManager.dispatchCommand(commandString);
         }
 
         if (panelChanges.hasOwnProperty("active")) {
           //TODO: Make this behaviour game specific with a default behaviour
+          let intensity, color;
+          if (panelChanges.active) {
+            intensity = 100;
+            color = this.store.userColor;
+          }
+          else {
+            intensity = lightArray.getIntensity(stripId, panelId);
+            color = lightArray.getColor(stripId, panelId);
+          }
+
           const commandString = SerialProtocolCommandBuilder.buildPanelSet({
             stripId: stripId,
             panelId: panelId,
-            intensity: panelChanges.active ? 100 : 0,
-            color: this.store.data.get('lights').getColor(stripId, panelId)
+            intensity: intensity,
+            color: color
           });
           this.serialManager.dispatchCommand(commandString);
         }
@@ -94,7 +112,8 @@ export default class PanelView {
   _handleStatusChanges(changes) {
     const status = changes.status;
     const statusAnimations = {
-      [SculptureStore.STATUS_SUCCESS]: this._playSuccessAnimation.bind(this)
+      [SculptureStore.STATUS_SUCCESS]: this._playSuccessAnimation.bind(this),
+      [SculptureStore.STATUS_FAILURE]: this._playFailureAnimation.bind(this)
     };
 
     const animationMethod = statusAnimations[status];
@@ -104,53 +123,22 @@ export default class PanelView {
   }
 
   _playSuccessAnimation() {
-    const frames = [
-      // stripId, panelId, intensity
-      [0, 3, 50],
-      [1, 3, 50],
-      [2, 3, 50],
-      [0, 4, 100],
-      [1, 4, 100],
-      [2, 4, 100]
-    ];
+    StatusAnimations.playSuccessAnimation(this, this._animationComplete.bind(this));
+  }
 
-    const playFrame = (frameIndex) => {
-      if (frameIndex > 0) {
-        const [stripId, panelId, intensity] = frames[frameIndex - 1];
-
-        const commandString = SerialProtocolCommandBuilder.buildPanelSet({
-          stripId: stripId,
-          panelId: panelId,
-          intensity: 0,
-          color: "success"
-        });
-        this.serialManager.dispatchCommand(commandString);
-      }
-
-      const [stripId, panelId, intensity] = frames[frameIndex];
-
-      const commandString = SerialProtocolCommandBuilder.buildPanelSet({
-        stripId: stripId,
-        panelId: panelId,
-        intensity: 100,
-        color: "success"
-      });
-      this.serialManager.dispatchCommand(commandString);
-
-      if (frameIndex >= frames.length - 1) {
-        this._animationComplete();
-      }
-      else {
-        setTimeout(() => playFrame(frameIndex + 1), 300);
-      }
-    };
-
-    playFrame(0);
+  _playFailureAnimation() {
+    StatusAnimations.playFailureAnimation(this, this._animationComplete.bind(this));
   }
 
   _animationComplete() {
     this._animating = false;
-    this.sculptureActionCreator.sendRestoreStatus();
-    this.showAllPanels();
+    this.sculptureActionCreator.sendFinishStatusAnimation();
+
+    //TODO: setTimeout is used here as a hack to compensate
+    //TODO: for the problem with many commands sent at once
+    //TODO: being garbled up together
+    setTimeout(() => {
+      this.showAllPanels();
+    }, 500);
   }
 }

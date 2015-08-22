@@ -1,8 +1,8 @@
-const {SculptureStore, MoleGameLogic, DisksActionCreator, Disk} = require('@anyware/game-logic');
+const {SculptureStore, DisksActionCreator, Disk} = require('@anyware/game-logic');
 
 const SerialManager = require('../serial/serial-manager');
 const serialProtocol = require('../serial/serial-protocol');
-const {SerialProtocolCommandParser, SerialProtocolCommandBuilder} = serialProtocol;
+const {SerialProtocolCommandBuilder} = serialProtocol;
 
 const MAX_RESET_ATTEMPTS = 5;
 const DISK_ID_TO_HARDWARE_MAP = {

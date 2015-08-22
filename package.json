@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/anyWareSculpture/sculpture-client#readme",
   "dependencies": {
-    "@anyware/game-logic": "^6.0.0",
+    "@anyware/game-logic": "^10.0.1",
     "@anyware/streaming-client": "^1.3.4",
     "flux": "^2.0.3",
     "serialport": "^1.7.4",
