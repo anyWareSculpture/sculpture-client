@@ -77,7 +77,16 @@ export default class SerialManager extends events.EventEmitter {
         return;
       }
       ports.forEach((portInfo) => {
-        this._testValidPort(portInfo);
+        process.stdout.write("Found port: " + portInfo.comName + " " + portInfo.manufacturer + " " + portInfo.vendorId);
+        // NB! Arduino uses Vendor ID 0x2341
+        // if we ever change microcontroller vendor, we need to update this check
+        if (portInfo.vendorId === "0x2341") {
+          this._testValidPort(portInfo);
+        }
+        else {
+          process.stdout.write(" => skipping");
+        }
+        console.log("");
       });
     });
   }
