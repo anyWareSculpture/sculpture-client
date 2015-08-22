@@ -29,9 +29,10 @@ export default class SerialManager extends events.EventEmitter {
    */
   static EVENT_COMMAND = "command";
 
-  constructor(identity) {
+  constructor(config, identity) {
     super();
 
+    this.config = config;
     this.identity = identity;
 
     this.patterns = {};
@@ -81,23 +82,24 @@ export default class SerialManager extends events.EventEmitter {
         return;
       }
       ports.forEach((portInfo) => {
-        process.stdout.write("Found port: " + portInfo.comName + " " + portInfo.manufacturer + " " + portInfo.vendorId);
-        // NB! Arduino uses Vendor ID 0x2341
-        // if we ever change microcontroller vendor, we need to update this check
-        if (portInfo.vendorId === "0x2341") {
-          this._testValidPort(portInfo);
+        if (this._isValidPort(portInfo)) {
+          console.log(`Found compatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`);
+          const portPath = portInfo.comName;
+          this._createSerialPort(portPath);
         }
         else {
-          process.stdout.write(" => skipping");
+          console.log(`Skipping incompatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`);
         }
-        console.log("");
       });
     });
   }
 
-  _testValidPort(portInfo) {
-    const portPath = portInfo.comName;
-    const port = this._createSerialPort(portPath);
+  _isValidPort(portInfo) {
+    if (!this.config.HARDWARE_VENDOR_IDS.has(portInfo.vendorId)) {
+      return false;
+    }
+
+    return true;
   }
 
   _createSerialPort(serialPortPath) {

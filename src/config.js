@@ -10,3 +10,7 @@ config.HARDWARE_USERNAME_MAPPINGS = {
   sculpture1: '1',
   sculpture2: '2'
 };
+
+config.HARDWARE_VENDOR_IDS = new Set([
+  "0x2341" // Arduino Vendor ID
+]);
