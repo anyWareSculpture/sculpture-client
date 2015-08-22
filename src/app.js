@@ -9,7 +9,9 @@ const DiskView = require('./views/disk-view');
 const SerialManager = require('./serial/serial-manager');
 
 export default class SculptureApp {
-  constructor() {
+  constructor(config) {
+    this.config = config;
+
     this.dispatcher = new Dispatcher();
     this.dispatcher.register((payload) => {
       this._log(`Sent action: ${JSON.stringify(payload)}`);
@@ -20,13 +22,13 @@ export default class SculptureApp {
     this.panelView = null;
     this.diskView = null;
 
-    //TODO: Pass in a real identity
-    this.serialManager = new SerialManager(0);
+    const serialIdentity = this.config.HARDWARE_USERNAME_MAPPINGS[config.username];
+    this.serialManager = new SerialManager(serialIdentity);
     this.serialManager.on(SerialManager.EVENT_COMMAND, (commandName, commandArgs) => {
       console.log(`COMMAND '${commandName}': ${JSON.stringify(commandArgs)}`);
     });
 
-    this.sculpture = new SculptureStore(this.dispatcher);
+    this.sculpture = new SculptureStore(this.dispatcher, this.config);
     this.sculpture.on(SculptureStore.EVENT_CHANGE, (changes) => {
       this._log(`Sent state update: ${JSON.stringify(changes)}`);
 
