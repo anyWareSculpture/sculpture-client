@@ -115,6 +115,7 @@ export default class SerialManager extends events.EventEmitter {
       }
     });
     port.on(SerialPort.EVENT_COMMAND, this._handleCommand.bind(this));
+    port.on(SerialPort.EVENT_ERROR, this._handleError.bind(this));
   }
 
   _handleCommand(commandName, commandData) {
@@ -124,6 +125,10 @@ export default class SerialManager extends events.EventEmitter {
     }
 
     this.emit(SerialManager.EVENT_COMMAND, commandName, commandData);
+  }
+
+  _handleError(error) {
+    console.error(`ERROR: ${error}`);
   }
 
   _setupCommandQueueProcessor() {

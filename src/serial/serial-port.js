@@ -1,8 +1,9 @@
 const events = require('events');
-
 const serialport = require('serialport');
 
-const COMMAND_LINE_TERMINATOR = "\n";
+const SerialInitializer = require('./serial-initializer');
+
+const LINE_TERMINATOR = "\n";
 
 /**
  * A higher-level adapter for serial ports that understands our custom serial protocol
@@ -33,14 +34,15 @@ export default class SerialPort extends events.EventEmitter {
   }
 
   initialize(callback) {
-    this._port.open(this._beginInitialization.bind(this, callback));
+    this._port.open((error) => {
+      if (error) {
+        return this._error(error);
+      }
+    });
   }
 
-  _beginInitialization(callback, error) {
-    if (error) {
-      callback(error);
-      return;
-    }
-
+  _error(message) {
+    this.emit(SerialPort.EVENT_ERROR, message);
   }
 }
+
