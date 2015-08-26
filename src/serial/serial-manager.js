@@ -108,11 +108,26 @@ export default class SerialManager extends events.EventEmitter {
         console.warn(error);
       }
       else {
+        this._addPortPatterns(port);
         console.log(`Successfully initialized serial port ${port.path}`);
       }
     });
     port.on(SerialPort.EVENT_COMMAND, this._handleCommand.bind(this));
     port.on(SerialPort.EVENT_ERROR, this._handleError.bind(this));
+  }
+
+  _addPortPatterns(port) {
+    const portId = port.path;
+
+    this.ports[portId] = port;
+    for (let pattern of port.supportedPatterns) {
+      pattern = pattern.trim();
+      if (!this.patterns[pattern]) {
+        this.patterns[pattern] = [];
+      }
+
+      this.patterns[pattern].push(portId);
+    }
   }
 
   _handleCommand(commandName, commandData) {
