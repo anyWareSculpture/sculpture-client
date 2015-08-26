@@ -1,7 +1,8 @@
 const events = require('events');
 const serialport = require('serialport');
 
-const {SerialProtocolCommandParser} = serialProtocol;
+const SerialHandshake = require('./serial-handshake');
+const {SerialProtocolCommandParser} = require('./serial-protocol');
 
 const COMMAND_DELIMETER = "\n";
 
@@ -27,6 +28,7 @@ export default class SerialPort extends events.EventEmitter {
   constructor(path, options) {
     this.path = path;
     this.options = options;
+    this.supportedPatterns = [];
 
     this._port = new serialport.SerialPort(path, options, false);
 
@@ -41,6 +43,22 @@ export default class SerialPort extends events.EventEmitter {
    */
   get isOpen() {
     return self._port.isOpen();
+  }
+
+  /**
+   * @returns {Boolean} Returns true if the port is open and ready to send/receive commands
+   */
+  get isReady() {
+    return this.isOpen && this._initialized;
+  }
+
+  /**
+   * Writes to the serial port
+   * @param {String} buffer
+   * @param {Function} callback
+   */
+  write(buffer, callback) {
+    return this._port.write(buffer, callback);
   }
 
   /**
@@ -65,7 +83,7 @@ export default class SerialPort extends events.EventEmitter {
     this._nextCommandHandler = callback || null;
   }
 
-  initialize(callback) {
+  initialize(identity, callback) {
     this._port.open((error) => {
       if (error) {
         callback(error);
@@ -75,7 +93,7 @@ export default class SerialPort extends events.EventEmitter {
       this._port.on("data", this._handleData.bind(this));
       this._port.on("error", this._handleError.bind(this));
 
-      this._beginHandshake();
+      this._beginHandshake(identity, callback);
     });
   }
 
@@ -142,20 +160,27 @@ export default class SerialPort extends events.EventEmitter {
     }
   }
 
-  _beginHandshake() {
-    this.handleNextCommand(this._initHello.bind(this));
-  }
-
-  _initHello(error, commandName, commandData) {
-    //TODO
-  }
-
   _error(message) {
     this.emit(SerialPort.EVENT_ERROR, message);
   }
 
   _command(commandName, commandData) {
     this.emit(SerialPort.EVENT_COMMAND, commandName, commandData);
+  }
+
+  _beginHandshake(identity, callback) {
+    const handshake = new SerialHandshake(identity, this);
+    handshake.execute(this._completeHandshake.bind(this, callback));
+  }
+
+  _completeHandshake(callback, error) {
+    if (error) {
+      callback(error);
+      return;
+    }
+
+    this._initialized = true;
+    callback();
   }
 }
 
