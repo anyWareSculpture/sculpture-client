@@ -66,6 +66,7 @@ export default class SerialHandshake {
     }
     else if (commandName === serialProtocol.END_SUPPORTED_COMMAND) {
       this._endHandshake();
+      return;
     }
 
     const pattern = [commandName, ...commandData].join(' ');

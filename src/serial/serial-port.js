@@ -44,7 +44,7 @@ export default class SerialPort extends events.EventEmitter {
    * @returns {Boolean} Returns true if the port is open
    */
   get isOpen() {
-    return self._port.isOpen();
+    return this._port.isOpen();
   }
 
   /**
