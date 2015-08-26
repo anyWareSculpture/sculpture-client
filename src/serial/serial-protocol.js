@@ -58,7 +58,7 @@ export class SerialProtocolCommandParser {
     return {supportedGames: args};
   }
 
-  static parseInitArguments(args) {
+  static parseInitArguments() {
     return {};
   }
 

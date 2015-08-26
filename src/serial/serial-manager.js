@@ -4,9 +4,6 @@ const serialport = require('serialport');
 const SerialPort = serialport.SerialPort;
 
 const serialProtocol = require('./serial-protocol');
-const {SerialProtocolCommandBuilder} = serialProtocol;
-
-const MAX_INITIALIZATION_ATTEMPTS = 2;
 
 // NOTE: In order to account for the limited buffer size on the Arduino, many
 // serial commands are not sent at once. Instead, each command to be sent

@@ -26,6 +26,8 @@ export default class SerialPort extends events.EventEmitter {
   static EVENT_ERROR = "error";
 
   constructor(path, options) {
+    super();
+
     this.path = path;
     this.options = options;
     this.supportedPatterns = [];
