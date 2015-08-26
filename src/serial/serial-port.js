@@ -1,13 +1,13 @@
 const events = require('events');
 const serialport = require('serialport');
 
-const SerialInitializer = require('./serial-initializer');
+const {SerialProtocolCommandParser} = serialProtocol;
 
-const LINE_TERMINATOR = "\n";
+const COMMAND_DELIMETER = "\n";
 
 /**
  * A higher-level adapter for serial ports that understands our custom serial protocol
- * Automatically handles opening and initialization
+ * Automatically handles the initialization handshake
  */
 export default class SerialPort extends events.EventEmitter {
   /**
@@ -30,19 +30,132 @@ export default class SerialPort extends events.EventEmitter {
 
     this._port = new serialport.SerialPort(path, options, false);
 
+    this._buffer = "";
+
+    this._nextCommandHandler = null;
     this._initialized = false;
+  }
+
+  /**
+   * @returns {Boolean} Returns true if the port is open
+   */
+  get isOpen() {
+    return self._port.isOpen();
+  }
+
+  /**
+   * Closes the serial port
+   * @param {Function} [callback] - The callback function to call once the connection has been closed, should take an error parameter
+   */
+  close(callback) {
+    this._port.close((error) => {
+      callback(error);
+    });
+  }
+
+  /**
+   * Handles the next command with the given function and forces the port
+   * to **not** emit a command event.
+   * Calling this again overwrites the current function so only use it
+   * once per command you were expecting
+   * Call this with no argument to disable the current handler
+   * @param {Function} [callback] - called with three parameters: error, commandName, commandData. If error is falsey, commandName and commandData will contain information about the next command that is seen. Either way, if an error occurs this handler must explicitly be set again if you want the same method to run next time
+   */
+  handleNextCommand(callback) {
+    this._nextCommandHandler = callback || null;
   }
 
   initialize(callback) {
     this._port.open((error) => {
       if (error) {
-        return this._error(error);
+        callback(error);
+        return;
       }
+
+      this._port.on("data", this._handleData.bind(this));
+      this._port.on("error", this._handleError.bind(this));
+
+      this._beginHandshake();
     });
+  }
+
+  _handleData(data) {
+    this._buffer += data;
+
+    this._parseBuffer();
+  }
+
+  _handleError(error) {
+    this._handleParsedCommand(error);
+  }
+
+  _parseBuffer() {
+    const bufferParts = this._buffer.split(COMMAND_DELIMETER);
+    // "abc".split() => ["abc"] whereas "abc\n".split() => ["abc", ""]
+    // Thus, a command exists iff the length > 1.
+    // The very last element can always be left in the buffer because it
+    // cannot be proven to be a complete command
+    // (to see why try splitting it and then apply the same logic)
+    if (bufferParts.length < 1) {
+      return;
+    }
+
+    this._buffer = bufferParts[bufferParts.length - 1];
+    bufferParts.splice(-1, 1);
+
+    for (let commandString of bufferParts) {
+      this._parseCommandString(commandString);
+    }
+  }
+
+  _parseCommandString(commandString) {
+    let parseError = null;
+    let commandName, commandData;
+    try {
+      ({name: commandName, data: commandData} = SerialProtocolCommandParser.parse(commandString));
+    }
+    catch (error) {
+      // Filter by expected errors
+      if (error instanceof Error) {
+        parseError = error;
+      }
+      // Throw unexpected errors
+      else {
+        throw error;
+      }
+    }
+
+    this._handleParsedCommand(parseError, commandName, commandData);
+  }
+
+  _handleParsedCommand(error, commandName, commandData) {
+    if (this._nextCommandHandler) {
+      this._nextCommandHandler(error, commandName, commandData);
+    }
+    else {
+      if (error) {
+        this._error(error);
+      }
+      else {
+        this._command(commandName, commandData);
+      }
+    }
+  }
+
+  _beginHandshake() {
+    this.handleNextCommand(this._initHello.bind(this));
+  }
+
+  _initHello(error, commandName, commandData) {
+    //TODO
   }
 
   _error(message) {
     this.emit(SerialPort.EVENT_ERROR, message);
+  }
+
+  _command(commandName, commandData) {
+    this.emit(SerialPort.EVENT_COMMAND, commandName, commandData);
   }
 }
 

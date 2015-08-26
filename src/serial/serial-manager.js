@@ -4,7 +4,7 @@ const serialport = require('serialport');
 const SerialPort = serialport.SerialPort;
 
 const serialProtocol = require('./serial-protocol');
-const {SerialProtocolCommandParser, SerialProtocolCommandBuilder} = serialProtocol;
+const {SerialProtocolCommandBuilder} = serialProtocol;
 
 const MAX_INITIALIZATION_ATTEMPTS = 2;
 
