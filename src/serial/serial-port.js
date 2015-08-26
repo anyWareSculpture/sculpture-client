@@ -150,7 +150,9 @@ export default class SerialPort extends events.EventEmitter {
 
   _handleParsedCommand(error, commandName, commandData) {
     if (this._nextCommandHandler) {
-      this._nextCommandHandler(error, commandName, commandData);
+      const commandHandler = this._nextCommandHandler;
+      this._nextCommandHandler = null;
+      commandHandler(error, commandName, commandData);
     }
     else {
       if (error) {
