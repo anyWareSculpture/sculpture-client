@@ -66,7 +66,12 @@ export default class SerialManager extends events.EventEmitter {
       this.commandQueue.unshift([port, command]);
     }
 
-    console.log(`Sent command "${command.trim()}" to: ${Array.from(targetPorts)}`);
+    if (targetPorts.size > 0) {
+      console.log(`Sent command "${command.trim()}" to: ${Array.from(targetPorts)}`);
+    }
+    else {
+      console.log(`Warning: No destination port for command "${command.trim()}"`);
+    }
 
     return targetPorts.size !== 0;
   }
