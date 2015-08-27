@@ -133,19 +133,19 @@ export default class SerialPort extends events.EventEmitter {
     let commandName, commandData;
     try {
       ({name: commandName, data: commandData} = SerialProtocolCommandParser.parse(commandString));
+      this._handleParsedCommand(parseError, commandName, commandData);
     }
     catch (error) {
       // Filter by expected errors
       if (error instanceof Error) {
         parseError = error;
+        console.log(`Parse error: ${error} string: ${commandString}`);
       }
       // Throw unexpected errors
       else {
         throw error;
       }
     }
-
-    this._handleParsedCommand(parseError, commandName, commandData);
   }
 
   _handleParsedCommand(error, commandName, commandData) {
@@ -173,11 +173,13 @@ export default class SerialPort extends events.EventEmitter {
   }
 
   _beginHandshake(identity, callback) {
+
     const handshake = new SerialHandshake(identity, this);
     handshake.execute(this._completeHandshake.bind(this, callback));
   }
 
   _completeHandshake(callback, error) {
+    console.log(`Handshake completed for ${this.path} ${error}`);
     if (error) {
       callback(error);
       return;
