@@ -1,13 +1,9 @@
 const events = require('events');
 
 const serialport = require('serialport');
-const SerialPort = serialport.SerialPort;
+const SerialPort = require('./serial-port');
 
 const serialProtocol = require('./serial-protocol');
-const {SerialProtocolCommandParser, SerialProtocolCommandBuilder} = serialProtocol;
-
-const DEFAULT_BAUDRATE = 115200;
-const MAX_INITIALIZATION_ATTEMPTS = 2;
 
 // NOTE: In order to account for the limited buffer size on the Arduino, many
 // serial commands are not sent at once. Instead, each command to be sent
@@ -29,9 +25,10 @@ export default class SerialManager extends events.EventEmitter {
    */
   static EVENT_COMMAND = "command";
 
-  constructor(identity) {
+  constructor(config, identity) {
     super();
 
+    this.config = config;
     this.identity = identity;
 
     this.patterns = {};
@@ -81,134 +78,49 @@ export default class SerialManager extends events.EventEmitter {
         return;
       }
       ports.forEach((portInfo) => {
-        process.stdout.write("Found port: " + portInfo.comName + " " + portInfo.manufacturer + " " + portInfo.vendorId);
-        // NB! Arduino uses Vendor ID 0x2341
-        // if we ever change microcontroller vendor, we need to update this check
-        if (portInfo.vendorId === "0x2341") {
-          this._testValidPort(portInfo);
+        if (this._isValidPort(portInfo)) {
+          console.log(`Found compatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`);
+          const portPath = portInfo.comName;
+          this._createSerialPort(portPath);
         }
         else {
-          process.stdout.write(" => skipping");
+          console.log(`Skipping incompatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`);
         }
-        console.log("");
       });
     });
   }
 
-  _testValidPort(portInfo) {
-    const portPath = portInfo.comName;
-    const port = this._createSerialPort(portPath);
+  _isValidPort(portInfo) {
+    if (!this.config.HARDWARE_VENDOR_IDS.has(portInfo.vendorId)) {
+      return false;
+    }
+
+    return true;
   }
 
   _createSerialPort(serialPortPath) {
     const port = new SerialPort(serialPortPath, {
-      baudrate: DEFAULT_BAUDRATE,
-      parser: serialport.parsers.readline("\n")
+      baudrate: this.config.SERIAL_BAUDRATE
     });
-    port.on("open", (error) => {
+    port.initialize(this.identity, (error) => {
       if (error) {
-        console.log(`Could not open serial port ${serialPortPath}`);
-        return;
-      }
-
-      port.once("data", (data) => {
-        this._handleInitialization(port, data);
-      });
-    });
-  }
-
-  _handleInitialization(port, data, attempt=1) {
-    let parseError = null;
-    let parsed = {};
-    try {
-      parsed = SerialProtocolCommandParser.parse(data);
-    }
-    catch (error) {
-      if (error instanceof Error) {
-        parseError = error;
+        console.warn(`ERROR: Failed to open serial port ${port.path}`);
+        console.warn(error);
       }
       else {
-        throw error;
+        this._addPortPatterns(port);
+        console.log(`Successfully initialized serial port ${port.path}`);
       }
-    }
-
-    if (!parseError && parsed.name !== serialProtocol.HELLO_COMMAND) {
-      parseError = true;
-    }
-
-    if (parseError) {
-      if (attempt >= MAX_INITIALIZATION_ATTEMPTS) {
-        port.close();
-        return;
-      }
-
-      port.once("data", (data) => {
-        this._handleInitialization(port, data, attempt + 1);
-      });
-      return;
-    }
-
-    console.log(`Got HELLO after ${attempt} attempts`);
-    this._expectInitialization(port);
+    });
+    port.on(SerialPort.EVENT_COMMAND, this._handleCommand.bind(this));
+    port.on(SerialPort.EVENT_ERROR, this._handleError.bind(this));
   }
 
-  _expectInitialization(port) {
-    let supportedPatterns = [];
-    const collectSupportedPatterns = (data) => {
-      let parsed = {};
-      try {
-        parsed = SerialProtocolCommandParser.parse(data);
-      }
-      catch (error) {
-        if (!(error instanceof Error)) {
-          throw error;
-        }
-      }
-
-      if (parsed.name === serialProtocol.END_SUPPORTED_COMMAND) {
-        this._completeInitialization(port, supportedPatterns);
-        return;
-      }
-
-      supportedPatterns.push(data);
-      port.once('data', collectSupportedPatterns);
-    };
-
-    const initCommandHandler = (data) => {
-      let parsed;
-      try {
-        parsed = SerialProtocolCommandParser.parse(data);
-      }
-      catch (error) {
-        if (error instanceof Error) {
-          port.close();
-          console.log(`Failed to initialize port ${port.path}`);
-          return;
-        }
-        else {
-          throw error;
-        }
-      }
-
-      if (parsed.name === serialProtocol.DEBUG_COMMAND) {
-        console.log(`DEBUG: ${parsed.data.message}`);
-        port.once("data", initCommandHandler);
-        return;
-      }
-
-      if (parsed.name === serialProtocol.SUPPORTED_COMMAND) {
-        port.once("data", collectSupportedPatterns);
-      }
-    };
-
-    port.once("data", initCommandHandler);
-  }
-
-  _completeInitialization(port, supportedPatterns) {
+  _addPortPatterns(port) {
     const portId = port.path;
 
     this.ports[portId] = port;
-    for (let pattern of supportedPatterns) {
+    for (let pattern of port.supportedPatterns) {
       pattern = pattern.trim();
       if (!this.patterns[pattern]) {
         this.patterns[pattern] = [];
@@ -216,39 +128,19 @@ export default class SerialManager extends events.EventEmitter {
 
       this.patterns[pattern].push(portId);
     }
-
-    const commandString = SerialProtocolCommandBuilder.buildIdentity({
-      identity: this.identity
-    });
-    port.write(commandString);
-    //TODO: Update this to INIT and add it to serial-protocol.js
-    port.write("INIT\n");
-
-    console.log(`Completed initialization of port ${portId}`);
-
-    port.on("data", this._handleData.bind(this));
   }
 
-  _handleData(data) {
-    let commandName, commandData;
-    try {
-      ({name: commandName, data: commandData} = SerialProtocolCommandParser.parse(data));
-    }
-    catch (error) {
-      if (error instanceof Error) {
-        return;
-      }
-      else {
-        throw error;
-      }
-    }
-
+  _handleCommand(commandName, commandData) {
     if (commandName === serialProtocol.DEBUG_COMMAND) {
       console.log(`DEBUG: ${commandData.message}`);
       return;
     }
 
     this.emit(SerialManager.EVENT_COMMAND, commandName, commandData);
+  }
+
+  _handleError(error) {
+    console.error(`ERROR: ${error}`);
   }
 
   _setupCommandQueueProcessor() {
