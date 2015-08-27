@@ -1,7 +1,7 @@
 const events = require('events');
 
 const serialport = require('serialport');
-const SerialPort = serialport.SerialPort;
+const SerialPort = require('./serial-port');
 
 const serialProtocol = require('./serial-protocol');
 
