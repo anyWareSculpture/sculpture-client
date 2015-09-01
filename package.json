@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "babel-node --stage 0 src/index.js",
-    "test": "gulp test"
+    "test": "gulp test",
+    "serial-emulator": "babel-node --stage 0 scripts/serial-emulator.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,8 @@
   },
   "devDependencies": {
     "@anyware/gulp-utils": "^1.1.1",
+    "blessed": "^0.1.80",
+    "serialport": "^1.7.4",
     "gulp": "^3.9.0",
     "run-sequence": "^1.1.0"
   }
