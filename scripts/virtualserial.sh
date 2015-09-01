@@ -32,4 +32,4 @@ read -p "Press [Enter] key to begin..."
 
 echo 
 echo "Press Ctrl-C to quit"
-socat -d -d pty,raw,echo=0 pty,raw,echo=0
+sudo socat -d -d pty,raw,echo=0,link=/dev/ttyS10 pty,raw,echo=0,link=/dev/ttyS11
