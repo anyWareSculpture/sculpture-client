@@ -1,2 +1,6 @@
 --ignore-dir
 coverage
+--ignore-dir
+build
+--ignore-dir
+dist
