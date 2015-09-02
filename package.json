@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "start": "babel-node --stage 0 src/index.js",
+    "start": "echo 'You may need to run `gulp build` or `gulp watch` before this' && gulp launch",
     "test": "gulp test",
     "serial-emulator": "babel-node --stage 0 scripts/serial-emulator.js"
   },
