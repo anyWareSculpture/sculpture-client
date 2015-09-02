@@ -1,8 +1,8 @@
-const {SculptureStore, MoleGameLogic, DisksActionCreator, Disk} = require('@anyware/game-logic');
+const {SculptureStore, DisksActionCreator, Disk} = require('@anyware/game-logic');
 
 const SerialManager = require('../serial/serial-manager');
 const serialProtocol = require('../serial/serial-protocol');
-const {SerialProtocolCommandParser, SerialProtocolCommandBuilder} = serialProtocol;
+const {SerialProtocolCommandBuilder} = serialProtocol;
 
 const MAX_RESET_ATTEMPTS = 5;
 const DISK_ID_TO_HARDWARE_MAP = {
@@ -13,7 +13,8 @@ const DISK_ID_TO_HARDWARE_MAP = {
 const DISK_DIRECTION_TO_HARDWARE_MAP = {
   [Disk.CLOCKWISE]: -1,
   [Disk.COUNTERCLOCKWISE]: 1,
-  [Disk.STOPPED]: 0
+  [Disk.STOPPED]: 0,
+  [Disk.CONFLICT]: 0
 };
 
 export default class DiskView {
@@ -54,7 +55,9 @@ export default class DiskView {
   }
 
   _handleChanges(changes) {
-    //TODO: reset() when level changes
+    if (changes.hasOwnProperty('disk') && changes.disk.hasOwnProperty('level')) {
+      this.resetDisks();
+    }
 
     const diskChanges = changes.disks;
     if (!diskChanges) {

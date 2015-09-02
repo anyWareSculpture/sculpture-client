@@ -1,15 +1,17 @@
 require('babelify/polyfill');
 
+const config = require('./config');
+
 const SculptureApp = require('./app');
 
 const DEFAULT_CLIENT_CONNECTION_OPTIONS = {
   protocol: "ws",
   username: "anyware",
   password: "anyware",
-  host: "connect.shiftr.io"
+  host: "broker.shiftr.io"
 };
 
-const app = new SculptureApp();
+const app = new SculptureApp(config);
 
 const connectionOptions = Object.assign({}, DEFAULT_CLIENT_CONNECTION_OPTIONS);
 

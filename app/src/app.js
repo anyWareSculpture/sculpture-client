@@ -9,7 +9,9 @@ const DiskView = require('./views/disk-view');
 const SerialManager = require('./serial/serial-manager');
 
 export default class SculptureApp {
-  constructor() {
+  constructor(config) {
+    this.config = config;
+
     this.dispatcher = new Dispatcher();
     this.dispatcher.register((payload) => {
       this._log(`Sent action: ${JSON.stringify(payload)}`);
@@ -20,13 +22,13 @@ export default class SculptureApp {
     this.panelView = null;
     this.diskView = null;
 
-    //TODO: Pass in a real identity
-    this.serialManager = new SerialManager(0);
+    const serialIdentity = this.config.HARDWARE_USERNAME_MAPPINGS[this.config.username];
+    this.serialManager = new SerialManager(this.config, serialIdentity);
     this.serialManager.on(SerialManager.EVENT_COMMAND, (commandName, commandArgs) => {
       console.log(`COMMAND '${commandName}': ${JSON.stringify(commandArgs)}`);
     });
 
-    this.sculpture = new SculptureStore(this.dispatcher);
+    this.sculpture = new SculptureStore(this.dispatcher, this.config);
     this.sculpture.on(SculptureStore.EVENT_CHANGE, (changes) => {
       this._log(`Sent state update: ${JSON.stringify(changes)}`);
 
@@ -74,14 +76,16 @@ export default class SculptureApp {
     this.client.on(StreamingClient.EVENT_ERROR, this._error.bind(this));
 
     this.client.once(StreamingClient.EVENT_CONNECT, () => {
-      // Temporarily here until the full game transitions are implemented
-      if (!this.sculpture.isPlayingMoleGame) {
-        //TODO: Hack! BAD
-        setTimeout(() => {
-          this._log("Starting disk game...");
-          this.sculpture.startDiskGame();
-        }, 4000);
-      }
+      //TODO: HACK! trying to compensate for the serial not connecting
+      setTimeout(() => {
+        //TODO: Temporarily here until the full game transitions are implemented
+        //TODO: This if statement is here to account for reconnections
+        if (this.sculpture.isPlayingNoGame) {
+          const game = this.config.GAMES_SEQUENCE[0];
+          this._log(`Starting ${game} game...`);
+          this.sculptureActionCreator.sendStartGame(game);
+        }
+      }, 4000);
     });
 
     this.client.on(StreamingClient.EVENT_STATE_UPDATE, this._onStateUpdate.bind(this));
