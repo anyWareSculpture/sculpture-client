@@ -97,3 +97,10 @@ gulp.task('launch', shell.task([
   'google-chrome --load-and-launch-app=$PWD/build'
 ]));
 
+gulp.task('watch', ['build'], function watch() {
+  gulp.watch('app/src/**/*.js', ['build-app']);
+  gulp.watch('static/**/*', ['collect-static']);
+  gulp.watch('manifest.json', ['collect-manifest']);
+  gulp.watch('app/**/*.html', ['collect-pages']);
+  gulp.watch('scripts/**/*.js', ['collect-scripts']);
+});
