@@ -62,7 +62,7 @@ gulp.task('build-app', function buildApp() {
     .pipe(browserified)
     .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(concat('application.js'))
-    .pipe(uglify())
+//    .pipe(uglify())
     .pipe(sourcemaps.write())
     .pipe(gulp.dest(BUILD_DIRECTORY));
 });
