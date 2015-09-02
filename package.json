@@ -9,7 +9,7 @@
   "scripts": {
     "start": "echo 'You may need to run `gulp build` or `gulp watch` before this' && gulp launch",
     "test": "gulp test",
-    "serial-emulator": "babel-node --stage 0 scripts/serial-emulator.js"
+    "serial-emulator": "babel-node --stage 0 utilities/serial-emulator.js"
   },
   "repository": {
     "type": "git",
