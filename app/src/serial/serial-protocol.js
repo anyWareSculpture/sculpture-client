@@ -86,14 +86,14 @@ export class SerialProtocolCommandParser {
     return {stripId: args[0], panelId: args[1], pressed: args[2]};
   }
 
+  // Only sent during initialization (args is regexp)
   static parsePanelSetArguments(args) {
-    const [stripId, panelId, intensity, color, easing, duration] = args;
-    return {stripId, panelId, intensity, color, easing, duration};
+    return args.join(' ');
   }
 
+  // Only sent during initialization (args is regexp)
   static parsePanelPulseArguments(args) {
-    const [stripId, panelId, intensity, color, easing, duration] = args;
-    return {stripId, panelId, intensity, color, easing, duration};
+    return args.join(' ');
   }
 
   static parseDiskArguments(args) {
