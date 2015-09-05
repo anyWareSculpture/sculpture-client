@@ -92,7 +92,7 @@ export default class SculptureApp {
   }
 
   _onConnectionStatusChange() {
-    this._log(`Client Connected: ${this.client.connected}`);
+    this._log(`Streaming Client Connected: ${this.client.connected}`);
   }
 
   _onStateUpdate(update, metadata) {
