@@ -6,8 +6,8 @@ const SculptureApp = require('./app');
 
 const DEFAULT_CLIENT_CONNECTION_OPTIONS = {
   protocol: "ws",
-  username: "anyware",
-  password: "anyware",
+  username: "sculpture0",
+  password: "7f24a3e73b91dc9f51f15861d75c888b",
   host: "broker.shiftr.io"
 };
 
