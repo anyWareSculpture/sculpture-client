@@ -1,5 +1,7 @@
 const events = require('events');
-const serialport = require('browser-serialport');
+
+const usingChrome = (typeof chrome != 'undefined' && chrome.serial);
+var serialport = usingChrome ? require('browser-serialport') : require('serialport');
 
 const SerialHandshake = require('./serial-handshake');
 const {SerialProtocolCommandParser} = require('./serial-protocol');
@@ -143,6 +145,7 @@ export default class SerialPort extends events.EventEmitter {
       }
       // Throw unexpected errors
       else {
+        console.log(`Unexpected error: ${JSON.stringify(error)}`);
         throw error;
       }
     }

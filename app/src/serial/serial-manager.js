@@ -1,6 +1,7 @@
 const events = require('events');
 
-const serialport = require('browser-serialport');
+const usingChrome = (typeof chrome != 'undefined' && chrome.serial);
+const serialport = usingChrome ? require('browser-serialport') : require('serialport');
 const SerialPort = require('./serial-port');
 
 const serialProtocol = require('./serial-protocol');
@@ -96,6 +97,7 @@ export default class SerialManager extends events.EventEmitter {
   }
 
   _isValidPort(portInfo) {
+    if (usingChrome) return true;
     if (!this.config.HARDWARE_VENDOR_IDS.has(portInfo.vendorId)) {
       return false;
     }
