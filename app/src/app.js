@@ -22,11 +22,8 @@ export default class SculptureApp {
     this.panelView = null;
     this.diskView = null;
 
-    const serialIdentity = this.config.HARDWARE_USERNAME_MAPPINGS[this.config.username];
-    this.serialManager = new SerialManager(this.config, serialIdentity);
-    this.serialManager.on(SerialManager.EVENT_COMMAND, (commandName, commandArgs) => {
-      console.log(`COMMAND '${commandName}': ${JSON.stringify(commandArgs)}`);
-    });
+    this.serialSearched = false;
+    this.serialManager = this._setupSerialManager();
 
     this.sculpture = new SculptureStore(this.dispatcher, this.config);
     this.sculpture.on(SculptureStore.EVENT_CHANGE, (changes) => {
@@ -75,20 +72,23 @@ export default class SculptureApp {
 
     this.client.on(StreamingClient.EVENT_ERROR, this._error.bind(this));
 
-    this.client.once(StreamingClient.EVENT_CONNECT, () => {
-      //TODO: HACK! trying to compensate for the serial not connecting
-      setTimeout(() => {
-        //TODO: Temporarily here until the full game transitions are implemented
-        //TODO: This if statement is here to account for reconnections
-        if (this.sculpture.isPlayingNoGame) {
-          const game = this.config.GAMES_SEQUENCE[0];
-          this._log(`Starting ${game} game...`);
-          this.sculptureActionCreator.sendStartGame(game);
-        }
-      }, 4000);
-    });
+    this.client.once(StreamingClient.EVENT_CONNECT, this._beginFirstGame.bind(this));
 
     this.client.on(StreamingClient.EVENT_STATE_UPDATE, this._onStateUpdate.bind(this));
+  }
+
+  _setupSerialManager() {
+    const serialIdentity = this.config.HARDWARE_USERNAME_MAPPINGS[this.config.username];
+    const serialManager = new SerialManager(this.config, serialIdentity);
+    serialManager.searchPorts(() => {
+      console.log('Finished searching all serial ports');
+      this.serialSearched = true;
+      this._beginFirstGame();
+    });
+    serialManager.on(SerialManager.EVENT_COMMAND, (commandName, commandArgs) => {
+      console.log(`COMMAND '${commandName}': ${JSON.stringify(commandArgs)}`);
+    });
+    return serialManager;
   }
 
   _onConnectionStatusChange() {
@@ -101,6 +101,19 @@ export default class SculptureApp {
     this._log(`Got state update: ${JSON.stringify(update)}`);
 
     this.sculptureActionCreator.sendMergeState(update);
+  }
+
+  _beginFirstGame() {
+    if (!this.client || !this.client.connected || !this.serialSearched) {
+      return;
+    }
+
+    //TODO: Temporarily here until the full game transitions are implemented
+    if (this.sculpture.isPlayingNoGame) {
+      const game = this.config.GAMES_SEQUENCE[0];
+      this._log(`Starting ${game} game...`);
+      this.sculptureActionCreator.sendStartGame(game);
+    }
   }
 }
 

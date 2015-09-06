@@ -37,8 +37,6 @@ export default class SerialManager extends events.EventEmitter {
 
     this.commandQueue = [];
     this._setupCommandQueueProcessor();
-
-    this._setupConnections();
   }
 
   /**
@@ -77,22 +75,43 @@ export default class SerialManager extends events.EventEmitter {
     return targetPorts.size !== 0;
   }
 
-  _setupConnections() {
+  /**
+   * Goes through all serial ports searching for valid connections
+   * @param {Function} callback - The callback to call once all possible connections have been searched
+   */
+  searchPorts(callback) {
     serialport.list((err, ports) => {
       if (err) {
         console.error(err);
         return;
       }
-      ports.forEach((portInfo) => {
+      const done = [];
+      for (let i = 0; i < ports.length; i++) {
+        done.push(false);
+      }
+
+      ports.forEach((portInfo, index) => {
         if (this._isValidPort(portInfo)) {
           console.log(`Found compatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`);
           const portPath = portInfo.comName;
-          this._createSerialPort(portPath);
+
+          this._createSerialPort(portPath, () => {
+            done[index] = true;
+
+            // If every item is true
+            if (done.every((d) => d)) {
+              callback();
+            }
+          });
         }
         else {
           console.log(`Skipping incompatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`);
         }
       });
+
+      if (!done.length) {
+        callback();
+      }
     });
   }
 
@@ -105,11 +124,12 @@ export default class SerialManager extends events.EventEmitter {
     return true;
   }
 
-  _createSerialPort(serialPortPath) {
+  _createSerialPort(serialPortPath, callback) {
     const port = new SerialPort(serialPortPath, {
       baudrate: this.config.SERIAL_BAUDRATE
     });
     port.initialize(this.identity, (error) => {
+      callback(error);
       if (error) {
         console.warn(`ERROR: Failed to open serial port ${port.path}`);
         console.warn(error);
