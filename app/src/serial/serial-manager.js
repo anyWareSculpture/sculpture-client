@@ -106,6 +106,7 @@ export default class SerialManager extends events.EventEmitter {
         }
         else {
           console.log(`Skipping incompatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`);
+          done[index] = true;
         }
       });
 
