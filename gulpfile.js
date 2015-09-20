@@ -1,4 +1,5 @@
 var path = require('path');
+var os = require('os');
 
 var gulp = require('gulp');
 var browserify = require('browserify');
@@ -93,8 +94,10 @@ gulp.task('collect-scripts', function collectPages() {
     .pipe(gulp.dest(BUILD_DIRECTORY));
 });
 
+var browser = os.platform() === 'linux' ? 'google-chrome' : (
+  os.platform() === 'darwin' ? '/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome' : '');
 gulp.task('launch', shell.task([
-  'google-chrome --load-and-launch-app=$PWD/build'
+  browser + ' --load-and-launch-app=$PWD/build'
 ]));
 
 gulp.task('watch', ['build'], function watch() {
