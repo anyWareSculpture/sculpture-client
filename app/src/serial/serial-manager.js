@@ -68,7 +68,7 @@ export default class SerialManager extends events.EventEmitter {
       console.log(`Sent command "${command.trim()}" to: ${Array.from(targetPorts)}`);
     }
     else {
-      console.log(`Warning: No destination port for command "${command.trim()}"`);
+      console.warn(`No destination port for command "${command.trim()}"`);
     }
 
     return targetPorts.size !== 0;
