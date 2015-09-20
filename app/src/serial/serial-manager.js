@@ -128,7 +128,6 @@ export default class SerialManager extends events.EventEmitter {
       baudrate: this.config.SERIAL_BAUDRATE
     });
     port.initialize(this.identity, (error) => {
-      callback(error);
       if (error) {
         console.warn(`ERROR: Failed to open serial port ${port.path}`);
         console.warn(error);
@@ -137,6 +136,7 @@ export default class SerialManager extends events.EventEmitter {
         this._addPortPatterns(port);
         console.log(`Successfully initialized serial port ${port.path}`);
       }
+      callback(error);
     });
     port.on(SerialPort.EVENT_COMMAND, this._handleCommand.bind(this));
     port.on(SerialPort.EVENT_ERROR, this._handleError.bind(this));
