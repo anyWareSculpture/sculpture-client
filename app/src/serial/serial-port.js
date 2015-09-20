@@ -139,7 +139,7 @@ export default class SerialPort extends events.EventEmitter {
       // Filter by expected errors
       if (error instanceof Error) {
         parseError = error;
-        console.log(`Parse error: ${error} string: ${commandString}`);
+        console.warn(`Parse error: ${error}\nOriginal string: ${commandString}\nThis command just may not be supported yet`);
       }
       // Throw unexpected errors
       else {
