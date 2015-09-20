@@ -86,7 +86,10 @@ export default class SerialHandshake {
     }
   
     const pattern = SerialProtocolCommandBuilder.build(commandName, commandData);
-    this.port.supportedPatterns.push(pattern);
+    // Don't add empty patterns as they match everything
+    if (pattern.trim().length > 0) {
+      this.port.supportedPatterns.push(pattern);
+    }
 
     this._handleNextCommandWith(this._supportedPattern);
   }
