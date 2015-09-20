@@ -11,9 +11,16 @@ config.HARDWARE_USERNAME_MAPPINGS = {
   sculpture2: '2'
 };
 
+config.CHECK_VENDOR_ID = false; // Chrome on Mac doesn't give us hardware IDs
 config.HARDWARE_VENDOR_IDS = new Set([
   "0x2341" // Arduino Vendor ID
 ]);
+
+// We blacklist serial ports as it takes too long time to open them
+config.BLACKLISTED_SERIAL_PORTS = [
+  "Bluetooth",
+  "WirelessiAP"
+];
 
 config.SERIAL_BAUDRATE = 115200;
 

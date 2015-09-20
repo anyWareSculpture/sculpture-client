@@ -116,8 +116,12 @@ export default class SerialManager extends events.EventEmitter {
   }
 
   _isValidPort(portInfo) {
-    if (!this.config.HARDWARE_VENDOR_IDS.has(portInfo.vendorId)) {
+    if (this.config.CHECK_VENDOR_ID && !this.config.HARDWARE_VENDOR_IDS.has(portInfo.vendorId)) {
       return false;
+    }
+
+    for (let regex of this.config.BLACKLISTED_SERIAL_PORTS) {
+      if (portInfo.comName.match(regex)) return false;
     }
 
     return true;
