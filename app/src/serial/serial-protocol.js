@@ -222,7 +222,25 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildPanelSet(data) {
-    let command = `${PANEL_SET_COMMAND} ${data.stripId} ${data.panelId} ${data.intensity} ${data.color || "-"} ${data.easing || "-"} ${data.duration || ""}`;
+    let command = `${PANEL_SET_COMMAND} ${data.stripId || ""} ${data.panelId || ""} ${data.intensity || ""}`.trim();
+
+    if (data.color) {
+      command += ` ${data.color}`;
+    }
+    else if (data.easing || data.duration) {
+        command += " -";
+    }
+
+    if (data.easing) {
+      command += ` ${data.easing}`;
+    }
+    else if (data.duration) {
+      command += " -";
+    }
+
+    if (data.duration) {
+      command += ` ${data.duration}`;
+    }
 
     command = removeOptionalParts(command);
 
@@ -230,7 +248,25 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildPanelPulse(data) {
-    let command = `${PANEL_PULSE_COMMAND} ${data.stripId} ${data.panelId} ${data.intensity} ${data.color || "-"} ${data.easing || "-"} ${data.duration || ""}`;
+    let command = `${PANEL_PULSE_COMMAND} ${data.stripId || ""} ${data.panelId || ""} ${data.intensity || ""}`.trim();
+
+    if (data.color) {
+      command += ` ${data.color}`;
+    }
+    else if (data.easing || data.duration) {
+        command += " -";
+    }
+
+    if (data.easing) {
+      command += ` ${data.easing}`;
+    }
+    else if (data.duration) {
+      command += " -";
+    }
+
+    if (data.duration) {
+      command += ` ${data.duration}`;
+    }
 
     command = removeOptionalParts(command);
 
