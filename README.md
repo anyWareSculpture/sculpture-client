@@ -9,7 +9,7 @@ Builds the app into the build/ directory
 
     gulp package
 
-Compresses the contents of build/ into a single .zip file for the dist/ directory. This can be directly uploaded as the kiosk app.
+Compresses the contents of build/ into a single .zip file in the dist/ directory. This can be directly uploaded as the kiosk app.
 
     gulp launch
 
