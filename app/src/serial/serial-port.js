@@ -124,7 +124,8 @@ export default class SerialPort extends events.EventEmitter {
     bufferParts.splice(-1, 1);
 
     for (let commandString of bufferParts) {
-      this._parseCommandString(commandString);
+      commandString = commandString.trim();
+      if (commandString.length > 0) this._parseCommandString(commandString);
     }
   }
 
@@ -139,7 +140,7 @@ export default class SerialPort extends events.EventEmitter {
       // Filter by expected errors
       if (error instanceof Error) {
         parseError = error;
-        console.warn(`Parse error: ${error}\nOriginal string: "${commandString}"\nThis command just may not be supported yet`);
+        console.warn(`Parse error from ${this.path}: ${error}\nOriginal string: "${commandString}"\nThis command just may not be supported yet`);
       }
       // Throw unexpected errors
       else {
