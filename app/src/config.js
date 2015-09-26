@@ -11,8 +11,16 @@ config.HARDWARE_USERNAME_MAPPINGS = {
   sculpture2: '2'
 };
 
+// Serial port paths matching these patterns will be ignored
+config.HARDWARE_INVALID_PATH_PATTERNS = [
+  "Bluetooth",
+  "WirelessiAP"
+];
+
 config.HARDWARE_VENDOR_IDS = new Set([
-  "0x2341" // Arduino Vendor ID
+  "0x0",    // Generic/Unspecified (for Macs)
+  "0x2341", // Arduino Vendor ID
+  "0x16c0"  // Teensy Vendor ID
 ]);
 
 config.SERIAL_BAUDRATE = 115200;

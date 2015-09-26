@@ -15,14 +15,24 @@ export default class SerialHandshake {
 
   execute(callback) {
     this.callback = callback;
+    this._sendHello();
     this._handleNextCommandWith(this._hello);
+  }
+
+  _sendHello() {
+    const commandString = SerialProtocolCommandBuilder.buildHello({debug: true});
+    this.port.write(commandString, this._error.bind(this));
   }
 
   _hello(error, commandName, commandData) {
     this._helloAttempts += 1;
 
-    if (error || commandName !== serialProtocol.HELLO_COMMAND) {
-      if (this._helloAttempts >= HELLO_ATTEMPTS) {
+    if (error || commandName !== serialProtocol.HELLO_COMMAND || commandName === serialProtocol.DEBUG_COMMAND) {
+      if (commandName === serialProtocol.DEBUG_COMMAND) {
+        this._helloAttempts -= 1;
+        this._handleNextCommandWith(this._hello);
+      }
+      else if (this._helloAttempts >= HELLO_ATTEMPTS) {
         this._error(`Could not get HELLO after ${HELLO_ATTEMPTS} attempts`);
       }
       else {
@@ -62,14 +72,15 @@ export default class SerialHandshake {
     // the serial interface supports isn't supported by our code. That's
     // not a problem and if we need to support that command we will.
     if (error) {
+      this._handleNextCommandWith(this._supportedPattern);
       return;
     }
     else if (commandName === serialProtocol.END_SUPPORTED_COMMAND) {
       this._endHandshake();
       return;
     }
-
-    const pattern = [commandName, ...commandData].join(' ');
+  
+    const pattern = SerialProtocolCommandBuilder.build(commandName, commandData).trim();
     this.port.supportedPatterns.push(pattern);
 
     this._handleNextCommandWith(this._supportedPattern);
@@ -80,28 +91,14 @@ export default class SerialHandshake {
   }
 
   _endHandshake() {
-    this._sendIdentity();
-    this._sendInit();
     this._finish();
-  }
-
-  _sendIdentity() {
-    const commandString = SerialProtocolCommandBuilder.buildIdentity({
-      identity: this.identity
-    });
-    this.port.write(commandString, this._error.bind(this));
-  }
-
-  _sendInit() {
-    const commandString = SerialProtocolCommandBuilder.buildInit();
-    this.port.write(commandString, this._error.bind(this));
   }
 
   _error(message) {
     if (!message) {
       return;
     }
-    this.callback(message);
+    this.callback(new Error(message.toString()));
   }
 
   _finish() {
