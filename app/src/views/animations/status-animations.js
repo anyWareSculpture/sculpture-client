@@ -27,17 +27,28 @@ export default class StatusAnimations {
   }
 
   static playFailureAnimation(view, completeCallback) {
-    const frames = [
-      // stripId, panelId, intensity, color
-      [0, 3, 50, "error"],
-      [2, 3, 50, "error"],
-      [1, 3, 50, "error"],
-      [0, 4, 100, "error"],
-      [2, 4, 100, "error"],
-      [1, 4, 100, "error"]
-    ];
+    const frames = [];
 
-    StatusAnimations.playAnimation(frames, view, completeCallback);
+    let direction = 1;
+    let lastPanel = null;
+    for (let round = 0; round < 3; round++) {
+      for (let i = 0; i < 10; i += 2) {
+        const panel = direction === 1 ? i : 10 - i - 1;
+        const panels = [[panel, 100, "error"]];
+        if (lastPanel !== null) {
+          panels.unshift([lastPanel, 0, "error"]);
+        }
+        const frame = () => {
+          return panels;
+        };
+
+        lastPanel = panel;
+        frames.push(frame);
+      }
+      direction *= -1;
+    }
+
+    StatusAnimations.animateStrips(view, ['0', '1', '2'], frames, 50, completeCallback);
   }
 
   /**
