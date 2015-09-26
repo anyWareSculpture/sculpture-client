@@ -3,7 +3,6 @@ export const ERROR_COMMAND = "ERROR";
 export const DEBUG_COMMAND = "DEBUG";
 export const SUPPORTED_COMMAND = "SUPPORTED";
 export const END_SUPPORTED_COMMAND = "ENDSUPPORTED";
-export const IDENTITY_COMMAND = "IDENTITY";
 export const PANEL_COMMAND = "PANEL";
 export const PANEL_SET_COMMAND = "PANEL-SET";
 export const PANEL_PULSE_COMMAND = "PANEL-PULSE";
@@ -32,7 +31,6 @@ export class SerialProtocolCommandParser {
       [DEBUG_COMMAND]: SerialProtocolCommandParser.parseDebugArguments,
       [SUPPORTED_COMMAND]: SerialProtocolCommandParser.parseSupportedArguments,
       [END_SUPPORTED_COMMAND]: SerialProtocolCommandParser.parseEndSupportedArguments,
-      [IDENTITY_COMMAND]: SerialProtocolCommandParser.parseIdentityArguments,
       [PANEL_COMMAND]: SerialProtocolCommandParser.parsePanelArguments,
       [PANEL_SET_COMMAND]: SerialProtocolCommandParser.parsePanelSetArguments,
       [PANEL_PULSE_COMMAND]: SerialProtocolCommandParser.parsePanelPulseArguments,
@@ -70,10 +68,6 @@ export class SerialProtocolCommandParser {
 
   static parseEndSupportedArguments() {
     return {};
-  }
-
-  static parseIdentityArguments(args) {
-    return {identity: args[0]};
   }
 
   static parsePanelArguments(args) {
@@ -164,7 +158,6 @@ export class SerialProtocolCommandBuilder {
       [DEBUG_COMMAND]: SerialProtocolCommandBuilder.buildDebug,
       [SUPPORTED_COMMAND]: SerialProtocolCommandBuilder.buildSupported,
       [END_SUPPORTED_COMMAND]: SerialProtocolCommandBuilder.buildEndSupported,
-      [IDENTITY_COMMAND]: SerialProtocolCommandBuilder.buildIdentity,
       [PANEL_COMMAND]: SerialProtocolCommandBuilder.buildPanel,
       [PANEL_SET_COMMAND]: SerialProtocolCommandBuilder.buildPanelSet,
       [PANEL_PULSE_COMMAND]: SerialProtocolCommandBuilder.buildPanelPulse,
@@ -183,7 +176,7 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildHello(data) {
-    return `${HELLO_COMMAND} ${data.debug}\n`;
+    return `${HELLO_COMMAND} ${data.debug ? "1" : "0"}\n`;
   }
 
   static buildError(data) {
@@ -200,10 +193,6 @@ export class SerialProtocolCommandBuilder {
 
   static buildEndSupported() {
     return `${END_SUPPORTED_COMMAND}\n`;
-  }
-
-  static buildIdentity(data) {
-    return `${IDENTITY_COMMAND} ${data.identity}\n`;
   }
 
   static buildPanel(data) {

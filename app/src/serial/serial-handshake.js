@@ -86,15 +86,7 @@ export default class SerialHandshake {
   }
 
   _endHandshake() {
-    this._sendIdentity();
     this._finish();
-  }
-
-  _sendIdentity() {
-    const commandString = SerialProtocolCommandBuilder.buildIdentity({
-      identity: this.identity
-    });
-    this.port.write(commandString, this._error.bind(this));
   }
 
   _error(message) {
