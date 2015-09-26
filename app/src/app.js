@@ -86,7 +86,9 @@ export default class SculptureApp {
     const serialManager = new SerialManager(this.config, serialIdentity);
     serialManager.searchPorts(() => {
       console.log('Finished searching all serial ports');
+
       this.serialSearched = true;
+      //TODO: May need the views to write out the initial state in the store
       this._beginFirstGame();
     });
     return serialManager;

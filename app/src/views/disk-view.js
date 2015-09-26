@@ -28,7 +28,6 @@ export default class DiskView {
     this._animating = false;
     this._previousHardwarePositions = {};
 
-    this.resetDisks();
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
   }
 
