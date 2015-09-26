@@ -15,7 +15,13 @@ export default class SerialHandshake {
 
   execute(callback) {
     this.callback = callback;
+    this._sendHello();
     this._handleNextCommandWith(this._hello);
+  }
+
+  _sendHello() {
+    const commandString = SerialProtocolCommandBuilder.buildHello({debug: true});
+    this.port.write(commandString, this._error.bind(this));
   }
 
   _hello(error, commandName, commandData) {

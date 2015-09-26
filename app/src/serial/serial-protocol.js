@@ -53,7 +53,7 @@ export class SerialProtocolCommandParser {
   }
 
   static parseHelloArguments(args) {
-    return {supportedGames: args};
+    return {debug: args[0] === "0" ? false : true};
   }
 
   static parseErrorArguments(args) {
@@ -183,7 +183,7 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildHello(data) {
-    return `${HELLO_COMMAND} ${data.supportedGames}\n`;
+    return `${HELLO_COMMAND} ${data.debug}\n`;
   }
 
   static buildError(data) {
