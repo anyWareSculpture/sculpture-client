@@ -29,6 +29,10 @@ export default class SculptureApp {
     this.sculpture.on(SculptureStore.EVENT_CHANGE, (changes) => {
       this._log(`Sent state update: ${JSON.stringify(changes)}`);
 
+      if (!this.client.connected) {
+        console.warn("Streaming client not connected: ignoring changes");
+        return;
+      }
       this.client.sendStateUpdate(changes);
     });
 
@@ -86,7 +90,7 @@ export default class SculptureApp {
       this._beginFirstGame();
     });
     serialManager.on(SerialManager.EVENT_COMMAND, (commandName, commandArgs) => {
-      console.log(`COMMAND '${commandName}': ${JSON.stringify(commandArgs)}`);
+      console.log(`GOT SERIAL '${commandName}': ${JSON.stringify(commandArgs)}`);
     });
     return serialManager;
   }
