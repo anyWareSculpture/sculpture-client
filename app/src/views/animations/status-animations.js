@@ -7,7 +7,7 @@ export default class StatusAnimations {
     let direction = 1;
     let lastPanel = null;
     for (let round = 0; round < 3; round++) {
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 10; i += 2) {
         const panel = direction === 1 ? i : 10 - i - 1;
         const panels = [[panel, 100, "success"]];
         if (lastPanel !== null) {
