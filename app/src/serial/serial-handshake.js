@@ -29,6 +29,8 @@ export default class SerialHandshake {
 
     if (error || commandName !== serialProtocol.HELLO_COMMAND || commandName === serialProtocol.DEBUG_COMMAND) {
       if (commandName === serialProtocol.DEBUG_COMMAND) {
+        console.log(`DEBUG: ${commandData.message} from ${this.port.path}`);
+
         this._helloAttempts -= 1;
         this._handleNextCommandWith(this._hello);
       }
