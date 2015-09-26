@@ -68,10 +68,10 @@ export default class DiskView {
 
       const newDiskValues = diskChanges[diskId];
 
-      let position;
-      if (newDiskValues.position !== this._previousHardwarePositions[diskId]) {
-        position = newDiskValues.position;
+      if (newDiskValues.position === this._previousHardwarePositions[diskId]) {
+        continue;
       }
+      const position = newDiskValues.position;
 
       const hardwareDirection = DISK_DIRECTION_TO_HARDWARE_MAP[newDiskValues.direction];
 
