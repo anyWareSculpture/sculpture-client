@@ -15,23 +15,7 @@ export default class SerialHandshake {
 
   execute(callback) {
     this.callback = callback;
-    // If we don't get any data within 500ms, we force the microcontroller to reset
-    // After that, we give it a 2 second timeout.
-    // FIXME: We might end up in a situation where we connect to a microcontroller which
-    // prints a lot of sensor output. We need to be more robust in this case (e.g. ignore
-    // all output which is not a HELLO command).
-    let timeout = setTimeout(() => {
-      console.log(`Sending RESET to ${this.port.path}...`);
-      this._sendReset();
-      timeout = setTimeout(() => {
-        this.port.handleNextCommand(null);
-        this._error('Connection timeout');
-      }, 2000);
-    }, 500);
-    this.port.handleNextCommand((...args) => {
-      clearTimeout(timeout);
-      this._hello(...args);
-    });
+    this._handleNextCommandWith(this._hello);
   }
 
   _hello(error, commandName, commandData) {
@@ -86,10 +70,7 @@ export default class SerialHandshake {
     }
   
     const pattern = SerialProtocolCommandBuilder.build(commandName, commandData);
-    // Don't add empty patterns as they match everything
-    if (pattern.trim().length > 0) {
-      this.port.supportedPatterns.push(pattern);
-    }
+    this.port.supportedPatterns.push(pattern);
 
     this._handleNextCommandWith(this._supportedPattern);
   }
@@ -113,11 +94,6 @@ export default class SerialHandshake {
 
   _sendInit() {
     const commandString = SerialProtocolCommandBuilder.buildInit();
-    this.port.write(commandString, this._error.bind(this));
-  }
-
-  _sendReset() {
-    const commandString = SerialProtocolCommandBuilder.buildReset();
     this.port.write(commandString, this._error.bind(this));
   }
 

@@ -1,5 +1,4 @@
 export const HELLO_COMMAND = "HELLO";
-export const RESET_COMMAND = "RESET";
 export const INIT_COMMAND = "INIT";
 export const ERROR_COMMAND = "ERROR";
 export const DEBUG_COMMAND = "DEBUG";
@@ -167,7 +166,6 @@ export class SerialProtocolCommandBuilder {
   static build(commandName, commandData) {
     const builderFunctions = {
       [HELLO_COMMAND]: SerialProtocolCommandBuilder.buildHello,
-      [RESET_COMMAND]: SerialProtocolCommandBuilder.buildReset,
       [INIT_COMMAND]: SerialProtocolCommandBuilder.buildInit,
       [ERROR_COMMAND]: SerialProtocolCommandBuilder.buildError,
       [DEBUG_COMMAND]: SerialProtocolCommandBuilder.buildDebug,
@@ -189,10 +187,6 @@ export class SerialProtocolCommandBuilder {
     }
 
     return builderFunction(commandData);
-  }
-
-  static buildReset() {
-    return `${RESET_COMMAND}\n`;
   }
 
   static buildHello(data) {
