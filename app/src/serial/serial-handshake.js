@@ -27,8 +27,12 @@ export default class SerialHandshake {
   _hello(error, commandName, commandData) {
     this._helloAttempts += 1;
 
-    if (error || commandName !== serialProtocol.HELLO_COMMAND) {
-      if (this._helloAttempts >= HELLO_ATTEMPTS) {
+    if (error || commandName !== serialProtocol.HELLO_COMMAND || commandName === serialProtocol.DEBUG_COMMAND) {
+      if (commandName === serialProtocol.DEBUG_COMMAND) {
+        this._helloAttempts -= 1;
+        this._handleNextCommandWith(this._hello);
+      }
+      else if (this._helloAttempts >= HELLO_ATTEMPTS) {
         this._error(`Could not get HELLO after ${HELLO_ATTEMPTS} attempts`);
       }
       else {
