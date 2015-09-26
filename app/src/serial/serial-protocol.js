@@ -286,6 +286,7 @@ export class SerialProtocolCommandBuilder {
       commandArgs += ` ${DISK_ARG_USER} ${data.user}`;
     }
 
+    // If nothing is actually being updated, there's no point in sending any command at all!
     if (!commandArgs) {
       return "";
     }
