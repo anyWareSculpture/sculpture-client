@@ -1,5 +1,4 @@
 export const HELLO_COMMAND = "HELLO";
-export const INIT_COMMAND = "INIT";
 export const ERROR_COMMAND = "ERROR";
 export const DEBUG_COMMAND = "DEBUG";
 export const SUPPORTED_COMMAND = "SUPPORTED";
@@ -29,7 +28,6 @@ export class SerialProtocolCommandParser {
 
     const parserFunctions = {
       [HELLO_COMMAND]: SerialProtocolCommandParser.parseHelloArguments,
-      [INIT_COMMAND]: SerialProtocolCommandParser.parseInitArguments,
       [ERROR_COMMAND]: SerialProtocolCommandParser.parseErrorArguments,
       [DEBUG_COMMAND]: SerialProtocolCommandParser.parseDebugArguments,
       [SUPPORTED_COMMAND]: SerialProtocolCommandParser.parseSupportedArguments,
@@ -56,10 +54,6 @@ export class SerialProtocolCommandParser {
 
   static parseHelloArguments(args) {
     return {supportedGames: args};
-  }
-
-  static parseInitArguments() {
-    return {};
   }
 
   static parseErrorArguments(args) {
@@ -166,7 +160,6 @@ export class SerialProtocolCommandBuilder {
   static build(commandName, commandData) {
     const builderFunctions = {
       [HELLO_COMMAND]: SerialProtocolCommandBuilder.buildHello,
-      [INIT_COMMAND]: SerialProtocolCommandBuilder.buildInit,
       [ERROR_COMMAND]: SerialProtocolCommandBuilder.buildError,
       [DEBUG_COMMAND]: SerialProtocolCommandBuilder.buildDebug,
       [SUPPORTED_COMMAND]: SerialProtocolCommandBuilder.buildSupported,
@@ -191,10 +184,6 @@ export class SerialProtocolCommandBuilder {
 
   static buildHello(data) {
     return `${HELLO_COMMAND} ${data.supportedGames}\n`;
-  }
-
-  static buildInit() {
-    return `${INIT_COMMAND}\n`;
   }
 
   static buildError(data) {
