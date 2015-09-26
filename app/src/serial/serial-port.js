@@ -133,7 +133,6 @@ export default class SerialPort extends events.EventEmitter {
     let commandName, commandData;
     try {
       ({name: commandName, data: commandData} = SerialProtocolCommandParser.parse(commandString));
-      this._handleParsedCommand(parseError, commandName, commandData);
     }
     catch (error) {
       // Filter by expected errors
@@ -146,6 +145,7 @@ export default class SerialPort extends events.EventEmitter {
         throw error;
       }
     }
+    this._handleParsedCommand(parseError, commandName, commandData);
   }
 
   _handleParsedCommand(error, commandName, commandData) {
@@ -156,7 +156,8 @@ export default class SerialPort extends events.EventEmitter {
     }
     else {
       if (error) {
-        this._error(error);
+        // In general, an invalid command is just ignored
+        return;
       }
       else {
         this._command(commandName, commandData);
