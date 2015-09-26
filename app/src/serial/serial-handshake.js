@@ -4,7 +4,9 @@ const {SerialProtocolCommandBuilder} = serialProtocol;
 // The number of attempts to make towards getting a valid HELLO command
 const HELLO_ATTEMPTS = 100;
 // The time to wait for a valid HELLO
-const TIMEOUT = 500; // ms
+// Measurements show that it takes 1700-1800 ms to get a HELLO from an
+// Arduino after reset (tested on a Mac)
+const TIMEOUT = 2000; // ms
 
 export default class SerialHandshake {
   constructor(identity, port) {
