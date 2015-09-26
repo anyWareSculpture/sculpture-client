@@ -2,7 +2,7 @@ const serialProtocol = require('./serial-protocol');
 const {SerialProtocolCommandBuilder} = serialProtocol;
 
 // The number of attempts to make towards getting a valid HELLO command
-const HELLO_ATTEMPTS = 2;
+const HELLO_ATTEMPTS = 100;
 
 export default class SerialHandshake {
   constructor(identity, port) {
