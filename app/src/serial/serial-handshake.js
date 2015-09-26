@@ -72,6 +72,7 @@ export default class SerialHandshake {
     // the serial interface supports isn't supported by our code. That's
     // not a problem and if we need to support that command we will.
     if (error) {
+      this._handleNextCommandWith(this._supportedPattern);
       return;
     }
     else if (commandName === serialProtocol.END_SUPPORTED_COMMAND) {
