@@ -12,7 +12,8 @@ config.HARDWARE_USERNAME_MAPPINGS = {
 };
 
 config.HARDWARE_VENDOR_IDS = new Set([
-  "0x2341" // Arduino Vendor ID
+  "0x2341", // Arduino Vendor ID
+  "0x16c0"  // Teensy Vendor ID
 ]);
 
 config.SERIAL_BAUDRATE = 115200;
