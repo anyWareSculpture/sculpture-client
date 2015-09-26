@@ -137,7 +137,7 @@ export default class SerialManager extends events.EventEmitter {
       }
       callback(error);
     });
-    port.on(SerialPort.EVENT_COMMAND, this._handleCommand.bind(this));
+    port.on(SerialPort.EVENT_COMMAND, (commandName, commandData) => this._handleCommand(port, commandName, commandData));
     port.on(SerialPort.EVENT_ERROR, this._handleError.bind(this));
   }
 
@@ -155,11 +155,12 @@ export default class SerialManager extends events.EventEmitter {
     }
   }
 
-  _handleCommand(commandName, commandData) {
+  _handleCommand(port, commandName, commandData) {
     if (commandName === serialProtocol.DEBUG_COMMAND) {
-      console.log(`DEBUG: ${commandData.message}`);
+      console.log(`DEBUG ${port.path}: ${commandData.message}`);
       return;
     }
+    console.log(`Received command "${commandName}": ${JSON.stringify(commandData)} from "${port.path}"`);
 
     this.emit(SerialManager.EVENT_COMMAND, commandName, commandData);
   }

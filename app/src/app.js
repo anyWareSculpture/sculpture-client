@@ -89,9 +89,6 @@ export default class SculptureApp {
       this.serialSearched = true;
       this._beginFirstGame();
     });
-    serialManager.on(SerialManager.EVENT_COMMAND, (commandName, commandArgs) => {
-      console.log(`GOT SERIAL '${commandName}': ${JSON.stringify(commandArgs)}`);
-    });
     return serialManager;
   }
 
