@@ -28,7 +28,6 @@ export default class DiskView {
     this._animating = false;
     this._previousHardwarePositions = {};
 
-    this.resetDisks();
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
   }
 
@@ -55,7 +54,7 @@ export default class DiskView {
   }
 
   _handleChanges(changes) {
-    if (changes.hasOwnProperty('disk') && changes.disk.hasOwnProperty('level')) {
+    if (changes.hasOwnProperty('disk') && changes.disk.hasOwnProperty('level') || changes.currentGame === "disk") {
       this.resetDisks();
     }
 

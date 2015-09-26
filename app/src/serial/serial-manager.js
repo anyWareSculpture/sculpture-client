@@ -68,7 +68,7 @@ export default class SerialManager extends events.EventEmitter {
       console.log(`Sent command "${command.trim()}" to: ${Array.from(targetPorts)}`);
     }
     else {
-      console.log(`Warning: No destination port for command "${command.trim()}"`);
+      console.warn(`No destination port for command "${command.trim()}"`);
     }
 
     return targetPorts.size !== 0;
@@ -105,21 +105,38 @@ export default class SerialManager extends events.EventEmitter {
         }
         else {
           console.log(`Skipping incompatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`);
+          done[index] = true;
         }
       });
 
       if (!done.length) {
+        console.debug("No serial ports connected");
         callback();
       }
     });
   }
 
   _isValidPort(portInfo) {
-    if (!this.config.HARDWARE_VENDOR_IDS.has(portInfo.vendorId)) {
+    if (portInfo.vendorId !== undefined && !this.config.HARDWARE_VENDOR_IDS.has(portInfo.vendorId)) {
+      return false;
+    }
+
+    const portPath = portInfo.comName;
+    if (this._isInvalidPortPath(portPath)) {
       return false;
     }
 
     return true;
+  }
+
+  _isInvalidPortPath(path) {
+    for (let pattern of this.config.HARDWARE_INVALID_PATH_PATTERNS) {
+      var regex = new RegExp(pattern);
+      if (regex.test(path)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   _createSerialPort(serialPortPath, callback) {
@@ -127,17 +144,16 @@ export default class SerialManager extends events.EventEmitter {
       baudrate: this.config.SERIAL_BAUDRATE
     });
     port.initialize(this.identity, (error) => {
-      callback(error);
       if (error) {
-        console.warn(`ERROR: Failed to open serial port ${port.path}`);
-        console.warn(error);
+        console.warn(`ERROR: Failed to open serial port ${port.path}: ${error.message}`);
       }
       else {
         this._addPortPatterns(port);
         console.log(`Successfully initialized serial port ${port.path}`);
       }
+      callback(error);
     });
-    port.on(SerialPort.EVENT_COMMAND, this._handleCommand.bind(this));
+    port.on(SerialPort.EVENT_COMMAND, (commandName, commandData) => this._handleCommand(port, commandName, commandData));
     port.on(SerialPort.EVENT_ERROR, this._handleError.bind(this));
   }
 
@@ -155,11 +171,12 @@ export default class SerialManager extends events.EventEmitter {
     }
   }
 
-  _handleCommand(commandName, commandData) {
+  _handleCommand(port, commandName, commandData) {
     if (commandName === serialProtocol.DEBUG_COMMAND) {
-      console.log(`DEBUG: ${commandData.message}`);
+      console.log(`DEBUG ${port.path}: ${commandData.message}`);
       return;
     }
+    console.log(`Received command "${commandName}": ${JSON.stringify(commandData)} from "${port.path}"`);
 
     this.emit(SerialManager.EVENT_COMMAND, commandName, commandData);
   }

@@ -133,19 +133,19 @@ export default class SerialPort extends events.EventEmitter {
     let commandName, commandData;
     try {
       ({name: commandName, data: commandData} = SerialProtocolCommandParser.parse(commandString));
-      this._handleParsedCommand(parseError, commandName, commandData);
     }
     catch (error) {
       // Filter by expected errors
       if (error instanceof Error) {
         parseError = error;
-        console.log(`Parse error: ${error} string: ${commandString}`);
+        console.warn(`Parse error: ${error}\nOriginal string: "${commandString}"\nThis command just may not be supported yet`);
       }
       // Throw unexpected errors
       else {
         throw error;
       }
     }
+    this._handleParsedCommand(parseError, commandName, commandData);
   }
 
   _handleParsedCommand(error, commandName, commandData) {
@@ -156,7 +156,8 @@ export default class SerialPort extends events.EventEmitter {
     }
     else {
       if (error) {
-        this._error(error);
+        // In general, an invalid command is just ignored
+        return;
       }
       else {
         this._command(commandName, commandData);
@@ -179,7 +180,7 @@ export default class SerialPort extends events.EventEmitter {
   }
 
   _completeHandshake(callback, error) {
-    console.log(`Handshake completed for ${this.path} ${error}`);
+    console.log(`Handshake ended for ${this.path} ${error ? "with error: " + error.toString() : "(no errors)"}`);
     if (error) {
       callback(error);
       return;

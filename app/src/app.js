@@ -31,6 +31,10 @@ export default class SculptureApp {
     this.sculpture.on(SculptureStore.EVENT_CHANGE, (changes) => {
       this._log(`Sent state update: ${JSON.stringify(changes)}`);
 
+      if (!this.client.connected) {
+        console.warn("Streaming client not connected: ignoring changes");
+        return;
+      }
       this.client.sendStateUpdate(changes);
     });
 
@@ -85,17 +89,16 @@ export default class SculptureApp {
     const serialManager = new SerialManager(this.config, serialIdentity);
     serialManager.searchPorts(() => {
       console.log('Finished searching all serial ports');
+
       this.serialSearched = true;
+      //TODO: May need the views to write out the initial state in the store
       this._beginFirstGame();
-    });
-    serialManager.on(SerialManager.EVENT_COMMAND, (commandName, commandArgs) => {
-      console.log(`COMMAND '${commandName}': ${JSON.stringify(commandArgs)}`);
     });
     return serialManager;
   }
 
   _onConnectionStatusChange() {
-    this._log(`Client Connected: ${this.client.connected}`);
+    this._log(`Streaming Client Connected: ${this.client.connected}`);
   }
 
   _onStateUpdate(update, metadata) {

@@ -17,7 +17,6 @@ export default class PanelView {
 
     this._animating = false;
 
-    this.showAllPanels();
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
   }
 

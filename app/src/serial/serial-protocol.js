@@ -1,10 +1,8 @@
 export const HELLO_COMMAND = "HELLO";
-export const INIT_COMMAND = "INIT";
 export const ERROR_COMMAND = "ERROR";
 export const DEBUG_COMMAND = "DEBUG";
 export const SUPPORTED_COMMAND = "SUPPORTED";
 export const END_SUPPORTED_COMMAND = "ENDSUPPORTED";
-export const IDENTITY_COMMAND = "IDENTITY";
 export const PANEL_COMMAND = "PANEL";
 export const PANEL_SET_COMMAND = "PANEL-SET";
 export const PANEL_PULSE_COMMAND = "PANEL-PULSE";
@@ -29,12 +27,10 @@ export class SerialProtocolCommandParser {
 
     const parserFunctions = {
       [HELLO_COMMAND]: SerialProtocolCommandParser.parseHelloArguments,
-      [INIT_COMMAND]: SerialProtocolCommandParser.parseInitArguments,
       [ERROR_COMMAND]: SerialProtocolCommandParser.parseErrorArguments,
       [DEBUG_COMMAND]: SerialProtocolCommandParser.parseDebugArguments,
       [SUPPORTED_COMMAND]: SerialProtocolCommandParser.parseSupportedArguments,
       [END_SUPPORTED_COMMAND]: SerialProtocolCommandParser.parseEndSupportedArguments,
-      [IDENTITY_COMMAND]: SerialProtocolCommandParser.parseIdentityArguments,
       [PANEL_COMMAND]: SerialProtocolCommandParser.parsePanelArguments,
       [PANEL_SET_COMMAND]: SerialProtocolCommandParser.parsePanelSetArguments,
       [PANEL_PULSE_COMMAND]: SerialProtocolCommandParser.parsePanelPulseArguments,
@@ -55,11 +51,7 @@ export class SerialProtocolCommandParser {
   }
 
   static parseHelloArguments(args) {
-    return {supportedGames: args};
-  }
-
-  static parseInitArguments() {
-    return {};
+    return {debug: args[0] === "0" ? false : true};
   }
 
   static parseErrorArguments(args) {
@@ -76,10 +68,6 @@ export class SerialProtocolCommandParser {
 
   static parseEndSupportedArguments() {
     return {};
-  }
-
-  static parseIdentityArguments(args) {
-    return {identity: args[0]};
   }
 
   static parsePanelArguments(args) {
@@ -121,7 +109,9 @@ export class SerialProtocolCommandParser {
         propertyToSet = "user";
       }
       else {
-        throw new Error(`Unrecognized argument to DISK command: ${arg}`);
+        // ignore the value of an unrecognized arg
+        iteration = argValues.next();
+        continue;
       }
 
       iteration = argValues.next();
@@ -166,12 +156,10 @@ export class SerialProtocolCommandBuilder {
   static build(commandName, commandData) {
     const builderFunctions = {
       [HELLO_COMMAND]: SerialProtocolCommandBuilder.buildHello,
-      [INIT_COMMAND]: SerialProtocolCommandBuilder.buildInit,
       [ERROR_COMMAND]: SerialProtocolCommandBuilder.buildError,
       [DEBUG_COMMAND]: SerialProtocolCommandBuilder.buildDebug,
       [SUPPORTED_COMMAND]: SerialProtocolCommandBuilder.buildSupported,
       [END_SUPPORTED_COMMAND]: SerialProtocolCommandBuilder.buildEndSupported,
-      [IDENTITY_COMMAND]: SerialProtocolCommandBuilder.buildIdentity,
       [PANEL_COMMAND]: SerialProtocolCommandBuilder.buildPanel,
       [PANEL_SET_COMMAND]: SerialProtocolCommandBuilder.buildPanelSet,
       [PANEL_PULSE_COMMAND]: SerialProtocolCommandBuilder.buildPanelPulse,
@@ -190,11 +178,7 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildHello(data) {
-    return `${HELLO_COMMAND} ${data.supportedGames}\n`;
-  }
-
-  static buildInit() {
-    return `${INIT_COMMAND}\n`;
+    return `${HELLO_COMMAND} ${data.debug ? "1" : "0"}\n`;
   }
 
   static buildError(data) {
@@ -213,16 +197,42 @@ export class SerialProtocolCommandBuilder {
     return `${END_SUPPORTED_COMMAND}\n`;
   }
 
-  static buildIdentity(data) {
-    return `${IDENTITY_COMMAND} ${data.identity}\n`;
-  }
-
   static buildPanel(data) {
     return `${PANEL_COMMAND} ${data.stripId} ${data.panelId} ${data.pressed}\n`;
   }
 
   static buildPanelSet(data) {
-    let command = `${PANEL_SET_COMMAND} ${data.stripId} ${data.panelId} ${data.intensity} ${data.color || "-"} ${data.easing || "-"} ${data.duration || ""}`;
+    let command = `${PANEL_SET_COMMAND}`;
+
+    if (data.stripId !== undefined) {
+      command += ` ${data.stripId}`;
+    }
+    
+    if (data.panelId !== undefined) {
+      command += ` ${data.panelId}`;
+    }
+    
+    if (data.intensity !== undefined) {
+      command += ` ${data.intensity}`;
+    }
+
+    if (data.color) {
+      command += ` ${data.color}`;
+    }
+    else if (data.easing || data.duration) {
+        command += " -";
+    }
+
+    if (data.easing) {
+      command += ` ${data.easing}`;
+    }
+    else if (data.duration) {
+      command += " -";
+    }
+
+    if (data.duration) {
+      command += ` ${data.duration}`;
+    }
 
     command = removeOptionalParts(command);
 
@@ -230,7 +240,25 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildPanelPulse(data) {
-    let command = `${PANEL_PULSE_COMMAND} ${data.stripId} ${data.panelId} ${data.intensity} ${data.color || "-"} ${data.easing || "-"} ${data.duration || ""}`;
+    let command = `${PANEL_PULSE_COMMAND} ${data.stripId || ""} ${data.panelId || ""} ${data.intensity || ""}`.trim();
+
+    if (data.color) {
+      command += ` ${data.color}`;
+    }
+    else if (data.easing || data.duration) {
+        command += " -";
+    }
+
+    if (data.easing) {
+      command += ` ${data.easing}`;
+    }
+    else if (data.duration) {
+      command += " -";
+    }
+
+    if (data.duration) {
+      command += ` ${data.duration}`;
+    }
 
     command = removeOptionalParts(command);
 
@@ -238,7 +266,7 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildDisk(data) {
-    let command = `${DISK_COMMAND} ${data.diskId}`;
+    let command = `${DISK_COMMAND} ${data.diskId || ""}`.trim();
     let commandArgs = "";
     if (typeof data.position !== 'undefined' && data.position !== null) {
       commandArgs += ` ${DISK_ARG_POSITION} ${data.position}`;
@@ -248,10 +276,6 @@ export class SerialProtocolCommandBuilder {
     }
     if (typeof data.user !== 'undefined' && data.user !== null) {
       commandArgs += ` ${DISK_ARG_USER} ${data.user}`;
-    }
-
-    if (!commandArgs) {
-      return "";
     }
 
     return `${command}${commandArgs}\n`;
