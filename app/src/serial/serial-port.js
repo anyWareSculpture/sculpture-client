@@ -174,7 +174,6 @@ export default class SerialPort extends events.EventEmitter {
   }
 
   _beginHandshake(identity, callback) {
-
     const handshake = new SerialHandshake(identity, this);
     handshake.execute(this._completeHandshake.bind(this, callback));
   }
