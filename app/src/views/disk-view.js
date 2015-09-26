@@ -54,7 +54,7 @@ export default class DiskView {
   }
 
   _handleChanges(changes) {
-    if (changes.hasOwnProperty('disk') && changes.disk.hasOwnProperty('level')) {
+    if (changes.hasOwnProperty('disk') && changes.disk.hasOwnProperty('level') || changes.currentGame === "disk") {
       this.resetDisks();
     }
 
