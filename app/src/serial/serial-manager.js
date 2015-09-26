@@ -117,7 +117,7 @@ export default class SerialManager extends events.EventEmitter {
   }
 
   _isValidPort(portInfo) {
-    if (portInfo.hasOwnProperty('vendorId') && !this.config.HARDWARE_VENDOR_IDS.has(portInfo.vendorId)) {
+    if (portInfo.vendorId !== undefined && !this.config.HARDWARE_VENDOR_IDS.has(portInfo.vendorId)) {
       return false;
     }
 
