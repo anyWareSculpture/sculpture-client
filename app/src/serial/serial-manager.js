@@ -110,17 +110,33 @@ export default class SerialManager extends events.EventEmitter {
       });
 
       if (!done.length) {
+        console.debug("No serial ports connected");
         callback();
       }
     });
   }
 
   _isValidPort(portInfo) {
-    if (!this.config.HARDWARE_VENDOR_IDS.has(portInfo.vendorId)) {
+    if (portInfo.hasOwnProperty('vendorId') && !this.config.HARDWARE_VENDOR_IDS.has(portInfo.vendorId)) {
+      return false;
+    }
+
+    const portPath = portInfo.comName;
+    if (this._isInvalidPortPath(portPath)) {
       return false;
     }
 
     return true;
+  }
+
+  _isInvalidPortPath(path) {
+    for (let pattern of this.config.HARDWARE_INVALID_PATH_PATTERNS) {
+      var regex = new RegExp(pattern);
+      if (regex.test(path)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   _createSerialPort(serialPortPath, callback) {
