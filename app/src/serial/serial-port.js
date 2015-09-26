@@ -180,7 +180,7 @@ export default class SerialPort extends events.EventEmitter {
   }
 
   _completeHandshake(callback, error) {
-    console.log(`Handshake ended for ${this.path} ${error ? "Error: " + error.toString() : "(no errors)"}`);
+    console.log(`Handshake ended for ${this.path} ${error ? "with error: " + error.toString() : "(no errors)"}`);
     if (error) {
       callback(error);
       return;
