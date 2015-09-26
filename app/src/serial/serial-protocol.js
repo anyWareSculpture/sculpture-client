@@ -252,7 +252,7 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildDisk(data) {
-    let command = `${DISK_COMMAND} ${data.diskId}`;
+    let command = `${DISK_COMMAND} ${data.diskId || ""}`.trim();
     let commandArgs = "";
     if (typeof data.position !== 'undefined' && data.position !== null) {
       commandArgs += ` ${DISK_ARG_POSITION} ${data.position}`;
@@ -262,11 +262,6 @@ export class SerialProtocolCommandBuilder {
     }
     if (typeof data.user !== 'undefined' && data.user !== null) {
       commandArgs += ` ${DISK_ARG_USER} ${data.user}`;
-    }
-
-    // If nothing is actually being updated, there's no point in sending any command at all!
-    if (!commandArgs) {
-      return "";
     }
 
     return `${command}${commandArgs}\n`;
