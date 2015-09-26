@@ -101,7 +101,7 @@ export default class SerialHandshake {
     if (!message) {
       return;
     }
-    this.callback(new Error(message));
+    this.callback(new Error(message.toString()));
   }
 
   _finish() {
