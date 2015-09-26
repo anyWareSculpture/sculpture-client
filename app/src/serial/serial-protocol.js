@@ -109,7 +109,9 @@ export class SerialProtocolCommandParser {
         propertyToSet = "user";
       }
       else {
-        throw new Error(`Unrecognized argument to DISK command: ${arg}`);
+        // ignore the value of an unrecognized arg
+        iteration = argValues.next();
+        continue;
       }
 
       iteration = argValues.next();
