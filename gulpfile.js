@@ -41,7 +41,7 @@ gulp.task('default', function(callback) {
   return runSequence('lint', 'test', 'build', 'package', callback);
 });
 
-gulp.task('build', ['build-app', 'collect-static', 'collect-manifest', 'collect-pages', 'collect-scripts']);
+gulp.task('build', ['build-app', 'collect-static', 'collect-sounds', 'collect-manifest', 'collect-pages', 'collect-scripts']);
 
 gulp.task('build-app', function buildApp() {
   var browserified = through.obj(function(file, enc, next) {
@@ -79,6 +79,11 @@ gulp.task('collect-static', function collectStatic() {
     .pipe(gulp.dest(path.join(BUILD_DIRECTORY, 'static')));
 });
 
+gulp.task('collect-sounds', function collectSounds() {
+  return gulp.src('sounds/**/*')
+    .pipe(gulp.dest(path.join(BUILD_DIRECTORY, 'sounds')));
+});
+
 gulp.task('collect-manifest', function collectManifest() {
   return gulp.src('manifest.json')
     .pipe(gulp.dest(BUILD_DIRECTORY));
@@ -103,6 +108,7 @@ gulp.task('launch', shell.task([
 gulp.task('watch', ['build'], function watch() {
   gulp.watch('app/src/**/*.js', ['build-app']);
   gulp.watch('static/**/*', ['collect-static']);
+  gulp.watch('sounds/**/*', ['collect-sounds']);
   gulp.watch('manifest.json', ['collect-manifest']);
   gulp.watch('app/**/*.html', ['collect-pages']);
   gulp.watch('scripts/**/*.js', ['collect-scripts']);

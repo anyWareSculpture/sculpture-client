@@ -5,6 +5,7 @@ const {SculptureStore, SculptureActionCreator} = require("@anyware/game-logic");
 
 const PanelView = require('./views/panel-view');
 const DiskView = require('./views/disk-view');
+const AudioView = require('./views/audio-view');
 
 const SerialManager = require('./serial/serial-manager');
 
@@ -21,6 +22,7 @@ export default class SculptureApp {
 
     this.panelView = null;
     this.diskView = null;
+    this.audioView = null;
 
     this.serialSearched = false;
     this.serialManager = this._setupSerialManager();
@@ -60,6 +62,7 @@ export default class SculptureApp {
   _setupViews() {
     this.panelView = new PanelView(this.sculpture, this.dispatcher, this.serialManager);
     this.diskView = new DiskView(this.sculpture, this.dispatcher, this.serialManager);
+    this.audioView = new AudioView(this.sculpture, this.dispatcher);
   }
 
   _setupStreamingClient() {
