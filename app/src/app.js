@@ -62,9 +62,9 @@ export default class SculptureApp {
   }
 
   _setupViews() {
-    this.panelView = new PanelView(this.sculpture, this.dispatcher, this.serialManager);
-    this.diskView = new DiskView(this.sculpture, this.dispatcher, this.serialManager);
-    this.audioView = new AudioView(this.sculpture, this.dispatcher);
+    this.panelView = new PanelView(this.sculpture, this.config, this.dispatcher, this.serialManager);
+    this.diskView = new DiskView(this.sculpture, this.config, this.dispatcher, this.serialManager);
+    this.audioView = new AudioView(this.sculpture, this.config, this.dispatcher);
   }
 
   _setupStreamingClient() {

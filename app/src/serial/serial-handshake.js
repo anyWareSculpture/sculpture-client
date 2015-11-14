@@ -1,15 +1,10 @@
 const serialProtocol = require('./serial-protocol');
 const {SerialProtocolCommandBuilder} = serialProtocol;
 
-// The number of attempts to make towards getting a valid HELLO command
-const HELLO_ATTEMPTS = 100;
-// The time to wait for a valid HELLO
-// Measurements show that it takes 1700-1800 ms to get a HELLO from an
-// Arduino after reset (tested on a Mac)
-const TIMEOUT = 2000; // ms
-
 export default class SerialHandshake {
-  constructor(identity, port) {
+  constructor(serialConfig, identity, port) {
+    this.serialConfig = serialConfig;
+    this.handshakeConfig = this.serialConfig.HANDSHAKE;
     this.identity = identity;
     this.port = port;
     this.callback = null;
@@ -40,8 +35,8 @@ export default class SerialHandshake {
         this._helloAttempts -= 1;
         this._handleNextCommandWith(this._hello);
       }
-      else if (this._helloAttempts >= HELLO_ATTEMPTS) {
-        this._error(`Could not get HELLO after ${HELLO_ATTEMPTS} attempts`);
+      else if (this._helloAttempts >= this.handshakeConfig.HELLO_ATTEMPTS) {
+        this._error(`Could not get HELLO after ${this.handshakeConfig.HELLO_ATTEMPTS} attempts`);
       }
       else {
         this._handleNextCommandWith(this._hello);
@@ -119,8 +114,8 @@ export default class SerialHandshake {
       if (!this._helloSucceeded) {
         // no arguments resets it all
         this._handleNextCommandWith();
-        this._error(`Connection to ${this.port.path} timed out after ${TIMEOUT} ms`);
+        this._error(`Connection to ${this.port.path} timed out after ${this.handshakeConfig.TIMEOUT} ms`);
       }
-    }, TIMEOUT);
+    }, this.handshakeConfig.TIMEOUT);
   }
 }

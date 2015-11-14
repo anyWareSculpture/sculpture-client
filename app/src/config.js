@@ -33,6 +33,33 @@ export default class Config extends DefaultConfig {
       "0x16c0"  // Teensy Vendor ID
     ]);
 
-    this.SERIAL_BAUDRATE = 115200;
+    this.SERIAL = {
+      COMMAND_DELIMETER: "\n",
+      BAUDRATE: 115200,
+      HANDSHAKE: {
+        // The number of attempts to make towards getting a valid HELLO command
+        HELLO_ATTEMPTS: 100,
+        // The time to wait for a valid HELLO
+        // Measurements show that it takes 1700-1800 ms to get a HELLO from an
+        // Arduino after reset (tested on a Mac)
+        TIMEOUT: 2000 // ms
+      }
+    };
+
+    /********* View Configuration *********/
+    this.DISKS_HARDWARE = {
+      MAX_RESET_ATTEMPTS: 5,
+      ID_TO_HARDWARE_MAP: {
+        disk0: "0",
+        disk1: "1",
+        disk2: "2"
+      },
+      DIRECTION_TO_HARDWARE_MAP: {
+        [Disk.CLOCKWISE]: -1,
+        [Disk.COUNTERCLOCKWISE]: 1,
+        [Disk.STOPPED]: 0,
+        [Disk.CONFLICT]: 0
+      }
+    };
   }
 }

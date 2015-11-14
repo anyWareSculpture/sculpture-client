@@ -9,8 +9,9 @@ const {SerialProtocolCommandParser, SerialProtocolCommandBuilder} = serialProtoc
 const StatusAnimations = require('./animations/status-animations');
 
 export default class PanelView {
-  constructor(store, dispatcher, serialManager) {
+  constructor(store, config, dispatcher, serialManager) {
     this.store = store;
+    this.config = config;
     this.serialManager = serialManager;
     this.serialManager.on(SerialManager.EVENT_COMMAND, this._handleCommand.bind(this));
 

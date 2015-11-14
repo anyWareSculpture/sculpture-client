@@ -3,8 +3,9 @@ const SculptureStore = require('@anyware/game-logic/lib/sculpture-store');
 const {Howl} = require('howler');
 
 export default class AudioView {
-  constructor(store, dispatcher) {
+  constructor(store, config, dispatcher) {
     this.store = store;
+    this.config = config;
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
 
     const ambientLoop = new Howl({

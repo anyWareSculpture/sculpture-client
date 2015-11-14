@@ -4,8 +4,6 @@ const serialport = require('browser-serialport');
 const SerialHandshake = require('./serial-handshake');
 const {SerialProtocolCommandParser} = require('./serial-protocol');
 
-const COMMAND_DELIMETER = "\n";
-
 /**
  * A higher-level adapter for serial ports that understands our custom serial protocol
  * Automatically handles the initialization handshake
@@ -25,11 +23,12 @@ export default class SerialPort extends events.EventEmitter {
    */
   static EVENT_ERROR = "error";
 
-  constructor(path, options) {
+  constructor(serialConfig, path, portOptions) {
     super();
 
+    this.config = serialConfig;
     this.path = path;
-    this.options = options;
+    this.options = portOptions;
     this.supportedPatterns = [];
 
     this._port = new serialport.SerialPort(path, options, false);
@@ -110,7 +109,7 @@ export default class SerialPort extends events.EventEmitter {
   }
 
   _parseBuffer() {
-    const bufferParts = this._buffer.split(COMMAND_DELIMETER);
+    const bufferParts = this._buffer.split(this.serialConfig.COMMAND_DELIMETER);
     // "abc".split() => ["abc"] whereas "abc\n".split() => ["abc", ""]
     // Thus, a command exists iff the length > 1.
     // The very last element can always be left in the buffer because it
@@ -174,7 +173,7 @@ export default class SerialPort extends events.EventEmitter {
   }
 
   _beginHandshake(identity, callback) {
-    const handshake = new SerialHandshake(identity, this);
+    const handshake = new SerialHandshake(this.serialConfig, identity, this);
     handshake.execute(this._completeHandshake.bind(this, callback));
   }
 

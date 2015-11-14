@@ -6,22 +6,11 @@ const SerialManager = require('../serial/serial-manager');
 const serialProtocol = require('../serial/serial-protocol');
 const {SerialProtocolCommandBuilder} = serialProtocol;
 
-const MAX_RESET_ATTEMPTS = 5;
-const DISK_ID_TO_HARDWARE_MAP = {
-  disk0: "0",
-  disk1: "1",
-  disk2: "2"
-};
-const DISK_DIRECTION_TO_HARDWARE_MAP = {
-  [Disk.CLOCKWISE]: -1,
-  [Disk.COUNTERCLOCKWISE]: 1,
-  [Disk.STOPPED]: 0,
-  [Disk.CONFLICT]: 0
-};
-
 export default class DiskView {
-  constructor(store, dispatcher, serialManager) {
+  constructor(store, config, dispatcher, serialManager) {
     this.store = store;
+    this.config = config;
+    this.disksHardware = this.config.DISKS_HARDWARE;
     this.serialManager = serialManager;
     this.serialManager.on(SerialManager.EVENT_COMMAND, this._handleCommand.bind(this));
 
@@ -36,9 +25,10 @@ export default class DiskView {
   /**
    * Start homing the disks back to their original positions
    * Makes multiple attempts if it doesn't work the first time
-   * @param {Number} maxAttempts - The maximum number of attempts that can be made
+   * @param {Number} maxAttempts - The maximum number greater than zero of attempts that can be made
    */
-  resetDisks(maxAttempts=MAX_RESET_ATTEMPTS) {
+  resetDisks(maxAttempts) {
+    maxAttempts = maxAttempts || this.disksHardware.MAX_RESET_ATTEMPTS;
     let attempt = 0;
 
     const reset = () => {
@@ -66,7 +56,7 @@ export default class DiskView {
     }
 
     for (let diskId of Object.keys(diskChanges)) {
-      const hardwareDiskId = DISK_ID_TO_HARDWARE_MAP[diskId];
+      const hardwareDiskId = this.disksHardware.ID_TO_HARDWARE_MAP[diskId];
 
       const newDiskValues = diskChanges[diskId];
 
@@ -75,7 +65,7 @@ export default class DiskView {
       }
       const position = newDiskValues.position;
 
-      const hardwareDirection = DISK_DIRECTION_TO_HARDWARE_MAP[newDiskValues.direction];
+      const hardwareDirection = this.disksHardware.DIRECTION_TO_HARDWARE_MAP[newDiskValues.direction];
 
       const commandString = SerialProtocolCommandBuilder.buildDisk({
         diskId: hardwareDiskId,
@@ -106,16 +96,16 @@ export default class DiskView {
   }
 
   _lookupDiskIdFromHardware(hardwareDiskId) {
-    for (let diskId of Object.keys(DISK_ID_TO_HARDWARE_MAP)) {
-      if (DISK_ID_TO_HARDWARE_MAP[diskId] === hardwareDiskId) {
+    for (let diskId of Object.keys(this.disksHardware.ID_TO_HARDWARE_MAP)) {
+      if (this.disksHardware.ID_TO_HARDWARE_MAP[diskId] === hardwareDiskId) {
         return diskId;
       }
     }
   }
 
   _lookupDirectionFromHardware(hardwareDirection) {
-    for (let direction of Object.keys(DISK_DIRECTION_TO_HARDWARE_MAP)) {
-      if (DISK_DIRECTION_TO_HARDWARE_MAP[direction] === hardwareDirection) {
+    for (let direction of Object.keys(this.disksHardware.DIRECTION_TO_HARDWARE_MAP)) {
+      if (this.disksHardware.DIRECTION_TO_HARDWARE_MAP[direction] === hardwareDirection) {
         return direction;
       }
     }
