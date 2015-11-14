@@ -1,4 +1,5 @@
 const DefaultConfig = require('@anyware/game-logic/lib/config/default-config');
+const Disk = require('@anyware/game-logic/lib/utils/disk');
 
 export default class Config extends DefaultConfig {
   constructor() {
