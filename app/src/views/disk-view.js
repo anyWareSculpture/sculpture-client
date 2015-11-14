@@ -1,4 +1,6 @@
-const {SculptureStore, DisksActionCreator, Disk} = require('@anyware/game-logic');
+const SculptureStore = require('@anyware/game-logic/lib/sculpture-store');
+const DisksActionCreator = require('@anyware/game-logic/lib/actions/disks-action-creator');
+const Disk = require('@anyware/game-logic/lib/utils/disk');
 
 const SerialManager = require('../serial/serial-manager');
 const serialProtocol = require('../serial/serial-protocol');

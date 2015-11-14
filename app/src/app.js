@@ -1,7 +1,9 @@
 const {Dispatcher} = require("flux");
 
 const StreamingClient = require("@anyware/streaming-client");
-const {SculptureStore, SculptureActionCreator} = require("@anyware/game-logic");
+
+const SculptureStore = require("@anyware/game-logic/lib/sculpture-store");
+const SculptureActionCreator = require("@anyware/game-logic/lib/actions/sculpture-action-creator");
 
 const PanelView = require('./views/panel-view');
 const DiskView = require('./views/disk-view');

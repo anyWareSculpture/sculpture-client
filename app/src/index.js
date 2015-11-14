@@ -1,19 +1,12 @@
 require('babelify/polyfill');
 
-const config = require('./config');
-
+const Config = require('./config');
 const SculptureApp = require('./app');
 
-const DEFAULT_CLIENT_CONNECTION_OPTIONS = {
-  protocol: "ws",
-  username: "anyware",
-  password: "anyware",
-  host: "broker.shiftr.io"
-};
-
+const config = new Config();
 const app = new SculptureApp(config);
 
-const connectionOptions = Object.assign({}, DEFAULT_CLIENT_CONNECTION_OPTIONS);
+const connectionOptions = Object.assign({}, config.CLIENT_CONNECTION_OPTIONS.default);
 
 if (process.argv.length === 4) {
   console.log("Using authentication information provided by command arguments");

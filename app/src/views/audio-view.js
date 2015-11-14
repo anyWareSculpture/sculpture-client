@@ -1,4 +1,5 @@
-const {SculptureStore} = require('@anyware/game-logic');
+const SculptureStore = require('@anyware/game-logic/lib/sculpture-store');
+
 const {Howl} = require('howler');
 
 export default class AudioView {
