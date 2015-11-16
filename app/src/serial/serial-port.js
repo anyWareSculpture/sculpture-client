@@ -31,7 +31,7 @@ export default class SerialPort extends events.EventEmitter {
     this.options = portOptions;
     this.supportedPatterns = [];
 
-    this._port = new serialport.SerialPort(path, options, false);
+    this._port = new serialport.SerialPort(path, this.options, false);
 
     this._buffer = "";
 
@@ -109,7 +109,7 @@ export default class SerialPort extends events.EventEmitter {
   }
 
   _parseBuffer() {
-    const bufferParts = this._buffer.split(this.serialConfig.COMMAND_DELIMETER);
+    const bufferParts = this._buffer.split(this.config.COMMAND_DELIMETER);
     // "abc".split() => ["abc"] whereas "abc\n".split() => ["abc", ""]
     // Thus, a command exists iff the length > 1.
     // The very last element can always be left in the buffer because it
@@ -173,7 +173,7 @@ export default class SerialPort extends events.EventEmitter {
   }
 
   _beginHandshake(identity, callback) {
-    const handshake = new SerialHandshake(this.serialConfig, identity, this);
+    const handshake = new SerialHandshake(this.config, identity, this);
     handshake.execute(this._completeHandshake.bind(this, callback));
   }
 
