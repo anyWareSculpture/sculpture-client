@@ -16,9 +16,9 @@ export default class Config extends DefaultConfig {
     };
 
     this.HARDWARE_USERNAME_MAPPINGS = {
-      sculpture0: '0',
-      sculpture1: '1',
-      sculpture2: '2'
+      [this.user0]: '0',
+      [this.user1]: '1',
+      [this.user2]: '2'
     };
 
     // Serial port paths matching these patterns will be ignored
