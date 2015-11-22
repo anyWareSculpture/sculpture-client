@@ -9,6 +9,7 @@ export const PANEL_PULSE_COMMAND = "PANEL-PULSE";
 export const DISK_COMMAND = "DISK";
 export const DISK_RESET_COMMAND = "DISK-RESET";
 export const DISK_STATE_COMMAND = "DISK-STATE";
+export const HANDSHAKE_COMMAND = "HANDSHAKE";
 
 const DISK_ARG_POSITION = "POS";
 const DISK_ARG_DIRECTION = "DIR";
@@ -36,7 +37,8 @@ export class SerialProtocolCommandParser {
       [PANEL_PULSE_COMMAND]: SerialProtocolCommandParser.parsePanelPulseArguments,
       [DISK_COMMAND]: SerialProtocolCommandParser.parseDiskArguments,
       [DISK_RESET_COMMAND]: SerialProtocolCommandParser.parseDiskResetArguments,
-      [DISK_STATE_COMMAND]: SerialProtocolCommandParser.parseDiskStateArguments
+      [DISK_STATE_COMMAND]: SerialProtocolCommandParser.parseDiskStateArguments,
+      [HANDSHAKE_COMMAND]: SerialProtocolCommandParser.parseHandshakeArguments
     };
 
     const parserFunction = parserFunctions[commandName];
@@ -129,6 +131,10 @@ export class SerialProtocolCommandParser {
   static parseDiskStateArguments(args) {
     return {diskId: args[0], state: args[1]};
   }
+
+  static parseHandshakeArguments(args) {
+    return {active: args[0], user: args[1]};
+  }
 }
 
 function removeOptionalParts(command) {
@@ -165,7 +171,8 @@ export class SerialProtocolCommandBuilder {
       [PANEL_PULSE_COMMAND]: SerialProtocolCommandBuilder.buildPanelPulse,
       [DISK_COMMAND]: SerialProtocolCommandBuilder.buildDisk,
       [DISK_RESET_COMMAND]: SerialProtocolCommandBuilder.buildDiskReset,
-      [DISK_STATE_COMMAND]: SerialProtocolCommandBuilder.buildDiskState
+      [DISK_STATE_COMMAND]: SerialProtocolCommandBuilder.buildDiskState,
+      [HANDSHAKE_COMMAND]: SerialProtocolCommandBuilder.buildHandshake
     };
 
     const builderFunction = builderFunctions[commandName];
@@ -286,6 +293,10 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildDiskState(data) {
-    return `${DISK_STATE_COMMAND} ${data.diskId} ${data.state}`;
+    return `${DISK_STATE_COMMAND} ${data.diskId} ${data.state}\n`;
+  }
+
+  static buildHandshake(data) {
+    return `${HANDSHAKE_COMMAND} ${data.active} ${data.user || ""}\n`;
   }
 }
