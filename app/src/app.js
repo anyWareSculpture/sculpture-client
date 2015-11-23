@@ -8,7 +8,7 @@ const SculptureActionCreator = require("@anyware/game-logic/lib/actions/sculptur
 const HandshakeView = require('./views/handshake-view');
 const PanelView = require('./views/panel-view');
 const DiskView = require('./views/disk-view');
-const AudioView = require('./views/audio-view');
+const AudioView = require('@anyware/shared-views/audio-view');
 
 const SerialManager = require('./serial/serial-manager');
 
@@ -68,6 +68,12 @@ export default class SculptureApp {
     this.panelView = new PanelView(this.sculpture, this.config, this.dispatcher, this.serialManager);
     this.diskView = new DiskView(this.sculpture, this.config, this.dispatcher, this.serialManager);
     this.audioView = new AudioView(this.sculpture, this.config, this.dispatcher);
+    this.audioView.load(err => {
+      if (err) {
+         return console.log(`AudioView error: ${err}`);
+      }
+      console.log('Loaded sounds');
+    });
   }
 
   _setupStreamingClient() {
