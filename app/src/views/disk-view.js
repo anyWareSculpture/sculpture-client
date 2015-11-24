@@ -1,6 +1,7 @@
 const SculptureStore = require('@anyware/game-logic/lib/sculpture-store');
 const DisksActionCreator = require('@anyware/game-logic/lib/actions/disks-action-creator');
 const Disk = require('@anyware/game-logic/lib/utils/disk');
+const GAMES = require('@anyware/game-logic/lib/constants/games');
 
 const SerialManager = require('../serial/serial-manager');
 const serialProtocol = require('../serial/serial-protocol');
@@ -46,7 +47,9 @@ export default class DiskView {
   }
 
   _handleChanges(changes) {
-    if (changes.hasOwnProperty('disk') && changes.disk.hasOwnProperty('level') || changes.currentGame === "disk") {
+    if (changes.currentGame === GAMES.HANDSHAKE || // Reset on startup
+        changes.hasOwnProperty('disk') && changes.disk.hasOwnProperty('level') ||
+        changes.currentGame === "disk") {
       this.resetDisks();
     }
 
