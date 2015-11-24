@@ -19,6 +19,7 @@ export default class DiskView {
 
     this._animating = false;
     this._previousHardwarePositions = {};
+    this._previousGame = null;
 
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
   }
@@ -47,11 +48,15 @@ export default class DiskView {
   }
 
   _handleChanges(changes) {
-    if (changes.currentGame === GAMES.HANDSHAKE || // Reset on startup
-        changes.hasOwnProperty('disk') && changes.disk.hasOwnProperty('level') ||
-        changes.currentGame === "disk") {
-      this.resetDisks();
+    let shouldReset = false;
+    // Reset on start or stop of playing the disk game
+    if (changes.hasOwnProperty('currentGame')) {
+      shouldReset = this._previousGame === GAMES.DISK || changes.currentGame == GAMES.DISK;
+      this._previousGame = changes.currentGame;
     }
+    // Reset on next level
+    shouldReset = shouldReset || changes.hasOwnProperty('disk') && changes.disk.hasOwnProperty('level');
+    if (shouldReset) this.resetDisks();
 
     const diskChanges = changes.disks;
     if (!diskChanges) {
