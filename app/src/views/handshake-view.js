@@ -17,6 +17,9 @@ export default class HandshakeView {
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
   }
 
+  reset() {
+  }
+
   get handshakes() {
     return this.store.data.get('handshakes');
   }

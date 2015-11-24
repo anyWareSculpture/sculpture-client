@@ -25,6 +25,13 @@ export default class DiskView {
   }
 
   /**
+   * Called on power-up, after initializing all subsystems
+   */
+  reset() {
+    this.resetDisks();
+  }
+
+  /**
    * Start homing the disks back to their original positions
    * Makes multiple attempts if it doesn't work the first time
    * @param {Number} maxAttempts - The maximum number greater than zero of attempts that can be made

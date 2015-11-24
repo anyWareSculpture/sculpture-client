@@ -23,10 +23,7 @@ export default class SculptureApp {
 
     this.client = null;
 
-    this.handshakeView = null;
-    this.panelView = null;
-    this.diskView = null;
-    this.audioView = null;
+    this.views = {};
     this.audioInitialized = false;
 
     this.serialSearched = false;
@@ -65,11 +62,11 @@ export default class SculptureApp {
   }
 
   _setupViews() {
-    this.handshakeView = new HandshakeView(this.sculpture, this.config, this.dispatcher, this.serialManager);
-    this.panelView = new PanelView(this.sculpture, this.config, this.dispatcher, this.serialManager);
-    this.diskView = new DiskView(this.sculpture, this.config, this.dispatcher, this.serialManager);
-    this.audioView = new AudioView(this.sculpture, this.config, this.dispatcher);
-    this.audioView.load(err => {
+    this.views.handshakeView = new HandshakeView(this.sculpture, this.config, this.dispatcher, this.serialManager);
+    this.views.panelView = new PanelView(this.sculpture, this.config, this.dispatcher, this.serialManager);
+    this.views.diskView = new DiskView(this.sculpture, this.config, this.dispatcher, this.serialManager);
+    this.views.audioView = new AudioView(this.sculpture, this.config, this.dispatcher);
+    this.views.audioView.load(err => {
       if (err) {
          return console.log(`AudioView error: ${err}`);
       }
@@ -130,6 +127,7 @@ export default class SculptureApp {
 
     //TODO: Temporarily here until the full game transitions are implemented
     if (this.sculpture.isPlayingNoGame) {
+      Object.keys(this.views).forEach(view => this.views[view].reset());
       const game = this.config.GAMES_SEQUENCE[0];
       this._log(`Starting ${game} game...`);
       this.sculptureActionCreator.sendStartGame(game);
