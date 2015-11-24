@@ -27,6 +27,7 @@ export default class SculptureApp {
     this.panelView = null;
     this.diskView = null;
     this.audioView = null;
+    this.audioInitialized = false;
 
     this.serialSearched = false;
     this.serialManager = this._setupSerialManager();
@@ -72,6 +73,8 @@ export default class SculptureApp {
       if (err) {
          return console.log(`AudioView error: ${err}`);
       }
+      this.audioInitialized = true;
+      this._beginFirstGame();
       console.log('Loaded sounds');
     });
   }
@@ -121,7 +124,7 @@ export default class SculptureApp {
   }
 
   _beginFirstGame() {
-    if (!this.client || !this.client.connected || !this.serialSearched) {
+    if (!this.client || !this.client.connected || !this.serialSearched || !this.audioInitialized) {
       return;
     }
 
