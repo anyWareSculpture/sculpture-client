@@ -5,6 +5,7 @@ const StreamingClient = require("@anyware/streaming-client");
 const SculptureStore = require("@anyware/game-logic/lib/sculpture-store");
 const SculptureActionCreator = require("@anyware/game-logic/lib/actions/sculpture-action-creator");
 
+const HandshakeView = require('./views/handshake-view');
 const PanelView = require('./views/panel-view');
 const DiskView = require('./views/disk-view');
 const AudioView = require('./views/audio-view');
@@ -22,6 +23,7 @@ export default class SculptureApp {
 
     this.client = null;
 
+    this.handshakeView = null;
     this.panelView = null;
     this.diskView = null;
     this.audioView = null;
@@ -62,6 +64,7 @@ export default class SculptureApp {
   }
 
   _setupViews() {
+    this.handshakeView = new HandshakeView(this.sculpture, this.config, this.dispatcher, this.serialManager);
     this.panelView = new PanelView(this.sculpture, this.config, this.dispatcher, this.serialManager);
     this.diskView = new DiskView(this.sculpture, this.config, this.dispatcher, this.serialManager);
     this.audioView = new AudioView(this.sculpture, this.config, this.dispatcher);
