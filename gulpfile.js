@@ -46,7 +46,8 @@ gulp.task('build', ['build-app', 'collect-static', 'collect-sounds', 'collect-ma
 gulp.task('build-app', function buildApp() {
   var browserified = through.obj(function(file, enc, next) {
     browserify(file.path, {
-      debug: true,
+// FIXME: Wait for https://github.com/substack/node-browserify/issues/1446
+//      debug: true,
     }).transform(babelify.configure({
       stage: 0
     })).bundle(function(err, res){
