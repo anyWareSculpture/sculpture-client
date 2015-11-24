@@ -1,6 +1,7 @@
 const SculptureStore = require('@anyware/game-logic/lib/sculpture-store');
 const DisksActionCreator = require('@anyware/game-logic/lib/actions/disks-action-creator');
 const Disk = require('@anyware/game-logic/lib/utils/disk');
+const GAMES = require('@anyware/game-logic/lib/constants/games');
 
 const SerialManager = require('../serial/serial-manager');
 const serialProtocol = require('../serial/serial-protocol');
@@ -18,8 +19,16 @@ export default class DiskView {
 
     this._animating = false;
     this._previousHardwarePositions = {};
+    this._previousGame = null;
 
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
+  }
+
+  /**
+   * Called on power-up, after initializing all subsystems
+   */
+  reset() {
+    this.resetDisks();
   }
 
   /**
@@ -46,9 +55,15 @@ export default class DiskView {
   }
 
   _handleChanges(changes) {
-    if (changes.hasOwnProperty('disk') && changes.disk.hasOwnProperty('level') || changes.currentGame === "disk") {
-      this.resetDisks();
+    let shouldReset = false;
+    // Reset on start or stop of playing the disk game
+    if (changes.hasOwnProperty('currentGame')) {
+      shouldReset = this._previousGame === GAMES.DISK || changes.currentGame == GAMES.DISK;
+      this._previousGame = changes.currentGame;
     }
+    // Reset on next level
+    shouldReset = shouldReset || changes.hasOwnProperty('disk') && changes.disk.hasOwnProperty('level');
+    if (shouldReset) this.resetDisks();
 
     const diskChanges = changes.disks;
     if (!diskChanges) {
