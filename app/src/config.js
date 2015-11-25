@@ -49,7 +49,6 @@ export default class Config extends DefaultConfig {
 
     /********* View Configuration *********/
     this.DISKS_HARDWARE = {
-      MAX_RESET_ATTEMPTS: 5,
       ID_TO_HARDWARE_MAP: {
         disk0: "0",
         disk1: "1",
