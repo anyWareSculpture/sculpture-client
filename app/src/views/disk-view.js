@@ -40,15 +40,11 @@ export default class DiskView {
   }
 
   _handleChanges(changes) {
-    let shouldReset = false;
-    // Reset on start or stop of playing the disk game
     if (changes.hasOwnProperty('currentGame')) {
-      shouldReset = this._previousGame === GAMES.DISK || changes.currentGame == GAMES.DISK;
+      // Reset on start or stop of playing the disk game
+      if (this._previousGame === GAMES.DISK || changes.currentGame == GAMES.DISK) this.resetDisks();
       this._previousGame = changes.currentGame;
     }
-    // Reset on next level
-    shouldReset = shouldReset || changes.hasOwnProperty('disk') && changes.disk.hasOwnProperty('level');
-    if (shouldReset) this.resetDisks();
 
     const diskChanges = changes.disks;
     if (!diskChanges) {
