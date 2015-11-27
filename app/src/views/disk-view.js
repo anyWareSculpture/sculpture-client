@@ -60,7 +60,8 @@ export default class DiskView {
 
       const newDiskValues = diskChanges[diskId];
 
-      if (newDiskValues.position === this._previousHardwarePositions[diskId]) {
+      if (newDiskValues.hasOwnProperty('position') && 
+          newDiskValues.position === this._previousHardwarePositions[diskId]) {
         continue;
       }
       const position = newDiskValues.position;
