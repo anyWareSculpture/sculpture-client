@@ -22,6 +22,7 @@ export default class StatusAnimations {
       }
       direction *= -1;
     }
+    frames.push(() => [[lastPanel, 0, "success"]]);
 
     StatusAnimations.animateStrips(view, ['0', '1', '2'], frames, 50, completeCallback);
   }
@@ -47,6 +48,7 @@ export default class StatusAnimations {
       }
       direction *= -1;
     }
+    frames.push(() => [[lastPanel, 0, "error"]]);
 
     StatusAnimations.animateStrips(view, ['0', '1', '2'], frames, 50, completeCallback);
   }
