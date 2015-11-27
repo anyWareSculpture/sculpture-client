@@ -36,7 +36,7 @@ export default class DiskView {
    */
   resetDisks() {
     const commandString = SerialProtocolCommandBuilder.buildDiskReset();
-    const sent = this.serialManager.dispatchCommand(commandString);
+    return this.serialManager.dispatchCommand(commandString);
   }
 
   _handleChanges(changes) {
