@@ -24,6 +24,10 @@ export default class DiskView {
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
   }
 
+  get disks() {
+    return this.store.data.get('disks');
+  }
+
   /**
    * Called on power-up, after initializing all subsystems
    */
@@ -42,7 +46,9 @@ export default class DiskView {
   _handleChanges(changes) {
     if (changes.hasOwnProperty('currentGame')) {
       // Reset on start or stop of playing the disk game
-      if (this._previousGame === GAMES.DISK || changes.currentGame == GAMES.DISK) this.resetDisks();
+      if (this._previousGame === GAMES.DISK || changes.currentGame == GAMES.DISK) {
+        this.resetDisks();
+      }
       this._previousGame = changes.currentGame;
     }
 
@@ -51,6 +57,7 @@ export default class DiskView {
       return;
     }
 
+    const disks = this.disks;
     for (let diskId of Object.keys(diskChanges)) {
       const hardwareDiskId = this.disksHardware.ID_TO_HARDWARE_MAP[diskId];
 
@@ -62,7 +69,7 @@ export default class DiskView {
       }
       const position = newDiskValues.position;
 
-      const hardwareDirection = this.disksHardware.DIRECTION_TO_HARDWARE_MAP[newDiskValues.direction];
+      const hardwareDirection = this.disksHardware.DIRECTION_TO_HARDWARE_MAP[newDiskValues.direction || disks.get(diskId).getDirection()];
 
       const commandString = SerialProtocolCommandBuilder.buildDisk({
         diskId: hardwareDiskId,
