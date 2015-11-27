@@ -73,25 +73,38 @@ export class Field {
       choices: null
     }, options);
   }
+
+  option(name, value) {
+    if (value === undefined) {
+      return this.options[name];
+    }
+    else {
+      return this.options[name] = value;
+    }
+  }
   
   default(value) {
-    this.options.default = value;
-    return this;
+    return this.option("default", value);
+  }
+
+  get isRequired() {
+    return this.option("required");
   }
   
   required() {
-    this.options.required = true;
-    return this;
+    return this.option("required", true);
   }
   
   optional() {
-    this.options.required = false;
-    return this;
+    return this.option("required", false);
   }
   
   choices(fieldChoices) {
-    this.options.choices = Object.assign(this.options.choices || {}, fieldChoices);
-    return this;
+    const choices = this.option("choices");
+    if (!fieldChoices) {
+      return choices;
+    }
+    return this.option("choices", Object.assign(choices || {}, fieldChoices));
   }
   
   parse(words) {
@@ -100,7 +113,9 @@ export class Field {
     if (this.options.required && !words.length) {
       throw new Error(`Required field ${this.name} not provided`);
     }
-    return words.pop(0) || this.default;
+    const result = words.pop(0) || this.default;
+    const choices = this.choices();
+    return choices ? choices[result] : result;
   }
   
   build(values) {
@@ -108,7 +123,9 @@ export class Field {
     if (this.options.required && !values.hasOwnProperty(this.name)) {
       throw new Error(`Required field ${this.name} not provided`);
     }
-    return values[this.name] || this.default;
+    const result = values[this.name] || this.default;
+    const choices = this.choices();
+    return choices ? choices[result] : result;
   }
 }
 
