@@ -5,10 +5,18 @@ const SerialPort = require('./serial-port');
 
 const serialProtocol = require('./serial-protocol');
 
+// NOTE: In order to account for the limited buffer size on the Arduino, many
+// serial commands are not sent at once. Instead, each command to be sent
+// is buffered and then sent after the following delay. This has a downside
+// where if this delay is too large, a large backlog of commands may build
+// up. The queue's processing speed is limited by how busy the JavaScript
+// engine is. A delay that is too small may not be respected.
+const DELAY_BETWEEN_SERIAL_COMMANDS = 10; // ms
+
 /**
- * Finds all available serial ports which supports the anyWare protocol.
- * Maps supported commands, and routes these to the appropriate serial port.
- */
+   Finds all available serial ports which supports the anyWare protocol.
+   Maps supported commands, and routes these to the appropriate serial port.
+*/
 export default class SerialManager extends events.EventEmitter {
   /**
    * Fired when the serial manager receives a command from a serial port
@@ -25,6 +33,9 @@ export default class SerialManager extends events.EventEmitter {
 
     this.patterns = {};
     this.ports = {};
+
+    this.commandQueue = [];
+    this._setupCommandQueueProcessor();
   }
 
   /**
@@ -50,7 +61,7 @@ export default class SerialManager extends events.EventEmitter {
 
     for (let portId of targetPorts) {
       const port = this.ports[portId];
-      port.write(command);
+      this.commandQueue.unshift([port, command]);
     }
 
     if (targetPorts.size > 0) {
@@ -172,5 +183,16 @@ export default class SerialManager extends events.EventEmitter {
 
   _handleError(error) {
     console.error(`ERROR: ${error}`);
+  }
+
+  _setupCommandQueueProcessor() {
+    setInterval(() => {
+      if (this.commandQueue.length === 0) {
+        return;
+      }
+
+      const [port, command] = this.commandQueue.pop();
+      port.write(command);
+    }, DELAY_BETWEEN_SERIAL_COMMANDS);
   }
 }
