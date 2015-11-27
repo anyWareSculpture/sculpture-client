@@ -81,7 +81,7 @@ gulp.task('collect-static', function collectStatic() {
 });
 
 gulp.task('collect-sounds', function collectSounds() {
-  return gulp.src('sounds/**/*')
+  return gulp.src(['node_modules/@anyware/sound-assets/**/*.wav'])
     .pipe(gulp.dest(path.join(BUILD_DIRECTORY, 'sounds')));
 });
 

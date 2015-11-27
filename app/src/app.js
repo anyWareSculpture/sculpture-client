@@ -8,7 +8,7 @@ const SculptureActionCreator = require("@anyware/game-logic/lib/actions/sculptur
 const HandshakeView = require('./views/handshake-view');
 const PanelView = require('./views/panel-view');
 const DiskView = require('./views/disk-view');
-const AudioView = require('./views/audio-view');
+const AudioView = require('@anyware/shared-views/lib/audio-view');
 
 const SerialManager = require('./serial/serial-manager');
 
@@ -121,7 +121,7 @@ export default class SculptureApp {
   }
 
   _beginFirstGame() {
-    if (!this.client || !this.client.connected || !this.serialSearched) {
+    if (!this.client || !this.client.connected || !this.serialSearched || !this.audioInitialized) {
       return;
     }
 
