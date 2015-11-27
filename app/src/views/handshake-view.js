@@ -42,8 +42,8 @@ export default class HandshakeView {
       var isActive = handshakesChanges[username];
 
       const commandString = SerialProtocolCommandBuilder.buildHandshake({
-        active: isActive,
-        user: this.config.HARDWARE_USERNAME_MAPPINGS[username]
+        // FIXME: For multi-plauer, send actual number of active users
+        numUsers: isActive ? 1 : 0,
       });
       this.serialManager.dispatchCommand(commandString);
     }
@@ -51,9 +51,9 @@ export default class HandshakeView {
 
   _handleCommand(commandName, commandArgs) {
     if (commandName === serialProtocol.HANDSHAKE_COMMAND) {
-      let {active} = commandArgs;
+      let {numUsers} = commandArgs;
 
-      if (parseInt(active)) {
+      if (parseInt(numUsers) > 0) {
         this.sculptureActionCreator.sendHandshakeActivate(this.config.username);
       }
       else {

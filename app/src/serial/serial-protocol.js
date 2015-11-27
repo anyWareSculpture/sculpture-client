@@ -133,7 +133,7 @@ export class SerialProtocolCommandParser {
   }
 
   static parseHandshakeArguments(args) {
-    return {active: args[0], user: args[1]};
+    return {numUsers: args[0]};
   }
 }
 
@@ -297,6 +297,10 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildHandshake(data) {
-    return `${HANDSHAKE_COMMAND} ${data.active} ${data.user || ""}\n`;
+    let command = `${HANDSHAKE_COMMAND}`;
+    if (data.numUsers !== undefined) {
+      command += ` ${data.numUsers}`;
+    }
+    return `${command}\n`;
   }
 }
