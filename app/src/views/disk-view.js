@@ -33,25 +33,10 @@ export default class DiskView {
 
   /**
    * Start homing the disks back to their original positions
-   * Makes multiple attempts if it doesn't work the first time
-   * @param {Number} maxAttempts - The maximum number greater than zero of attempts that can be made
    */
-  resetDisks(maxAttempts) {
-    maxAttempts = maxAttempts || this.disksHardware.MAX_RESET_ATTEMPTS;
-    let attempt = 0;
-
-    const reset = () => {
-      attempt += 1;
-
-      const commandString = SerialProtocolCommandBuilder.buildDiskReset();
-      const sent = this.serialManager.dispatchCommand(commandString);
-
-      if (!sent && attempt < maxAttempts) {
-        setTimeout(reset, 300);
-      }
-    };
-
-    reset();
+  resetDisks() {
+    const commandString = SerialProtocolCommandBuilder.buildDiskReset();
+    return this.serialManager.dispatchCommand(commandString);
   }
 
   _handleChanges(changes) {
