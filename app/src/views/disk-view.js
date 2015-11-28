@@ -61,21 +61,37 @@ export default class DiskView {
     for (let diskId of Object.keys(diskChanges)) {
       const hardwareDiskId = this.disksHardware.ID_TO_HARDWARE_MAP[diskId];
 
+      const disk = disks.get(diskId);
       const newDiskValues = diskChanges[diskId];
 
-      if (newDiskValues.hasOwnProperty('position') && 
-          newDiskValues.position === this._previousHardwarePositions[diskId]) {
-        continue;
+      let position, direction, user;
+      if (newDiskValues.hasOwnProperty('position') && newDiskValues.position !== this._previousHardwarePositions[diskId]) {
+        position = newDiskValues.position;
       }
-      const position = newDiskValues.position;
+      else {
+        // leave position undefined because sending a position that
+        // is already set stops the disk
+      }
+      if (newDiskValues.hasOwnProperty('direction')) {
+        direction = newDiskValues.direction;
+      }
+      else {
+        direction = disk.getDirection();
+      }
+      if (newDiskValues.hasOwnProperty('user')) {
+        user = newDiskValues.user;
+      }
+      else {
+        user = disk.getUser();
+      }
 
-      const hardwareDirection = this.disksHardware.DIRECTION_TO_HARDWARE_MAP[newDiskValues.direction || disks.get(diskId).getDirection()];
+      const hardwareDirection = this.disksHardware.DIRECTION_TO_HARDWARE_MAP[direction];
 
       const commandString = SerialProtocolCommandBuilder.buildDisk({
         diskId: hardwareDiskId,
         position: position,
         direction: hardwareDirection,
-        user: newDiskValues.user
+        user: user
       });
       this.serialManager.dispatchCommand(commandString);
     }
