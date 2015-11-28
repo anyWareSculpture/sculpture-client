@@ -1,3 +1,4 @@
+const GAMES = require('@anyware/game-logic/lib/constants/games');
 const SculptureStore = require('@anyware/game-logic/lib/sculpture-store');
 const SculptureActionCreator = require('@anyware/game-logic/lib/actions/sculpture-action-creator');
 
@@ -14,6 +15,8 @@ export default class HandshakeView {
 
     this.sculptureActionCreator = new SculptureActionCreator(dispatcher);
 
+    this._pulseInterval = null;
+
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
   }
 
@@ -25,10 +28,7 @@ export default class HandshakeView {
   }
 
   _handleChanges(changes) {
-    if (this._animating) {
-      return;
-    }
-
+    this._handleCurrentGameChanges(changes);
     this._handleHandshakesChanges(changes);
   }
 
@@ -38,15 +38,51 @@ export default class HandshakeView {
       return;
     }
 
-    for (let username of Object.keys(handshakesChanges)) {
-      var isActive = handshakesChanges[username];
+    const handshakes = this.handshakes;
+    const count = Array.from(handshakes).reduce((total, username) => {
+      return total + (handshakes.get(username) ? 1 : 0);
+    }, 0);
+    const commandString = SerialProtocolCommandBuilder.buildHandshake({
+      numUsers: count
+    });
+    this.serialManager.dispatchCommand(commandString);
+  }
 
-      const commandString = SerialProtocolCommandBuilder.buildHandshake({
-        // FIXME: For multi-plauer, send actual number of active users
-        numUsers: isActive ? 1 : 0,
-      });
-      this.serialManager.dispatchCommand(commandString);
+  _handleCurrentGameChanges(changes) {
+    if (!changes.hasOwnProperty("currentGame")) {
+      return
     }
+
+    if (changes.currentGame === GAMES.HANDSHAKE) {
+      // starting handshake game
+      this._beginPulsing();
+    }
+    else {
+      this._endPulsing();
+    }
+  }
+
+  _beginPulsing() {
+    // ensure that we can never orphan a timer
+    this._endPulsing();
+
+    this._pulseInterval = setInterval(this._pulse.bind(this),
+      this.config.HANDSHAKE_HARDWARE.PULSE_DELAY);
+  }
+
+  _endPulsing() {
+    clearInterval(this._pulseInterval);
+  }
+
+  _pulse() {
+    const commandString = SerialProtocolCommandBuilder.buildPanelPulse({
+      stripId: this.config.LIGHTS.HANDSHAKE_STRIP,
+      panelId: '3',
+      intensity: 100,
+      color: 'white',
+      easing: 'sleep'
+    });
+    this.serialManager.dispatchCommand(commandString);
   }
 
   _handleCommand(commandName, commandArgs) {

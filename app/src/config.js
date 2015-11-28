@@ -48,6 +48,11 @@ export default class Config extends DefaultConfig {
     };
 
     /********* View Configuration *********/
+    this.HANDSHAKE_HARDWARE = {
+      // Delay between consequtive pulses in the handshake game
+      PULSE_DELAY: 4500 // ms
+    };
+
     this.DISKS_HARDWARE = {
       ID_TO_HARDWARE_MAP: {
         disk0: "0",
