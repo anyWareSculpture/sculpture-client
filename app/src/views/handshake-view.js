@@ -66,6 +66,8 @@ export default class HandshakeView {
     // ensure that we can never orphan a timer
     this._endPulsing();
 
+    this._pulse();
+
     this._pulseInterval = setInterval(this._pulse.bind(this),
       this.config.HANDSHAKE_HARDWARE.PULSE_DELAY);
   }
