@@ -16,6 +16,7 @@ export default class HandshakeView {
     this.sculptureActionCreator = new SculptureActionCreator(dispatcher);
 
     this._pulseInterval = null;
+    this._complete = false;
 
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
   }
@@ -129,10 +130,12 @@ export default class HandshakeView {
 
     if (changes.currentGame === GAMES.HANDSHAKE) {
       // starting handshake game
+      this._complete = true;
       this._beginPulsing();
     }
     else {
       this._endPulsing();
+      this._complete = false;
     }
   }
 
@@ -142,8 +145,13 @@ export default class HandshakeView {
 
     this._pulse();
 
-    this._pulseInterval = setInterval(this._pulse.bind(this),
-      this.config.HANDSHAKE_HARDWARE.PULSE_DELAY);
+    this._pulseInterval = setInterval(() => {
+      if (this._complete) {
+        return;
+      }
+      
+      this._pulse();
+    }, this.config.HANDSHAKE_HARDWARE.PULSE_DELAY);
   }
 
   _endPulsing() {
