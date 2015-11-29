@@ -130,12 +130,12 @@ export default class HandshakeView {
 
     if (changes.currentGame === GAMES.HANDSHAKE) {
       // starting handshake game
-      this._complete = true;
+      this._complete = false;
       this._beginPulsing();
     }
     else {
       this._endPulsing();
-      this._complete = false;
+      this._complete = true;
     }
   }
 
