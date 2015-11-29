@@ -46,6 +46,9 @@ export default class HandshakeView {
         this._activateUserPanel(username);
 
         if (username === this.store.username) {
+          // Pulsing needs to be stopped if the user has activated the 
+          // handshake because both cannot happen at once
+          this._endPulsing();
           this._activateMiddlePanel();
         }
       }
@@ -156,6 +159,7 @@ export default class HandshakeView {
 
   _endPulsing() {
     clearInterval(this._pulseInterval);
+    this._pulseInterval = null;
   }
 
   _pulse() {
