@@ -45,8 +45,9 @@ export default class DiskView {
 
   _handleChanges(changes) {
     if (changes.hasOwnProperty('currentGame')) {
-      // Reset on start or stop of playing the disk game
-      if (this._previousGame === GAMES.DISK || changes.currentGame == GAMES.DISK) {
+
+      // Reset on start of playing the disk game
+      if (changes.currentGame == GAMES.DISK || changes.currentGame == GAMES.HANDSHAKE) {
         this.resetDisks();
       }
       this._previousGame = changes.currentGame;
