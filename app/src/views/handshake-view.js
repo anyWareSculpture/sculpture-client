@@ -61,47 +61,52 @@ export default class HandshakeView {
   _activateUserPanel(username) {
     const intensity = this.config.HANDSHAKE_HARDWARE.USER_PANEL_ON_INTENSITY;
     const color = this.config.getUserColor(username);
+    const easing = this.config.HANDSHAKE_HARDWARE.USER_PANEL_ON_EASING;
 
-    this._userPanelSet(username, intensity, color);
+    this._userPanelSet(username, {intensity, color, easing});
   }
 
   _deactivateUserPanel(username) {
     const intensity = this.config.HANDSHAKE_HARDWARE.USER_PANEL_OFF_INTENSITY;
+    const easing = this.config.HANDSHAKE_HARDWARE.USER_PANEL_OFF_EASING;
 
-    this._userPanelSet(username, intensity);
+    this._userPanelSet(username, {intensity, easing});
   }
 
   _activateMiddlePanel() {
     const intensity = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_INTENSITY;
     const color = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_COLOR || this.store.userColor;
+    const easing = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_EASING;
 
-    this._middlePanelSet(intensity, color);
+    this._middlePanelSet({intensity, color, easing});
   }
 
   _deactivateMiddlePanel() {
     const intensity = this.config.HANDSHAKE_HARDWARE.MIDDLE_OFF_INTENSITY;
     const color = this.config.HANDSHAKE_HARDWARE.MIDDLE_OFF_COLOR;
+    const easing = this.config.HANDSHAKE_HARDWARE.MIDDLE_OFF_EASING;
 
-    this._middlePanelSet(intensity, color);
+    this._middlePanelSet({intensity, color, easing});
   }
 
-  _userPanelSet(username, intensity, color) {
+  _userPanelSet(username, {intensity, color, easing}) {
     const userPanel = this.config.HANDSHAKE_HARDWARE.USER_PANELS[username];
 
-    this._handshakePanelSet(userPanel, intensity, color);
+    this._handshakePanelSet(userPanel, {intensity, color, easing});
   }
 
-  _middlePanelSet(intensity, color) {
+  _middlePanelSet({intensity, color, easing}) {
     const panel = this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL;
-    this._handshakePanelSet(panel, intensity, color);
+    this._handshakePanelSet(panel, {intensity, color, easing});
   }
 
-  _handshakePanelSet(panel, intensity, color) {
+  _handshakePanelSet(panel, {intensity, color, easing}) {
     const commandString = SerialProtocolCommandBuilder.buildPanelSet({
       stripId: this.config.LIGHTS.HANDSHAKE_STRIP,
       panelId: panel,
       intensity: intensity,
-      color: color
+      color: color,
+      easing: easing
     });
     this.serialManager.dispatchCommand(commandString);
   }
