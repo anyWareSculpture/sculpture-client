@@ -81,27 +81,6 @@ export default class PanelView {
           });
           this.serialManager.dispatchCommand(commandString);
         }
-
-        if (panelChanges.hasOwnProperty("active")) {
-          //TODO: Make this behaviour game specific with a default behaviour
-          let intensity, color;
-          if (panelChanges.active) {
-            intensity = 100;
-            color = this.store.userColor;
-          }
-          else {
-            intensity = lightArray.getIntensity(stripId, panelId);
-            color = lightArray.getColor(stripId, panelId);
-          }
-
-          const commandString = SerialProtocolCommandBuilder.buildPanelSet({
-            stripId: stripId,
-            panelId: panelId,
-            intensity: intensity,
-            color: color
-          });
-          this.serialManager.dispatchCommand(commandString);
-        }
       }
     }
   }
