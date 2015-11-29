@@ -15,6 +15,7 @@ export default class Config extends DefaultConfig {
       }
     };
 
+    /*********** Hardware Mappings ************/
     this.HARDWARE_USERNAME_MAPPINGS = {
       [this.user0]: '0',
       [this.user1]: '1',
@@ -50,7 +51,24 @@ export default class Config extends DefaultConfig {
     /********* View Configuration *********/
     this.HANDSHAKE_HARDWARE = {
       // Delay between consequtive pulses in the handshake game
-      PULSE_DELAY: 4000 // ms
+      PULSE_DELAY: 4000, // ms
+      USER_PANELS: {
+        // username : panelId
+        [this.user0]: '0',
+        [this.user1]: '1',
+        [this.user2]: '2'
+      },
+      USER_PANEL_ON_INTENSITY: 100,
+      USER_PANEL_OFF_INTENSITY: 0,
+
+      MIDDLE_PANEL: '3',
+      // Settings for the middle part of the handshake
+      MIDDLE_ON_INTENSITY: 100,
+      MIDDLE_OFF_INTENSITY: 0,
+      // The color settings here represent the color of the middle
+      // setting ON_COLOR to null makes it default to the user color
+      MIDDLE_ON_COLOR: null,
+      MIDDLE_OFF_COLOR: 'white'
     };
 
     this.DISKS_HARDWARE = {

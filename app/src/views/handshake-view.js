@@ -38,6 +38,75 @@ export default class HandshakeView {
       return;
     }
 
+    this._updateHandshakeVibrationIntensity();
+
+    for (let username of Object.keys(handshakesChanges)) {
+      if (handshakesChanges[username]) {
+        this._activateUserPanel(username);
+
+        if (username === this.store.username) {
+          this._activateMiddlePanel();
+        }
+      }
+      else {
+        this._deactivateUserPanel(username);
+
+        if (username === this.store.username) {
+          this._deactivateMiddlePanel();
+        }
+      }
+    }
+  }
+
+  _activateUserPanel(username) {
+    const intensity = this.config.HANDSHAKE_HARDWARE.USER_PANEL_ON_INTENSITY;
+    const color = this.config.getUserColor(username);
+
+    this._userPanelSet(username, intensity, color);
+  }
+
+  _deactivateUserPanel(username) {
+    const intensity = this.config.HANDSHAKE_HARDWARE.USER_PANEL_OFF_INTENSITY;
+
+    this._userPanelSet(username, intensity);
+  }
+
+  _activateMiddlePanel() {
+    const intensity = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_INTENSITY;
+    const color = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_COLOR || this.store.userColor;
+
+    this._middlePanelSet(intensity, color);
+  }
+
+  _deactivateMiddlePanel() {
+    const intensity = this.config.HANDSHAKE_HARDWARE.MIDDLE_OFF_INTENSITY;
+    const color = this.config.HANDSHAKE_HARDWARE.MIDDLE_OFF_COLOR;
+
+    this._middlePanelSet(intensity, color);
+  }
+
+  _userPanelSet(username, intensity, color) {
+    const userPanel = this.config.HANDSHAKE_HARDWARE.USER_PANELS[username];
+
+    this._handshakePanelSet(userPanel, intensity, color);
+  }
+
+  _middlePanelSet(intensity, color) {
+    const panel = this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL;
+    this._handshakePanelSet(panel, intensity, color);
+  }
+
+  _handshakePanelSet(panel, intensity, color) {
+    const commandString = SerialProtocolCommandBuilder.buildPanelSet({
+      stripId: this.config.LIGHTS.HANDSHAKE_STRIP,
+      panelId: panel,
+      intensity: intensity,
+      color: color
+    });
+    this.serialManager.dispatchCommand(commandString);
+  }
+
+  _updateHandshakeVibrationIntensity() {
     const handshakes = this.handshakes;
     const count = Array.from(handshakes).reduce((total, username) => {
       return total + (handshakes.get(username) ? 1 : 0);
