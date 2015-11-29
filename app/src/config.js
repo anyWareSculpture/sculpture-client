@@ -66,7 +66,7 @@ export default class Config extends DefaultConfig {
       MIDDLE_PANEL: '3',
       // Settings for the middle part of the handshake
       MIDDLE_ON_INTENSITY: 100,
-      MIDDLE_OFF_INTENSITY: 5,
+      MIDDLE_OFF_INTENSITY: 10,
       // The color settings here represent the color of the middle
       // setting ON_COLOR to null makes it default to the user color
       MIDDLE_ON_COLOR: null,
