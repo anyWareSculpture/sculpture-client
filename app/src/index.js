@@ -4,7 +4,8 @@ const Config = require('./config');
 const SculptureApp = require('./app');
 
 const config = new Config();
-const app = new SculptureApp(config);
+//TODO: Don't expose this
+window.app = new SculptureApp(config);
 
 const connectionOptions = Object.assign({}, config.CLIENT_CONNECTION_OPTIONS.default);
 
