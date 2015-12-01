@@ -53,6 +53,33 @@ export default class StatusAnimations {
     StatusAnimations.animateStrips(view, ['0', '1', '2'], frames, 50, completeCallback);
   }
 
+  // FIXME: This is a hack to support failure animation on one panel
+  static playSingleStripFailureAnimation(stripId, view, completeCallback) {
+    const frames = [];
+
+    let direction = 1;
+    let lastPanel = null;
+    for (let round = 0; round < 3; round++) {
+      for (let i = 0; i < 10; i += 2) {
+        const panel = direction === 1 ? i : 10 - i - 1;
+        const panels = [[panel, 100, "error"]];
+        if (lastPanel !== null) {
+          panels.unshift([lastPanel, 0, "error"]);
+        }
+        const frame = () => {
+          return panels;
+        };
+
+        lastPanel = panel;
+        frames.push(frame);
+      }
+      direction *= -1;
+    }
+    frames.push(() => [[lastPanel, 0, "error"]]);
+
+    StatusAnimations.animateStrips(view, [stripId], frames, 50, completeCallback);
+  }
+
   /**
    * Animates several strips identically
    * It is often useful for each frame function to undo its predecessor (don't forget!)
