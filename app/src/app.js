@@ -121,13 +121,13 @@ export default class SculptureApp {
   }
 
   _beginFirstGame() {
-    if (!this.client || !this.client.connected || !this.serialSearched || !this.audioInitialized) {
+    if (!this.client /*|| !this.client.connected*/ || !this.serialSearched || !this.audioInitialized) {
       return;
     }
 
     //TODO: Temporarily here until the full game transitions are implemented
     if (this.sculpture.isPlayingNoGame) {
-      Object.keys(this.views).forEach(view => this.views[view].reset());
+      Object.keys(this.views).forEach((view) => this.views[view].reset());
       const game = this.config.GAMES_SEQUENCE[0];
       this._log(`Starting ${game} game...`);
       this.sculptureActionCreator.sendStartGame(game);
