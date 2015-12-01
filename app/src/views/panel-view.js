@@ -111,7 +111,14 @@ export default class PanelView {
   }
 
   _playFailureAnimation() {
-    StatusAnimations.playFailureAnimation(this, this._animationComplete.bind(this));
+    // FIXME: This is a hack to support failure animation on one panel
+    if (this.store.isPlayingSimonGame) {
+      const simongame = this.store.currentGameLogic;
+      StatusAnimations.playSingleStripFailureAnimation(simongame.currentStrip, this, this._animationComplete.bind(this));
+    }
+    else {
+      StatusAnimations.playFailureAnimation(this, this._animationComplete.bind(this));
+    }
   }
 
   _animationComplete() {
