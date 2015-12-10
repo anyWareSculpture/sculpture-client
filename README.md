@@ -19,12 +19,46 @@ Linux systems use the `google-chrome` command to launch Google Chrome. On other 
 
 ## Chrome Box Development HOWTO
 
-* Put anyware-sculpture.zip somewhere public (Dropbox or a web server)
-* Download anyware-sculpture.zip
-* Double-click to mount zip file
-* Select all -> Copy
-* Paste to Download folder
-* Navigate to chrome://extensions
-* Make sure Developer Mode is checked
-* Click "Load unpacked extension" -> Select Download folder -> Open
+* Dev computer
+   * ```gulp build```
+   * ```gulp package```
+   * Put dist/anyware-sculpture.zip in Google Drive
+* Chrome:
+   * Google Drive -> Shared with me -> anyWare -> ChromeApp
+   * Double-click to mount zip file
+   * Delete all files from Downloads/anyware-sculpture
+   * Select all -> Copy
+   * Paste to Download/anyware-sculpture folder
+   * Navigate to chrome://extensions
+   * First install:
+       * Make sure Developer Mode is checked
+       * Click "Load unpacked extension" -> Select Downloads/anyware-sculpture -> Open
+   * Update:
+       * Reload
+   * Launch
 
+## Publish Chrome App
+
+* Make sure manifest.json has a bumped version number
+* ```gulp build```
+* ```gulp package```
+* Login to https://chrome.google.com/webstore/developer/dashboard
+* ..using anyware.sculpture@gmail.com
+* anyWare Sculpture -> edit -> Upload Updated package
+* Choose file: dist/anyware-sculpture.zip -> Upload
+  
+## Using Chrome App
+
+* Click on Apps -> "anyWare Sculpture"
+* To update fast:
+    * chrome://extensions/
+    * -> Update extensions now
+    * Wait & verify that version number increased
+
+### ChromeOS Setup
+
+* Login using anyware.sculpture@gmail.com
+* Switch to Dev Channel: Settings->About->More Info->Change Channel
+  This is necessary for Kiosk Mode
+
+  
