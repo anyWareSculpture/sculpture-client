@@ -40,11 +40,6 @@ https://chrome.google.com/webstore/detail/anyware-sculpture/dojbbdfnddgofmdbonbk
 
 NB! Kiosk Apps cannot be privately published (since Kiosk sessions don't have a login to verify against). It's possible to publish unlisted instead.
 
-
-Ctrl-Alt-K
-Ctrl-Alt-S
-
-
 * chrome://extensions
 * Manage kiosk applications -> Add kiosk application -> paste application ID -> Add -> Done
 
@@ -56,7 +51,14 @@ Ctrl-Alt-S
 * At login screen: Ctrl-Alt-K
 * Sign in as usual
 * When setting up a Kiosk App, we can now make it auto-start. On the first subsequent reboot we need to confirm this.
+* It's possible to cancel auto-launch by pressing Ctrl-Alt-S on startup
+
+## Persisting data
+
+* Data stored using chrome.storage.local will persist
+* NB! After writing any data, it's important to perform a software reload using chrome.runtime.reload(), otherwise stored data will/may not persist.
 
 # Questions
 
 * How to allow quit/restart from within Chrome app (without having to power toggle)
+  -> chrome.runtime.reload();
