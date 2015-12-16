@@ -214,11 +214,11 @@ export class SerialProtocolCommandBuilder {
     if (data.stripId !== undefined) {
       command += ` ${data.stripId}`;
     }
-    
+
     if (data.panelId !== undefined) {
       command += ` ${data.panelId}`;
     }
-    
+
     if (data.intensity !== undefined) {
       command += ` ${data.intensity}`;
     }
@@ -227,7 +227,7 @@ export class SerialProtocolCommandBuilder {
       command += ` ${data.color}`;
     }
     else if (data.easing || data.duration) {
-        command += " -";
+      command += " -";
     }
 
     if (data.easing) {
@@ -253,7 +253,7 @@ export class SerialProtocolCommandBuilder {
       command += ` ${data.color}`;
     }
     else if (data.easing || data.duration) {
-        command += " -";
+      command += " -";
     }
 
     if (data.easing) {

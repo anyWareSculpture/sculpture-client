@@ -4,7 +4,7 @@ const SculptureActionCreator = require('@anyware/game-logic/lib/actions/sculptur
 
 const SerialManager = require('../serial/serial-manager');
 const serialProtocol = require('../serial/serial-protocol');
-const {SerialProtocolCommandParser, SerialProtocolCommandBuilder} = serialProtocol;
+const {SerialProtocolCommandBuilder} = serialProtocol;
 
 const StatusAnimations = require('./animations/status-animations');
 
@@ -125,9 +125,9 @@ export default class PanelView {
     this._animating = false;
     this.sculptureActionCreator.sendFinishStatusAnimation();
 
-    //TODO: setTimeout is used here as a hack to compensate
-    //TODO: for the problem with many commands sent at once
-    //TODO: being garbled up together
+    // TODO: setTimeout is used here as a hack to compensate
+    // TODO: for the problem with many commands sent at once
+    // TODO: being garbled up together
     setTimeout(() => {
       this.showAllPanels();
     }, 500);

@@ -121,9 +121,9 @@ export default class StatusAnimations {
   }
 
   static clearView(view) {
-    //TODO: This code relies on there being certain hard coded stripIds
-    //TODO: All of this should be using a config - that would then reflect
-    //TODO: how the light array gets setup in the store
+    // TODO: This code relies on there being certain hard coded stripIds
+    // TODO: All of this should be using a config - that would then reflect
+    // TODO: how the light array gets setup in the store
     for (let stripId of [0, 1, 2]) {
       for (let panelId = 0; panelId < 10; panelId++) {
         const commandString = SerialProtocolCommandBuilder.buildPanelSet({

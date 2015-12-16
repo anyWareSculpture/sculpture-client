@@ -4,7 +4,7 @@ const SculptureActionCreator = require('@anyware/game-logic/lib/actions/sculptur
 
 const SerialManager = require('../serial/serial-manager');
 const serialProtocol = require('../serial/serial-protocol');
-const {SerialProtocolCommandParser, SerialProtocolCommandBuilder} = serialProtocol;
+const {SerialProtocolCommandBuilder} = serialProtocol;
 
 export default class HandshakeView {
   constructor(store, config, dispatcher, serialManager) {
@@ -46,7 +46,7 @@ export default class HandshakeView {
         this._activateUserPanel(username);
 
         if (username === this.store.username) {
-          // Pulsing needs to be stopped if the user has activated the 
+          // Pulsing needs to be stopped if the user has activated the
           // handshake because both cannot happen at once
           this._endPulsing();
           this._activateMiddlePanel();
@@ -128,7 +128,7 @@ export default class HandshakeView {
 
   _handleCurrentGameChanges(changes) {
     if (!changes.hasOwnProperty("currentGame")) {
-      return
+      return;
     }
 
     if (changes.currentGame === GAMES.HANDSHAKE) {
@@ -152,7 +152,7 @@ export default class HandshakeView {
       if (this._complete) {
         return;
       }
-      
+
       this._pulse();
     }, this.config.HANDSHAKE_HARDWARE.PULSE_DELAY);
   }
