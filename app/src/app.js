@@ -69,7 +69,7 @@ export default class SculptureApp {
     this.views.audioView = new AudioView(this.sculpture, this.config, this.dispatcher);
     this.views.audioView.load(err => {
       if (err) {
-         return console.log(`AudioView error: ${err}`);
+        return console.log(`AudioView error: ${err}`);
       }
       this.audioInitialized = true;
       this._beginFirstGame();
@@ -127,7 +127,7 @@ export default class SculptureApp {
     if (this.client && !this.client.connected) return;
     if (!this.serialSearched || !this.audioInitialized) return;
 
-    //TODO: Temporarily here until the full game transitions are implemented
+    // TODO: Temporarily here until the full game transitions are implemented
     if (this.sculpture.isPlayingNoGame) {
       Object.keys(this.views).forEach(view => this.views[view].reset());
       const game = this.config.GAMES_SEQUENCE[0];
@@ -136,4 +136,3 @@ export default class SculptureApp {
     }
   }
 }
-
