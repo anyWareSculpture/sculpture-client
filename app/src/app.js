@@ -1,3 +1,4 @@
+const events = require('events');
 const {Dispatcher} = require("flux");
 
 const StreamingClient = require("@anyware/streaming-client");
@@ -12,8 +13,13 @@ const AudioView = require('@anyware/shared-views/lib/audio-view');
 
 const SerialManager = require('./serial/serial-manager');
 
-export default class SculptureApp {
+export default class SculptureApp extends events.EventEmitter {
+
+  static EVENT_SERIAL_INITIALIZED = "serial-init";
+  static EVENT_CLIENT_CONNECTED = "client-connected";
+
   constructor(config) {
+    super();
     this.config = config;
 
     this.dispatcher = new Dispatcher();
@@ -84,7 +90,7 @@ export default class SculptureApp {
 
     this._log(`Using username ${options.username}`);
 
-    if (options.SINGLE_USER_MODE) return;
+    if (this.config.SINGLE_USER_MODE) return;
 
     this.client = new StreamingClient(options);
 
@@ -105,7 +111,10 @@ export default class SculptureApp {
       console.log('Finished searching all serial ports');
 
       this.serialSearched = true;
-      //TODO: May need the views to write out the initial state in the store
+      // TODO: May need the views to write out the initial state in the store
+
+      this.emit(SculptureApp.EVENT_SERIAL_INITIALIZED, serialManager);
+
       this._beginFirstGame();
     });
     return serialManager;
@@ -113,6 +122,7 @@ export default class SculptureApp {
 
   _onConnectionStatusChange() {
     this._log(`Streaming Client Connected: ${this.client.connected}`);
+    this.emit(SculptureApp.EVENT_CLIENT_CONNECTED, this.client.connected);
   }
 
   _onStateUpdate(update, metadata) {

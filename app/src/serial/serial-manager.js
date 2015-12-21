@@ -31,7 +31,7 @@ export default class SerialManager extends events.EventEmitter {
     this.config = config;
     this.identity = identity;
 
-    this.patterns = {};
+    this.patterns = {}; // { patternRegexp: [portIds..] }
     this.ports = {};
 
     this.commandQueue = [];
@@ -44,20 +44,7 @@ export default class SerialManager extends events.EventEmitter {
    * @returns {Boolean} Returns true if the command was dispatched to any port.
    */
   dispatchCommand(command) {
-    if (!command) {
-      return false;
-    }
-
-    const targetPorts = new Set();
-    for (let pattern of Object.keys(this.patterns)) {
-      const regex = new RegExp(pattern);
-      const portIds = this.patterns[pattern];
-      if (regex.test(command)) {
-        for (let portId of portIds) {
-          targetPorts.add(portId);
-        }
-      }
-    }
+    const targetPorts = this.findTargetPorts(command);
 
     for (let portId of targetPorts) {
       const port = this.ports[portId];
@@ -71,7 +58,21 @@ export default class SerialManager extends events.EventEmitter {
       console.warn(`No destination port for command "${command.trim()}"`);
     }
 
-    return targetPorts.size !== 0;
+    return targetPorts.size > 0;
+  }
+
+  findTargetPorts(command) {
+    const targetPorts = new Set();
+    if (command) {
+      for (let pattern of Object.keys(this.patterns)) {
+        if (new RegExp(pattern).test(command)) {
+          for (let portId of this.patterns[pattern]) {
+            targetPorts.add(portId);
+          }
+        }
+      }
+    }
+    return targetPorts;
   }
 
   /**

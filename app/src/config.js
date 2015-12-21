@@ -7,6 +7,7 @@ export default class Config extends DefaultConfig {
     super();
 
     this.username = "sculpture0";
+    this.SINGLE_USER_MODE = true;
     this.CLIENT_CONNECTION_OPTIONS = {
       default: {
         protocol: "ws",

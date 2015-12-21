@@ -2,10 +2,57 @@ require('babelify/polyfill');
 
 const Config = require('./config');
 const SculptureApp = require('./app');
+const serialProtocol = require('./serial/serial-protocol');
+const {SerialProtocolCommandBuilder} = serialProtocol;
 
 const config = new Config();
-//TODO: Don't expose this
+// TODO: Don't expose this
 window.app = new SculptureApp(config);
+
+function buildRequiredCommands() {
+  const commands = [];
+  // All required panels
+  for (let lightId of Object.keys(config.LIGHTS)) {
+    const stripId = config.LIGHTS[lightId];
+    commands.push({name: lightId,
+                   cmd: SerialProtocolCommandBuilder.build(serialProtocol.PANEL_SET_COMMAND, {stripId})});
+  }
+  commands.push({name: 'Disk Reset',
+                 cmd: SerialProtocolCommandBuilder.build(serialProtocol.DISK_RESET_COMMAND, {})});
+  commands.push({name: 'Handshake',
+                 cmd: SerialProtocolCommandBuilder.build(serialProtocol.HANDSHAKE_COMMAND, {})});
+  return commands;
+}
+
+window.app.on(SculptureApp.EVENT_SERIAL_INITIALIZED, (serialManager) => {
+  const commands = buildRequiredCommands();
+  const table = document.getElementById('serial-status');
+  for (let cmdobj of commands) {
+    const ports = serialManager.findTargetPorts(cmdobj.cmd);
+    console.debug(`${cmdobj.name} ${ports.size === 0 ? 'Not' : ''} OK`);
+    const cell = table.insertRow(-1).insertCell(0);
+    cell.innerHTML = `${cmdobj.name} ${ports.size === 0 ? 'Not' : ''} OK`;
+  }
+});
+
+window.app.on(SculptureApp.EVENT_CLIENT_CONNECTED, (connected) => {
+  const clientSpan = document.getElementById('client-status');
+  clientSpan.innerHTML = `${connected ? '' : 'Not '} connected`;
+});
+
+window.onload = function() {
+  const manifest = chrome.runtime.getManifest();
+  console.log(`Version: ${manifest.version}`);
+  console.debug(document);
+  const v = document.getElementById('anyware-version');
+  v.innerHTML = manifest.version;
+
+  const restart = document.getElementById('restart');
+  restart.addEventListener('click', function() {
+    chrome.runtime.reload();
+  });
+};
+
 
 const connectionOptions = Object.assign({}, config.CLIENT_CONNECTION_OPTIONS.default);
 
