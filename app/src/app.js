@@ -31,13 +31,15 @@ export default class SculptureApp {
 
     this.sculpture = new SculptureStore(this.dispatcher, this.config);
     this.sculpture.on(SculptureStore.EVENT_CHANGE, (changes) => {
-      this._log(`Sent state update: ${JSON.stringify(changes)}`);
-
-      if (!this.client.connected) {
-        console.warn("Streaming client not connected: ignoring changes");
-        return;
+      if (this.client) {
+        if (this.client.connected) {
+          this.client.sendStateUpdate(changes);
+          this._log(`Sent state update: ${JSON.stringify(changes)}`);
+        }
+        else {
+          console.warn("Streaming client not connected: ignoring changes");
+        }
       }
-      this.client.sendStateUpdate(changes);
     });
 
     this.sculptureActionCreator = new SculptureActionCreator(this.dispatcher);
@@ -49,8 +51,7 @@ export default class SculptureApp {
    * Connects to the streaming server and sets up the rest of the application
    */
   connectAndSetup(options) {
-    this._connectionOptions = options;
-    this._setupStreamingClient();
+    this._setupStreamingClient(options);
   }
 
   _log(message) {
@@ -76,14 +77,16 @@ export default class SculptureApp {
     });
   }
 
-  _setupStreamingClient() {
+  _setupStreamingClient(options) {
     if (this.client) {
       this.client.close();
     }
 
-    this._log(`Using username ${this._connectionOptions.username}`);
+    this._log(`Using username ${options.username}`);
 
-    this.client = new StreamingClient(this._connectionOptions);
+    if (options.SINGLE_USER_MODE) return;
+
+    this.client = new StreamingClient(options);
 
     this.client.on(StreamingClient.EVENT_CONNECT, this._onConnectionStatusChange.bind(this));
     this.client.on(StreamingClient.EVENT_DISCONNECT, this._onConnectionStatusChange.bind(this));
@@ -121,9 +124,8 @@ export default class SculptureApp {
   }
 
   _beginFirstGame() {
-    if (!this.client || !this.client.connected || !this.serialSearched || !this.audioInitialized) {
-      return;
-    }
+    if (this.client && !this.client.connected) return;
+    if (!this.serialSearched || !this.audioInitialized) return;
 
     //TODO: Temporarily here until the full game transitions are implemented
     if (this.sculpture.isPlayingNoGame) {
