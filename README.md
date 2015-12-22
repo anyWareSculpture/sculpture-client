@@ -46,7 +46,8 @@ Linux systems use the `google-chrome` command to launch Google Chrome. On other 
 * ..using anyware.sculpture@gmail.com
 * anyWare Sculpture -> edit -> Upload Updated package
 * Choose file: dist/anyware-sculpture.zip -> Upload
-  
+* Click "Publish Changes"
+
 ## Using Chrome App
 
 * Click on Apps -> "anyWare Sculpture"
