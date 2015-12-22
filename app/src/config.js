@@ -23,19 +23,6 @@ export default class Config extends DefaultConfig {
       [this.user2]: '2'
     };
 
-    // Serial port paths matching these patterns will be ignored
-    this.HARDWARE_INVALID_PATH_PATTERNS = [
-      "Bluetooth",
-      "WirelessiAP"
-    ];
-
-    this.HARDWARE_VENDOR_IDS = new Set([
-      "0x0",    // Generic/Unspecified (for Macs)
-      "0x2341", // Arduino Vendor ID
-      "0x2a03", // Arduino Uno (Alternate) Vendor ID
-      "0x16c0"  // Teensy Vendor ID
-    ]);
-
     this.SERIAL = {
       COMMAND_DELIMETER: "\n",
       BAUDRATE: 115200,
@@ -46,7 +33,18 @@ export default class Config extends DefaultConfig {
         // Measurements show that it takes 1700-1800 ms to get a HELLO from an
         // Arduino after reset (tested on a Mac)
         TIMEOUT: 2000 // ms
-      }
+      },
+      // Serial port paths matching these patterns will be ignored
+      HARDWARE_INVALID_PATH_PATTERNS: [
+        "Bluetooth",
+        "WirelessiAP"
+      ],
+      HARDWARE_VENDOR_IDS: new Set([
+        "0x0",    // Generic/Unspecified (for Macs)
+        "0x2341", // Arduino Vendor ID
+        "0x2a03", // Arduino Uno (Alternate) Vendor ID
+        "0x16c0"  // Teensy Vendor ID
+      ])
     };
 
     /********* View Configuration *********/
