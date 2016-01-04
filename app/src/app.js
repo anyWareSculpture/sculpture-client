@@ -100,7 +100,7 @@ export default class SculptureApp {
 
   _setupSerialManager() {
     const serialIdentity = this.config.HARDWARE_USERNAME_MAPPINGS[this.config.username];
-    const serialManager = new SerialManager(this.config, serialIdentity);
+    const serialManager = new SerialManager(this.config.SERIAL, serialIdentity);
     serialManager.searchPorts(() => {
       console.log('Finished searching all serial ports');
 
