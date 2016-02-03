@@ -83,7 +83,7 @@ export default class SerialHandshake {
       this._endHandshake();
       return;
     }
-  
+
     const pattern = SerialProtocolCommandBuilder.build(commandName, commandData).trim();
     this.port.supportedPatterns.push(pattern);
 

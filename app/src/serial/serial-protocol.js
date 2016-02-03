@@ -133,7 +133,7 @@ export class SerialProtocolCommandParser {
   }
 
   static parseHandshakeArguments(args) {
-    return {active: args[0], user: args[1]};
+    return {numUsers: args[0]};
   }
 }
 
@@ -214,11 +214,11 @@ export class SerialProtocolCommandBuilder {
     if (data.stripId !== undefined) {
       command += ` ${data.stripId}`;
     }
-    
+
     if (data.panelId !== undefined) {
       command += ` ${data.panelId}`;
     }
-    
+
     if (data.intensity !== undefined) {
       command += ` ${data.intensity}`;
     }
@@ -227,7 +227,7 @@ export class SerialProtocolCommandBuilder {
       command += ` ${data.color}`;
     }
     else if (data.easing || data.duration) {
-        command += " -";
+      command += " -";
     }
 
     if (data.easing) {
@@ -253,7 +253,7 @@ export class SerialProtocolCommandBuilder {
       command += ` ${data.color}`;
     }
     else if (data.easing || data.duration) {
-        command += " -";
+      command += " -";
     }
 
     if (data.easing) {
@@ -297,6 +297,10 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildHandshake(data) {
-    return `${HANDSHAKE_COMMAND} ${data.active} ${data.user || ""}\n`;
+    let command = `${HANDSHAKE_COMMAND}`;
+    if (data.numUsers !== undefined) {
+      command += ` ${data.numUsers}`;
+    }
+    return `${command}\n`;
   }
 }

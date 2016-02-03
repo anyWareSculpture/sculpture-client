@@ -4,7 +4,7 @@ const SculptureActionCreator = require('@anyware/game-logic/lib/actions/sculptur
 
 const SerialManager = require('../serial/serial-manager');
 const serialProtocol = require('../serial/serial-protocol');
-const {SerialProtocolCommandParser, SerialProtocolCommandBuilder} = serialProtocol;
+const {SerialProtocolCommandBuilder} = serialProtocol;
 
 const StatusAnimations = require('./animations/status-animations');
 
@@ -81,27 +81,6 @@ export default class PanelView {
           });
           this.serialManager.dispatchCommand(commandString);
         }
-
-        if (panelChanges.hasOwnProperty("active")) {
-          //TODO: Make this behaviour game specific with a default behaviour
-          let intensity, color;
-          if (panelChanges.active) {
-            intensity = 100;
-            color = this.store.userColor;
-          }
-          else {
-            intensity = lightArray.getIntensity(stripId, panelId);
-            color = lightArray.getColor(stripId, panelId);
-          }
-
-          const commandString = SerialProtocolCommandBuilder.buildPanelSet({
-            stripId: stripId,
-            panelId: panelId,
-            intensity: intensity,
-            color: color
-          });
-          this.serialManager.dispatchCommand(commandString);
-        }
       }
     }
   }
@@ -132,16 +111,23 @@ export default class PanelView {
   }
 
   _playFailureAnimation() {
-    StatusAnimations.playFailureAnimation(this, this._animationComplete.bind(this));
+    // FIXME: This is a hack to support failure animation on one panel
+    if (this.store.isPlayingSimonGame) {
+      const simongame = this.store.currentGameLogic;
+      StatusAnimations.playSingleStripFailureAnimation(simongame.currentStrip, this, this._animationComplete.bind(this));
+    }
+    else {
+      StatusAnimations.playFailureAnimation(this, this._animationComplete.bind(this));
+    }
   }
 
   _animationComplete() {
     this._animating = false;
     this.sculptureActionCreator.sendFinishStatusAnimation();
 
-    //TODO: setTimeout is used here as a hack to compensate
-    //TODO: for the problem with many commands sent at once
-    //TODO: being garbled up together
+    // TODO: setTimeout is used here as a hack to compensate
+    // TODO: for the problem with many commands sent at once
+    // TODO: being garbled up together
     setTimeout(() => {
       this.showAllPanels();
     }, 500);

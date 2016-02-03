@@ -25,10 +25,10 @@ export default class SerialManager extends events.EventEmitter {
    */
   static EVENT_COMMAND = "command";
 
-  constructor(config, identity) {
+  constructor(serialConfig, identity) {
     super();
 
-    this.config = config;
+    this.config = serialConfig;
     this.identity = identity;
 
     this.patterns = {};
@@ -106,6 +106,7 @@ export default class SerialManager extends events.EventEmitter {
         else {
           console.log(`Skipping incompatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`);
           done[index] = true;
+          if (done.every((d) => d)) callback();
         }
       });
 
@@ -131,7 +132,7 @@ export default class SerialManager extends events.EventEmitter {
 
   _isInvalidPortPath(path) {
     for (let pattern of this.config.HARDWARE_INVALID_PATH_PATTERNS) {
-      var regex = new RegExp(pattern);
+      const regex = new RegExp(pattern);
       if (regex.test(path)) {
         return true;
       }
@@ -140,8 +141,8 @@ export default class SerialManager extends events.EventEmitter {
   }
 
   _createSerialPort(serialPortPath, callback) {
-    const port = new SerialPort(this.config.SERIAL, serialPortPath, {
-      baudrate: this.config.SERIAL.BAUDRATE
+    const port = new SerialPort(this.config, serialPortPath, {
+      baudrate: this.config.BAUDRATE
     });
     port.initialize(this.identity, (error) => {
       if (error) {

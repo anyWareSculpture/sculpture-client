@@ -22,6 +22,7 @@ export default class StatusAnimations {
       }
       direction *= -1;
     }
+    frames.push(() => [[lastPanel, 0, "success"]]);
 
     StatusAnimations.animateStrips(view, ['0', '1', '2'], frames, 50, completeCallback);
   }
@@ -47,8 +48,36 @@ export default class StatusAnimations {
       }
       direction *= -1;
     }
+    frames.push(() => [[lastPanel, 0, "error"]]);
 
     StatusAnimations.animateStrips(view, ['0', '1', '2'], frames, 50, completeCallback);
+  }
+
+  // FIXME: This is a hack to support failure animation on one panel
+  static playSingleStripFailureAnimation(stripId, view, completeCallback) {
+    const frames = [];
+
+    let direction = 1;
+    let lastPanel = null;
+    for (let round = 0; round < 3; round++) {
+      for (let i = 0; i < 10; i += 2) {
+        const panel = direction === 1 ? i : 10 - i - 1;
+        const panels = [[panel, 100, "error"]];
+        if (lastPanel !== null) {
+          panels.unshift([lastPanel, 0, "error"]);
+        }
+        const frame = () => {
+          return panels;
+        };
+
+        lastPanel = panel;
+        frames.push(frame);
+      }
+      direction *= -1;
+    }
+    frames.push(() => [[lastPanel, 0, "error"]]);
+
+    StatusAnimations.animateStrips(view, [stripId], frames, 50, completeCallback);
   }
 
   /**
@@ -92,11 +121,10 @@ export default class StatusAnimations {
   }
 
   static clearView(view) {
-    //TODO: This code relies on there being certain hard coded stripIds
-    //TODO: All of this should be using a config - that would then reflect
-    //TODO: how the light array gets setup in the store
-    for (let stripId of [0, 1, 2]) {
-      for (let panelId = 0; panelId < 10; panelId++) {
+    for (let stripId of view.config.LIGHTS.GAME_STRIPS) {
+      const panelIds = view.config.PANELS[stripId];
+      for (let i = 0; i < panelIds.length; i++) {
+        const panelId = panelIds[i];
         const commandString = SerialProtocolCommandBuilder.buildPanelSet({
           stripId: stripId,
           panelId: panelId,

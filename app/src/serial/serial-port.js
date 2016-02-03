@@ -120,10 +120,10 @@ export default class SerialPort extends events.EventEmitter {
     }
 
     this._buffer = bufferParts[bufferParts.length - 1];
-    bufferParts.splice(-1, 1);
+    bufferParts.splice(-1, 1); // pop last (partial command) string
 
     for (let commandString of bufferParts) {
-      this._parseCommandString(commandString);
+      if (commandString.trim().length > 0) this._parseCommandString(commandString);
     }
   }
 
