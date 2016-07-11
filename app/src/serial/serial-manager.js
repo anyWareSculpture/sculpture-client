@@ -25,11 +25,10 @@ export default class SerialManager extends events.EventEmitter {
    */
   static EVENT_COMMAND = "command";
 
-  constructor(serialConfig, identity) {
+  constructor(serialConfig) {
     super();
 
     this.config = serialConfig;
-    this.identity = identity;
 
     this.patterns = {}; // { patternRegexp: [portIds..] }
     this.ports = {};
@@ -52,7 +51,7 @@ export default class SerialManager extends events.EventEmitter {
     }
 
     if (targetPorts.size > 0) {
-      console.log(`Sent command "${command.trim()}" to: ${Array.from(targetPorts)}`);
+      console.log(`Queued command "${command.trim()}" for: ${Array.from(targetPorts)} (queue: ${this.commandQueue.length})`);
     }
     else {
       console.warn(`No destination port for command "${command.trim()}"`);
@@ -145,7 +144,7 @@ export default class SerialManager extends events.EventEmitter {
     const port = new SerialPort(this.config, serialPortPath, {
       baudrate: this.config.BAUDRATE
     });
-    port.initialize(this.identity, (error) => {
+    port.initialize((error) => {
       if (error) {
         console.warn(`ERROR: Failed to open serial port ${port.path}: ${error.message}`);
       }

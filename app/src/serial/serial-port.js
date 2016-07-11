@@ -84,7 +84,7 @@ export default class SerialPort extends events.EventEmitter {
     this._nextCommandHandler = callback || null;
   }
 
-  initialize(identity, callback) {
+  initialize(callback) {
     this._port.open((error) => {
       if (error) {
         callback(error);
@@ -93,8 +93,9 @@ export default class SerialPort extends events.EventEmitter {
 
       this._port.on("data", this._handleData.bind(this));
       this._port.on("error", this._handleError.bind(this));
+      this._port.on("close", this._handleClose.bind(this));
 
-      this._beginHandshake(identity, callback);
+      this._beginHandshake(callback);
     });
   }
 
@@ -106,6 +107,10 @@ export default class SerialPort extends events.EventEmitter {
 
   _handleError(error) {
     this._handleParsedCommand(error);
+  }
+
+  _handleClose(error, result) {
+    console.log(`DEBUG: Port closed: ${error} ${result}`);
   }
 
   _parseBuffer() {
@@ -172,8 +177,8 @@ export default class SerialPort extends events.EventEmitter {
     this.emit(SerialPort.EVENT_COMMAND, commandName, commandData);
   }
 
-  _beginHandshake(identity, callback) {
-    const handshake = new SerialHandshake(this.config, identity, this);
+  _beginHandshake(callback) {
+    const handshake = new SerialHandshake(this.config, this);
     handshake.execute(this._completeHandshake.bind(this, callback));
   }
 

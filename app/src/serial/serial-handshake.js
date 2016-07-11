@@ -2,10 +2,9 @@ const serialProtocol = require('./serial-protocol');
 const {SerialProtocolCommandBuilder} = serialProtocol;
 
 export default class SerialHandshake {
-  constructor(serialConfig, identity, port) {
+  constructor(serialConfig, port) {
     this.serialConfig = serialConfig;
     this.handshakeConfig = this.serialConfig.HANDSHAKE;
-    this.identity = identity;
     this.port = port;
     this.callback = null;
 
