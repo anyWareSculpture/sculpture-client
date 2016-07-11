@@ -1,7 +1,7 @@
-require('babelify/polyfill');
+import 'babel-polyfill';
 
-const Config = require('./config');
-const SculptureApp = require('./app');
+import Config from './config';
+import SculptureApp from './app';
 const serialProtocol = require('./serial/serial-protocol');
 const {SerialProtocolCommandBuilder} = serialProtocol;
 

@@ -1,12 +1,12 @@
-const SculptureStore = require('@anyware/game-logic/lib/sculpture-store');
-const PanelsActionCreator = require('@anyware/game-logic/lib/actions/panels-action-creator');
-const SculptureActionCreator = require('@anyware/game-logic/lib/actions/sculpture-action-creator');
+import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
+import PanelsActionCreator from 'anyware/lib/game-logic/actions/panels-action-creator';
+import SculptureActionCreator from 'anyware/lib/game-logic/actions/sculpture-action-creator';
 
-const SerialManager = require('../serial/serial-manager');
+import SerialManager from '../serial/serial-manager';
 const serialProtocol = require('../serial/serial-protocol');
 const {SerialProtocolCommandBuilder} = serialProtocol;
 
-const StatusAnimations = require('./animations/status-animations');
+import StatusAnimations from './animations/status-animations';
 
 export default class PanelView {
   constructor(store, config, dispatcher, serialManager) {

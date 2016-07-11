@@ -13,13 +13,13 @@ var uglify = require('gulp-uglify');
 var zip = require('gulp-zip');
 var shell = require('gulp-shell');
 
-var gulpUtils = require('@anyware/gulp-utils');
+var gulpUtils = require('anyware/gulp-utils');
 
 var MINIMUM_CODE_COVERAGE = 90;
 var BUILD_DIRECTORY = 'build';
 
 // Create shared tasks
-require('@anyware/gulp-utils/tasks/test-task')(
+require('anyware/gulp-utils/tasks/test-task')(
   gulp,
   'test', // taskName
   'app/src/**/*.js', // filesToCover
@@ -27,11 +27,11 @@ require('@anyware/gulp-utils/tasks/test-task')(
   process.env.TRAVIS ? 'spec' : 'nyan', // reporter
   MINIMUM_CODE_COVERAGE // minimumCodeCoverage
 );
-require('@anyware/gulp-utils/tasks/submit-coverage-task')(
+require('anyware/gulp-utils/tasks/submit-coverage-task')(
   gulp,
   'submit-coverage' // taskName
 );
-require('@anyware/gulp-utils/tasks/lint-task')(
+require('anyware/gulp-utils/tasks/lint-task')(
   gulp,
   'lint', // taskName
   ["app/**/*.js"] // files
@@ -49,7 +49,8 @@ gulp.task('build-app', function buildApp() {
 // FIXME: Wait for https://github.com/substack/node-browserify/issues/1446
 //      debug: true,
     }).transform(babelify.configure({
-      stage: 0
+      presets: ['es2015'],
+      plugins: ['transform-class-properties']
     })).bundle(function(err, res){
       // assumes file.contents is a Buffer
       if (err) {

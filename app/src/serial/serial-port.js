@@ -1,7 +1,7 @@
 const events = require('events');
 const serialport = require('browser-serialport');
 
-const SerialHandshake = require('./serial-handshake');
+import SerialHandshake from './serial-handshake';
 const {SerialProtocolCommandParser} = require('./serial-protocol');
 
 /**

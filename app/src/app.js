@@ -1,17 +1,16 @@
 const events = require('events');
-const {Dispatcher} = require("flux");
+const {Dispatcher} = require('flux');
 
-const StreamingClient = require("@anyware/streaming-client");
+import StreamingClient from 'anyware/lib/streaming-client';
+import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
+import SculptureActionCreator from 'anyware/lib/game-logic/actions/sculpture-action-creator';
 
-const SculptureStore = require("@anyware/game-logic/lib/sculpture-store");
-const SculptureActionCreator = require("@anyware/game-logic/lib/actions/sculpture-action-creator");
+import HandshakeView from './views/handshake-view';
+import PanelView from './views/panel-view';
+import DiskView from './views/disk-view';
+import AudioView from 'anyware/lib/views/audio-view';
 
-const HandshakeView = require('./views/handshake-view');
-const PanelView = require('./views/panel-view');
-const DiskView = require('./views/disk-view');
-const AudioView = require('@anyware/shared-views/lib/audio-view');
-
-const SerialManager = require('./serial/serial-manager');
+import SerialManager from './serial/serial-manager';
 
 export default class SculptureApp extends events.EventEmitter {
 

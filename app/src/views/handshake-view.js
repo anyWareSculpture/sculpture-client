@@ -1,8 +1,8 @@
-const GAMES = require('@anyware/game-logic/lib/constants/games');
-const SculptureStore = require('@anyware/game-logic/lib/sculpture-store');
-const SculptureActionCreator = require('@anyware/game-logic/lib/actions/sculpture-action-creator');
+import GAMES from 'anyware/lib/game-logic/constants/games';
+import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
+import SculptureActionCreator from 'anyware/lib/game-logic/actions/sculpture-action-creator';
 
-const SerialManager = require('../serial/serial-manager');
+import SerialManager from '../serial/serial-manager';
 const serialProtocol = require('../serial/serial-protocol');
 const {SerialProtocolCommandBuilder} = serialProtocol;
 

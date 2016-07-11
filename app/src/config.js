@@ -1,6 +1,6 @@
-const DefaultConfig = require('@anyware/game-logic/lib/config/default-config');
-const Disk = require('@anyware/game-logic/lib/utils/disk');
-const GAMES = require('@anyware/game-logic/lib/constants/games');
+import DefaultConfig from 'anyware/lib/game-logic/config/default-config';
+import Disk from 'anyware/lib/game-logic/utils/disk';
+import GAMES from 'anyware/lib/game-logic/constants/games';
 
 export default class Config extends DefaultConfig {
   constructor() {
