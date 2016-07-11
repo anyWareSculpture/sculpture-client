@@ -70,6 +70,12 @@ export default class DiskView {
       else {
         // leave position undefined because sending a position that
         // is already set stops the disk
+
+        // FIXME: This might not be the best way of solving this:
+        // If the changes are discarded due to the above previousHardwarePosition check, and there
+        // are no other changes, we don't need to send anything as it would be redundant.
+        delete newDiskValues.position;
+        if (Object.keys(newDiskValues).length === 0) continue;
       }
       if (newDiskValues.hasOwnProperty('direction')) {
         direction = newDiskValues.direction;
