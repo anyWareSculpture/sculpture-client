@@ -1,5 +1,5 @@
-const events = require('events');
-const {Dispatcher} = require('flux');
+import events from 'events';
+import {Dispatcher} from 'flux';
 
 import StreamingClient from 'anyware/lib/streaming-client';
 import SculptureStore from 'anyware/lib/game-logic/sculpture-store';

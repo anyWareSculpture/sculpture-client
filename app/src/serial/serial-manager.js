@@ -1,9 +1,8 @@
-const events = require('events');
-
-const serialport = require('browser-serialport');
+import events from 'events';
+import serialport from 'browser-serialport';
 import SerialPort from './serial-port';
 
-const serialProtocol = require('./serial-protocol');
+import * as SerialProtocol from './serial-protocol';
 
 // NOTE: In order to account for the limited buffer size on the Arduino, many
 // serial commands are not sent at once. Instead, each command to be sent
@@ -173,7 +172,7 @@ export default class SerialManager extends events.EventEmitter {
   }
 
   _handleCommand(port, commandName, commandData) {
-    if (commandName === serialProtocol.DEBUG_COMMAND) {
+    if (commandName === SerialProtocol.DEBUG_COMMAND) {
       console.log(`DEBUG ${port.path}: ${commandData.message}`);
       return;
     }

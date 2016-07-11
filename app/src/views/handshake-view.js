@@ -3,8 +3,8 @@ import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
 import SculptureActionCreator from 'anyware/lib/game-logic/actions/sculpture-action-creator';
 
 import SerialManager from '../serial/serial-manager';
-const serialProtocol = require('../serial/serial-protocol');
-const {SerialProtocolCommandBuilder} = serialProtocol;
+import * as SerialProtocol from '../serial/serial-protocol';
+const {SerialProtocolCommandBuilder} = SerialProtocol;
 
 export default class HandshakeView {
   constructor(store, config, dispatcher, serialManager) {
@@ -174,7 +174,7 @@ export default class HandshakeView {
   }
 
   _handleCommand(commandName, commandArgs) {
-    if (commandName === serialProtocol.HANDSHAKE_COMMAND) {
+    if (commandName === SerialProtocol.HANDSHAKE_COMMAND) {
       let {numUsers} = commandArgs;
 
       if (parseInt(numUsers) > 0) {

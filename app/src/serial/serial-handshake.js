@@ -1,5 +1,5 @@
-const serialProtocol = require('./serial-protocol');
-const {SerialProtocolCommandBuilder} = serialProtocol;
+import * as SerialProtocol from './serial-protocol';
+const {SerialProtocolCommandBuilder} = SerialProtocol;
 
 export default class SerialHandshake {
   constructor(serialConfig, port) {
@@ -27,8 +27,8 @@ export default class SerialHandshake {
   _hello(error, commandName, commandData) {
     this._helloAttempts += 1;
 
-    if (error || commandName !== serialProtocol.HELLO_COMMAND || commandName === serialProtocol.DEBUG_COMMAND) {
-      if (commandName === serialProtocol.DEBUG_COMMAND) {
+    if (error || commandName !== SerialProtocol.HELLO_COMMAND || commandName === SerialProtocol.DEBUG_COMMAND) {
+      if (commandName === SerialProtocol.DEBUG_COMMAND) {
         console.log(`DEBUG: ${commandData.message} from ${this.port.path}`);
 
         this._helloAttempts -= 1;
@@ -48,8 +48,8 @@ export default class SerialHandshake {
   }
 
   _supported(error, commandName, commandData) {
-    if (error || commandName !== serialProtocol.SUPPORTED_COMMAND) {
-      if (commandName === serialProtocol.DEBUG_COMMAND) {
+    if (error || commandName !== SerialProtocol.SUPPORTED_COMMAND) {
+      if (commandName === SerialProtocol.DEBUG_COMMAND) {
         this._debugMode(error, commandName, commandData);
       }
       else {
@@ -62,7 +62,7 @@ export default class SerialHandshake {
   }
 
   _debugMode(error, commandName, commandData) {
-    if (commandName !== serialProtocol.DEBUG_COMMAND) {
+    if (commandName !== SerialProtocol.DEBUG_COMMAND) {
       this._error(`Did not receive DEBUG command. Got: ${error || commandName}`);
       return;
     }
@@ -78,7 +78,7 @@ export default class SerialHandshake {
       this._handleNextCommandWith(this._supportedPattern);
       return;
     }
-    else if (commandName === serialProtocol.END_SUPPORTED_COMMAND) {
+    else if (commandName === SerialProtocol.END_SUPPORTED_COMMAND) {
       this._endHandshake();
       return;
     }

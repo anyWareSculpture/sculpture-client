@@ -1,4 +1,4 @@
-const {SerialProtocolCommandBuilder} = require('../../serial/serial-protocol');
+import {SerialProtocolCommandBuilder} from '../../serial/serial-protocol';
 
 export default class StatusAnimations {
   static playSuccessAnimation(view, completeCallback) {

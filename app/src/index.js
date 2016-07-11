@@ -2,8 +2,8 @@ import 'babel-polyfill';
 
 import Config from './config';
 import SculptureApp from './app';
-const serialProtocol = require('./serial/serial-protocol');
-const {SerialProtocolCommandBuilder} = serialProtocol;
+import * as SerialProtocol from './serial/serial-protocol';
+const {SerialProtocolCommandBuilder} = SerialProtocol;
 
 const config = new Config();
 // TODO: Don't expose this
@@ -15,12 +15,12 @@ function buildRequiredCommands() {
   for (let lightId of Object.keys(config.LIGHTS)) {
     const stripId = config.LIGHTS[lightId];
     commands.push({name: lightId,
-                   cmd: SerialProtocolCommandBuilder.build(serialProtocol.PANEL_SET_COMMAND, {stripId})});
+                   cmd: SerialProtocolCommandBuilder.build(SerialProtocol.PANEL_SET_COMMAND, {stripId})});
   }
   commands.push({name: 'Disk Reset',
-                 cmd: SerialProtocolCommandBuilder.build(serialProtocol.DISK_RESET_COMMAND, {})});
+                 cmd: SerialProtocolCommandBuilder.build(SerialProtocol.DISK_RESET_COMMAND, {})});
   commands.push({name: 'Handshake',
-                 cmd: SerialProtocolCommandBuilder.build(serialProtocol.HANDSHAKE_COMMAND, {})});
+                 cmd: SerialProtocolCommandBuilder.build(SerialProtocol.HANDSHAKE_COMMAND, {})});
   return commands;
 }
 

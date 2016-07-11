@@ -1,8 +1,8 @@
-const events = require('events');
-const serialport = require('browser-serialport');
+import events from 'events';
+import serialport from 'browser-serialport';
 
 import SerialHandshake from './serial-handshake';
-const {SerialProtocolCommandParser} = require('./serial-protocol');
+import {SerialProtocolCommandParser} from './serial-protocol';
 
 /**
  * A higher-level adapter for serial ports that understands our custom serial protocol

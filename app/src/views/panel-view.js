@@ -3,8 +3,8 @@ import PanelsActionCreator from 'anyware/lib/game-logic/actions/panels-action-cr
 import SculptureActionCreator from 'anyware/lib/game-logic/actions/sculpture-action-creator';
 
 import SerialManager from '../serial/serial-manager';
-const serialProtocol = require('../serial/serial-protocol');
-const {SerialProtocolCommandBuilder} = serialProtocol;
+import * as SerialProtocol from '../serial/serial-protocol';
+const {SerialProtocolCommandBuilder} = SerialProtocol;
 
 import StatusAnimations from './animations/status-animations';
 
@@ -86,7 +86,7 @@ export default class PanelView {
   }
 
   _handleCommand(commandName, commandArgs) {
-    if (commandName === serialProtocol.PANEL_COMMAND) {
+    if (commandName === SerialProtocol.PANEL_COMMAND) {
       const {stripId, panelId, pressed} = commandArgs;
 
       this.panelsActionCreator.sendPanelPressed(stripId, panelId, parseInt(pressed) ? true : false);

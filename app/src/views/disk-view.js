@@ -3,8 +3,8 @@ import DisksActionCreator from 'anyware/lib/game-logic/actions/disks-action-crea
 import GAMES from 'anyware/lib/game-logic/constants/games';
 
 import SerialManager from '../serial/serial-manager';
-const serialProtocol = require('../serial/serial-protocol');
-const {SerialProtocolCommandBuilder} = serialProtocol;
+import * as SerialProtocol from '../serial/serial-protocol');
+const {SerialProtocolCommandBuilder} = SerialProtocol;
 
 export default class DiskView {
   constructor(store, config, dispatcher, serialManager) {
@@ -103,7 +103,7 @@ export default class DiskView {
   }
 
   _handleCommand(commandName, commandArgs) {
-    if (commandName === serialProtocol.DISK_COMMAND) {
+    if (commandName === SerialProtocol.DISK_COMMAND) {
       let {diskId, position, direction} = commandArgs;
       diskId = this._lookupDiskIdFromHardware(diskId);
       position = parseInt(position);
