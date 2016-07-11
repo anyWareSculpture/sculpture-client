@@ -121,7 +121,7 @@ export default class SculptureApp extends events.EventEmitter {
   }
 
   _onConnectionStatusChange() {
-    this._log(`Streaming Client Connected: ${this.client.connected}`);
+    this._log(`Streaming Client ${this.client.connected ? 'Connected' : 'Disconnected'}`);
     this.emit(SculptureApp.EVENT_CLIENT_CONNECTED, this.client.connected);
   }
 
