@@ -32,9 +32,9 @@ export default class PanelView {
 
   showAllPanels() {
     const lightArray = this.lightArray;
-    for (let stripId of lightArray.stripIds) {
+    for (const stripId of lightArray.stripIds) {
       const panelIds = lightArray.get(stripId).panelIds;
-      for (let panelId of panelIds) {
+      for (const panelId of panelIds) {
         const intensity = lightArray.getIntensity(stripId, panelId);
         const color = lightArray.getColor(stripId, panelId);
 
@@ -65,9 +65,9 @@ export default class PanelView {
     }
 
     const lightArray = this.lightArray;
-    for (let stripId of Object.keys(lightChanges)) {
+    for (const stripId of Object.keys(lightChanges)) {
       const panels = lightChanges[stripId].panels;
-      for (let panelId of Object.keys(panels)) {
+      for (const panelId of Object.keys(panels)) {
         const panelChanges = panels[panelId];
 
         if (panelChanges.hasOwnProperty("intensity") || panelChanges.hasOwnProperty("color")) {

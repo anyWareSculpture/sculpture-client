@@ -127,7 +127,7 @@ export default class SerialPort extends events.EventEmitter {
     this._buffer = bufferParts[bufferParts.length - 1];
     bufferParts.splice(-1, 1); // pop last (partial command) string
 
-    for (let commandString of bufferParts) {
+    for (const commandString of bufferParts) {
       if (commandString.trim().length > 0) this._parseCommandString(commandString);
     }
   }
@@ -159,13 +159,9 @@ export default class SerialPort extends events.EventEmitter {
       commandHandler(error, commandName, commandData);
     }
     else {
-      if (error) {
-        // In general, an invalid command is just ignored
-        return;
-      }
-      else {
-        this._command(commandName, commandData);
-      }
+      // In general, an invalid command is just ignored
+      if (error) return;
+      this._command(commandName, commandData);
     }
   }
 
@@ -183,7 +179,7 @@ export default class SerialPort extends events.EventEmitter {
   }
 
   _completeHandshake(callback, error) {
-    console.log(`Handshake ended for ${this.path} ${error ? "with error: " + error.toString() : "(no errors)"}`);
+    console.log(`Handshake ended for ${this.path} ${error ? `with error: ${error.toString()}`: "(no errors)"}`);
     if (error) {
       callback(error);
       return;

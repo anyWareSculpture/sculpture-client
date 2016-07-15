@@ -13,9 +13,7 @@ export default class StatusAnimations {
         if (lastPanel !== null) {
           panels.unshift([lastPanel, 0, "success"]);
         }
-        const frame = () => {
-          return panels;
-        };
+        const frame = () => panels;
 
         lastPanel = panel;
         frames.push(frame);
@@ -39,9 +37,7 @@ export default class StatusAnimations {
         if (lastPanel !== null) {
           panels.unshift([lastPanel, 0, "error"]);
         }
-        const frame = () => {
-          return panels;
-        };
+        const frame = () => panels;
 
         lastPanel = panel;
         frames.push(frame);
@@ -66,9 +62,7 @@ export default class StatusAnimations {
         if (lastPanel !== null) {
           panels.unshift([lastPanel, 0, "error"]);
         }
-        const frame = () => {
-          return panels;
-        };
+        const frame = () => panels;
 
         lastPanel = panel;
         frames.push(frame);
@@ -95,8 +89,8 @@ export default class StatusAnimations {
     const playFrame = (frameIndex) => {
       const panelsProperties = frames[frameIndex]();
 
-      for (let stripId of strips) {
-        for (let [panelId, intensity, color] of panelsProperties) {
+      for (const stripId of strips) {
+        for (const [panelId, intensity, color] of panelsProperties) {
           const commandString = SerialProtocolCommandBuilder.buildPanelSet({
             stripId: stripId,
             panelId: panelId,
@@ -121,7 +115,7 @@ export default class StatusAnimations {
   }
 
   static clearView(view) {
-    for (let stripId of view.config.LIGHTS.GAME_STRIPS) {
+    for (const stripId of view.config.LIGHTS.GAME_STRIPS) {
       const panelIds = view.config.PANELS[stripId];
       for (let i = 0; i < panelIds.length; i++) {
         const panelId = panelIds[i];

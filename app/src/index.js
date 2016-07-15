@@ -12,7 +12,7 @@ window.app = new SculptureApp(config);
 function buildRequiredCommands() {
   const commands = [];
   // All required panels
-  for (let lightId of Object.keys(config.LIGHTS)) {
+  for (const lightId of Object.keys(config.LIGHTS)) {
     const stripId = config.LIGHTS[lightId];
     commands.push({name: lightId,
                    cmd: SerialProtocolCommandBuilder.build(SerialProtocol.PANEL_SET_COMMAND, {stripId})});
@@ -27,7 +27,7 @@ function buildRequiredCommands() {
 window.app.on(SculptureApp.EVENT_SERIAL_INITIALIZED, (serialManager) => {
   const commands = buildRequiredCommands();
   const table = document.getElementById('serial-status');
-  for (let cmdobj of commands) {
+  for (const cmdobj of commands) {
     const ports = serialManager.findTargetPorts(cmdobj.cmd);
     console.debug(`${cmdobj.name} ${ports.size === 0 ? 'Not' : ''} OK`);
     const cell = table.insertRow(-1).insertCell(0);
@@ -40,7 +40,7 @@ window.app.on(SculptureApp.EVENT_CLIENT_CONNECTED, (connected) => {
   clientSpan.innerHTML = `${connected ? '' : 'Not '} connected`;
 });
 
-window.onload = function() {
+window.onload = () => {
   const manifest = chrome.runtime.getManifest();
   console.log(`Version: ${manifest.version}`);
   console.debug(document);
@@ -48,9 +48,7 @@ window.onload = function() {
   v.innerHTML = manifest.version;
 
   const restart = document.getElementById('restart');
-  restart.addEventListener('click', function() {
-    chrome.runtime.reload();
-  });
+  restart.addEventListener('click', () => chrome.runtime.reload());
 };
 
 
@@ -62,5 +60,4 @@ if (process.argv.length === 4) {
   connectionOptions.password = process.argv[3];
 }
 
-app.connectAndSetup(connectionOptions);
-
+window.app.connectAndSetup(connectionOptions);

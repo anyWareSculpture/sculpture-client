@@ -41,7 +41,7 @@ export default class HandshakeView {
 
     this._updateHandshakeVibrationIntensity();
 
-    for (let username of Object.keys(handshakesChanges)) {
+    for (const username of Object.keys(handshakesChanges)) {
       if (handshakesChanges[username]) {
         this._activateUserPanel(username);
 
@@ -117,9 +117,7 @@ export default class HandshakeView {
 
   _updateHandshakeVibrationIntensity() {
     const handshakes = this.handshakes;
-    const count = Array.from(handshakes).reduce((total, username) => {
-      return total + (handshakes.get(username) ? 1 : 0);
-    }, 0);
+    const count = Array.from(handshakes).reduce((total, username) => total + (handshakes.get(username) ? 1 : 0), 0);
     const commandString = SerialProtocolCommandBuilder.buildHandshake({
       numUsers: count
     });
@@ -175,7 +173,7 @@ export default class HandshakeView {
 
   _handleCommand(commandName, commandArgs) {
     if (commandName === SerialProtocol.HANDSHAKE_COMMAND) {
-      let {numUsers} = commandArgs;
+      const {numUsers} = commandArgs;
 
       if (parseInt(numUsers) > 0) {
         this.sculptureActionCreator.sendHandshakeActivate(this.config.username);

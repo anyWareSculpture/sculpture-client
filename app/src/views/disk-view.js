@@ -57,7 +57,7 @@ export default class DiskView {
     }
 
     const disks = this.disks;
-    for (let diskId of Object.keys(diskChanges)) {
+    for (const diskId of Object.keys(diskChanges)) {
       const hardwareDiskId = this.disksHardware.ID_TO_HARDWARE_MAP[diskId];
 
       const disk = disks.get(diskId);
@@ -121,18 +121,20 @@ export default class DiskView {
   }
 
   _lookupDiskIdFromHardware(hardwareDiskId) {
-    for (let diskId of Object.keys(this.disksHardware.ID_TO_HARDWARE_MAP)) {
+    for (const diskId of Object.keys(this.disksHardware.ID_TO_HARDWARE_MAP)) {
       if (this.disksHardware.ID_TO_HARDWARE_MAP[diskId] === hardwareDiskId) {
         return diskId;
       }
     }
+    // FIXME: Assert?
   }
 
   _lookupDirectionFromHardware(hardwareDirection) {
-    for (let direction of Object.keys(this.disksHardware.DIRECTION_TO_HARDWARE_MAP)) {
+    for (const direction of Object.keys(this.disksHardware.DIRECTION_TO_HARDWARE_MAP)) {
       if (this.disksHardware.DIRECTION_TO_HARDWARE_MAP[direction] === hardwareDirection) {
         return direction;
       }
     }
+    // FIXME: Assert?
   }
 }

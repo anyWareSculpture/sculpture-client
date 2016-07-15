@@ -44,7 +44,7 @@ export default class SerialManager extends events.EventEmitter {
   dispatchCommand(command) {
     const targetPorts = this.findTargetPorts(command);
 
-    for (let portId of targetPorts) {
+    for (const portId of targetPorts) {
       const port = this.ports[portId];
       this.commandQueue.unshift([port, command]);
     }
@@ -62,9 +62,9 @@ export default class SerialManager extends events.EventEmitter {
   findTargetPorts(command) {
     const targetPorts = new Set();
     if (command) {
-      for (let pattern of Object.keys(this.patterns)) {
+      for (const pattern of Object.keys(this.patterns)) {
         if (new RegExp(pattern).test(command)) {
-          for (let portId of this.patterns[pattern]) {
+          for (const portId of this.patterns[pattern]) {
             targetPorts.add(portId);
           }
         }
@@ -130,7 +130,7 @@ export default class SerialManager extends events.EventEmitter {
   }
 
   _isInvalidPortPath(path) {
-    for (let pattern of this.config.HARDWARE_INVALID_PATH_PATTERNS) {
+    for (const pattern of this.config.HARDWARE_INVALID_PATH_PATTERNS) {
       const regex = new RegExp(pattern);
       if (regex.test(path)) {
         return true;

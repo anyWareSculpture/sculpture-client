@@ -273,7 +273,7 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildDisk(data) {
-    let command = `${DISK_COMMAND} ${data.diskId || ""}`.trim();
+    const command = `${DISK_COMMAND} ${data.diskId || ""}`.trim();
     let commandArgs = "";
     if (typeof data.position !== 'undefined' && data.position !== null) {
       commandArgs += ` ${DISK_ARG_POSITION} ${data.position}`;
