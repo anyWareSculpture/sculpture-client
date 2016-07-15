@@ -3,7 +3,7 @@ import DisksActionCreator from 'anyware/lib/game-logic/actions/disks-action-crea
 import GAMES from 'anyware/lib/game-logic/constants/games';
 
 import SerialManager from '../serial/serial-manager';
-import * as SerialProtocol from '../serial/serial-protocol');
+import * as SerialProtocol from '../serial/serial-protocol';
 const {SerialProtocolCommandBuilder} = SerialProtocol;
 
 export default class DiskView {
