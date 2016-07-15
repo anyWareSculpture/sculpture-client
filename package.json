@@ -22,11 +22,12 @@
   },
   "homepage": "https://github.com/anyWareSculpture/sculpture-client#readme",
   "dependencies": {
-    "anyware": "*",
     "@anyware/sound-assets": "anyWareSculpture/sound-assets",
+    "anyware": "*",
     "babel-polyfill": "^6.9.1",
     "browser-serialport": "^2.0.2",
     "flux": "^2.0.3",
+    "gulp": "^3.9.1",
     "howler": "^1.1.26"
   },
   "devDependencies": {
