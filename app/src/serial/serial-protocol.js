@@ -22,9 +22,8 @@ export class SerialProtocolCommandParser {
    * @returns {Object} - Two keys: 1. name - the name of the command, 2. data - other data as provided by that command's specific parser
    */
   static parse(commandString) {
-    let commandName, commandArgs;
-    [commandName, ...commandArgs] = commandString.trim().split(/\s+/);
-    commandName = commandName.toUpperCase();
+    const [commandName, ...commandArgs] = commandString.trim().split(/\s+/);
+    const upperName = commandName.toUpperCase();
 
     const parserFunctions = {
       [HELLO_COMMAND]: SerialProtocolCommandParser.parseHelloArguments,
@@ -41,13 +40,13 @@ export class SerialProtocolCommandParser {
       [HANDSHAKE_COMMAND]: SerialProtocolCommandParser.parseHandshakeArguments
     };
 
-    const parserFunction = parserFunctions[commandName];
+    const parserFunction = parserFunctions[upperName];
     if (!parserFunction) {
-      throw new Error(`Unrecognized command name '${commandName}'`);
+      throw new Error(`Unrecognized command name '${upperName}'`);
     }
 
     return {
-      name: commandName,
+      name: upperName,
       data: parserFunction(commandArgs)
     };
   }
