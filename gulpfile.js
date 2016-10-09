@@ -46,8 +46,7 @@ gulp.task('build', ['build-app', 'collect-static', 'collect-sounds', 'collect-ma
 gulp.task('build-app', function buildApp() {
   var browserified = through.obj(function(file, enc, next) {
     browserify(file.path, {
-// FIXME: Wait for https://github.com/substack/node-browserify/issues/1446
-//      debug: true,
+      debug: true,
     }).transform(babelify.configure({
       presets: ['es2015'],
       plugins: ['transform-class-properties']
@@ -66,7 +65,7 @@ gulp.task('build-app', function buildApp() {
     .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(concat('application.js'))
 //    .pipe(uglify())
-    .pipe(sourcemaps.write())
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest(BUILD_DIRECTORY));
 });
 
