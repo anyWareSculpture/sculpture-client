@@ -14,7 +14,10 @@ export default class SerialHandshake {
 
   execute(callback) {
     this.callback = callback;
-    this._sendHello();
+    // If we always use auto-resetting microcontrollers, we don't need to send an initial HELLO.
+    // Note: If we do send an initial HELLO, we run the risk of triggering bootloader mode, which could
+    // cause a 6-8 second startup delay.
+    // Was: this._sendHello();
     this._handleNextCommandWith(this._hello);
     this._beginTimeout();
   }
