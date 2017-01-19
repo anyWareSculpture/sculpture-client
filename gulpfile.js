@@ -22,7 +22,7 @@ var BUILD_DIRECTORY = 'build';
 require('anyware/gulp-utils/tasks/test-task')(
   gulp,
   'test', // taskName
-  'app/src/**/*.js', // filesToCover
+  'app/src/**/*.js{,x}', // filesToCover
   'app/test/**/*-test.js', // testFiles
   process.env.TRAVIS ? 'spec' : 'nyan', // reporter
   MINIMUM_CODE_COVERAGE // minimumCodeCoverage
@@ -34,7 +34,7 @@ require('anyware/gulp-utils/tasks/submit-coverage-task')(
 require('anyware/gulp-utils/tasks/lint-task')(
   gulp,
   'lint', // taskName
-  ["app/**/*.js"] // files
+  ["app/**/*.js{,x}"] // files
 );
 
 gulp.task('default', function(callback) {
@@ -46,9 +46,10 @@ gulp.task('build', ['build-app', 'collect-static', 'collect-sounds', 'collect-ma
 gulp.task('build-app', function buildApp() {
   var browserified = through.obj(function(file, enc, next) {
     browserify(file.path, {
+      extensions: ['.js', '.jsx'],
       debug: true,
     }).transform(babelify.configure({
-      presets: ['es2015'],
+      presets: ['es2015', 'react'],
       plugins: ['transform-class-properties']
     })).bundle(function(err, res){
       // assumes file.contents is a Buffer
@@ -91,12 +92,12 @@ gulp.task('collect-manifest', function collectManifest() {
 });
 
 gulp.task('collect-pages', function collectPages() {
-  return gulp.src('app/**/*.html')
+  return gulp.src(['app/**/*.html','app/**/*.css'])
     .pipe(gulp.dest(BUILD_DIRECTORY));
 });
 
 gulp.task('collect-scripts', function collectPages() {
-  return gulp.src('scripts/**/*.js')
+  return gulp.src('scripts/**/*.js{,x}')
     .pipe(gulp.dest(BUILD_DIRECTORY));
 });
 
@@ -107,10 +108,10 @@ gulp.task('launch', shell.task([
 ]));
 
 gulp.task('watch', ['build'], function watch() {
-  gulp.watch('app/src/**/*.js', ['build-app']);
+  gulp.watch('app/src/**/*.js{,x}', ['build-app']);
   gulp.watch('static/**/*', ['collect-static']);
   gulp.watch('sounds/**/*', ['collect-sounds']);
   gulp.watch('manifest.json', ['collect-manifest']);
-  gulp.watch('app/**/*.html', ['collect-pages']);
-  gulp.watch('scripts/**/*.js', ['collect-scripts']);
+  gulp.watch(['app/**/*.html', 'app/**/*.css'], ['collect-pages']);
+  gulp.watch('scripts/**/*.js{,x}', ['collect-scripts']);
 });

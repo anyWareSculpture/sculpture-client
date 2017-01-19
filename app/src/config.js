@@ -11,8 +11,8 @@ export default class Config extends DefaultConfig {
     this.CLIENT_CONNECTION_OPTIONS = {
       default: {
         protocol: "ws",
-        username: "anyware",
-        password: "anyware",
+        username: "sculpture0",
+        password: "7f24a3e73b91dc9f51f15861d75c888a",
         host: "broker.shiftr.io"
       }
     };
@@ -75,6 +75,12 @@ export default class Config extends DefaultConfig {
       MIDDLE_OFF_EASING: 'easein'
     };
 
+    this.diskUrls = {
+      disk0: '/static/images/disk0.png',
+      disk1: '/static/images/disk1.png',
+      disk2: '/static/images/disk2.png'
+    };
+
     this.DISKS_HARDWARE = {
       ID_TO_HARDWARE_MAP: {
         disk0: "0",
@@ -88,5 +94,8 @@ export default class Config extends DefaultConfig {
         [Disk.CONFLICT]: 0
       }
     };
+
+    // Playtest configurations:
+    this.GAMES_SEQUENCE = [ GAMES.HANDSHAKE, GAMES.MOLE, GAMES.SIMON ];
   }
 }

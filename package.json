@@ -27,9 +27,12 @@
     "anyware": "*",
     "babel-polyfill": "^6.9.1",
     "browser-serialport": "^2.1.0",
+    "babel-preset-react": "^6.16.0",
     "flux": "^2.0.3",
     "gulp": "^3.9.1",
-    "howler": "^1.1.26"
+    "howler": "^1.1.26",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2"
   },
   "devDependencies": {
     "babel-core": "^6.10.4",

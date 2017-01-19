@@ -7,7 +7,6 @@ import SculptureActionCreator from 'anyware/lib/game-logic/actions/sculpture-act
 
 import HandshakeView from './views/handshake-view';
 import PanelView from './views/panel-view';
-import DiskView from './views/disk-view';
 import AudioView from 'anyware/lib/views/audio-view';
 
 import SerialManager from './serial/serial-manager';
@@ -70,7 +69,6 @@ export default class SculptureApp extends events.EventEmitter {
   _setupViews() {
     this.views.handshakeView = new HandshakeView(this.sculpture, this.config, this.dispatcher, this.serialManager);
     this.views.panelView = new PanelView(this.sculpture, this.config, this.dispatcher, this.serialManager);
-    this.views.diskView = new DiskView(this.sculpture, this.config, this.dispatcher, this.serialManager);
     this.views.audioView = new AudioView(this.sculpture, this.config, this.dispatcher);
     this.views.audioView.load((err) => {
       if (err) {
