@@ -1,41 +1,27 @@
 # sculpture-client
 The embedded system code for the sculpture itself. This will run as a chrome app.
 
+## Getting started
+
+Dependencies: node.js, npm, Google Chrome
+
+   npm install
+   npm run dev
+
 ## Building, Packaging, & Launching the app
 
-    gulp build
+Build the app into the build/ directory:
 
-Builds the app into the build/ directory
+    npm run build
 
-    gulp package
+Package as a Chrome packaged app (dist/anyware-sculpture.zip)
 
-Compresses the contents of build/ into a single .zip file in the dist/ directory. This can be directly uploaded as the kiosk app.
+    npm run package
 
-    gulp launch
+Other targets:
 
-Launches google chrome (assuming your google chrome executable can be loaded using the `google-chrome` command) for development purposes. You must `build` first before launch (no need to fully `package` each time).
+* Launch without rebuild: `npm run launch`
 
-Linux systems use the `google-chrome` command to launch Google Chrome. On other systems, please alias your chrome executable to use that name. 
-
-## Chrome Box Development HOWTO
-
-* Dev computer
-   * ```gulp build```
-   * ```gulp package```
-   * Put dist/anyware-sculpture.zip in Google Drive
-* Chrome:
-   * Google Drive -> Shared with me -> anyWare -> ChromeApp
-   * Double-click to mount zip file
-   * Delete all files from Downloads/anyware-sculpture
-   * Select all -> Copy
-   * Paste to Download/anyware-sculpture folder
-   * Navigate to chrome://extensions
-   * First install:
-       * Make sure Developer Mode is checked
-       * Click "Load unpacked extension" -> Select Downloads/anyware-sculpture -> Open
-   * Update:
-       * Reload
-   * Launch
 
 ## Publish Chrome App
 
@@ -55,11 +41,3 @@ Linux systems use the `google-chrome` command to launch Google Chrome. On other 
     * chrome://extensions/
     * -> Update extensions now
     * Wait & verify that version number increased
-
-### ChromeOS Setup
-
-* Login using anyware.sculpture@gmail.com
-* Switch to Dev Channel: Settings->About->More Info->Change Channel
-  This is necessary for Kiosk Mode
-
-  

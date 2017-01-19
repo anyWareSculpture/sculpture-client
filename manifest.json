@@ -15,8 +15,8 @@
     }
   },
   "icons": {
-    "16": "static/app-icons/anyware-16.png",
-    "128": "static/app-icons/anyware-128.png"
+    "16": "images/anyware-16.png",
+    "128": "images/anyware-128.png"
   },
   "kiosk_enabled" : true,
   "kiosk_only" : false
