@@ -76,9 +76,9 @@ export default class Config extends DefaultConfig {
     };
 
     this.diskUrls = {
-      disk0: '/static/images/disk0.png',
-      disk1: '/static/images/disk1.png',
-      disk2: '/static/images/disk2.png'
+      disk0: '/images/disk0.png',
+      disk1: '/images/disk1.png',
+      disk2: '/images/disk2.png'
     };
 
     this.DISKS_HARDWARE = {

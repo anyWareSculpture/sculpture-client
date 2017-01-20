@@ -14,7 +14,7 @@ module.exports = {
   },
   resolve: {
     // Allowed implicit extensions for require/import
-    extensions: ['.js']
+    extensions: ['.js', '.jsx']
   },
   plugins: [
     new CopyWebpackPlugin([
@@ -26,14 +26,19 @@ module.exports = {
         from: '*.png',
         to: 'images'
       },
+      { context: 'static/images',
+        from: '*.png',
+        to: 'images'
+      },
       { from: 'app/application.html' },
+      { from: 'app/application.css' },
       { from: 'manifest.json' },
       { from: 'scripts/background.js' },
     ]),
   ],
   module: {
     rules: [
-      { test: /\.js$/,
+      { test: /\.jsx?$/,
         exclude: /node_modules/,
         use: ['babel-loader'],
       },
