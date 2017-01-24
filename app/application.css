@@ -5,12 +5,12 @@ html {
 body {
   background-color: transparent;
 }
-.red-circle {
-  fill: #C81C25;
+.red-status {
+  stroke: #C81C25;
 }
-.yellow-circle {
-  fill: #C8BC40;
+.yellow-status {
+  stroke: #C8BC40;
 }
-.green-circle {
-  fill: #00C80A;
+.green-status {
+  stroke: #00C80A;
 }
