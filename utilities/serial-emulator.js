@@ -1,18 +1,171 @@
+#!/usr/bin/env ./node_modules/.bin/babel-node
 const blessed = require('blessed');
 
-const {SerialPort, parsers} = require("serialport");
+const spawn = require('child_process').spawn;
+//const spawn = require('child-process-promise').spawn;
+const SerialPort = require('serialport');
+const readline = SerialPort.parsers.readline;
+const username = require('username');
 
-const INSTRUCTIONS = 
-  "{center}{bold}{yellow-fg}Welcome to the Serial Emulator!{/yellow-fg}{/bold}\n" +
-  "Press {bold}{blue-fg}Ctrl-C{/blue-fg}{/bold} to quit.\n\n" +
-  "Please enter the path of the serial port this program should read and write from and then press enter" +
-  "{/center}";
+class SerialHandler {
+  constructor(portconfig) {
+    this.portconfig = portconfig;
+    portconfig.port.on('data', this.inputHandler.bind(this));
+  }
 
-const screen = setupScreen();
+  inputHandler(line) {
+    const key = line.trim().split(' ')[0];
+    if (this.portconfig.handlers.hasOwnProperty(key)) {
+      this.portconfig.port.write(this.portconfig.handlers[key]);
+      this.portconfig.output(this.portconfig.handlers[key]);
+    }
+  }
+}
 
-promptForSerialPort(screen);
+const ports = {
+  A: {
+    path: '/dev/tty.usbserial0',
+    device: 'A',
+    handlers: {
+      'HELLO': `HELLO panel\nSUPPORTED\nPANEL-SET 0\nPANEL-PULSE 0\nPANEL-INTENSITY 0\nPANEL-ANIMATE\nPANEL-STATE\nENDSUPPORTED\n`,
+    },
+  },
+  B: {
+    path: '/dev/tty.usbserial1',
+    device: 'B',
+    handlers: {
+      'HELLO': `HELLO panel\nSUPPORTED\nPANEL-SET 1\nPANEL-PULSE 1\nPANEL-INTENSITY 1\nPANEL-ANIMATE\nPANEL-STATE\nENDSUPPORTED\n`,
+    },
+  },
+  C: {
+    path: '/dev/tty.usbserial2',
+    device: 'C',
+    handlers: {
+      'HELLO': `HELLO panel\nSUPPORTED\nPANEL-SET 2\nPANEL-PULSE 2\nPANEL-INTENSITY 2\nPANEL-ANIMATE\nPANEL-STATE\nENDSUPPORTED\n`,
+    },
+  },
+  M: {
+    path: '/dev/tty.usbserial3',
+    device: 'M',
+    handlers: {
+      'HELLO': `HELLO handshake\nSUPPORTED\nPANEL-SET [356]\nPANEL-PULSE [356]\nPANEL-INTENSITY [356]\nHANDSHAKE\nENDSUPPORTED\n`,
+    },
+  },
+};
 
-screen.render();
+let activePort;
+
+main();
+
+let screen;
+
+async function main() {
+  setupSimulatedPorts();
+  setTimeout(() => {
+    screen = setupScreen();
+    screen.render();
+    setupPorts();
+    setupInput();
+  }, 2000);
+}
+
+function setupSimulatedPorts() {
+  const user = 'kintel';
+  for (let key of Object.keys(ports)) {
+    const portconfig = ports[key];
+    const cmd = 'socat';
+    const args= ['-d', '-d', `pty,rawer,link=${portconfig.path},user=${user},mode=0666`, `pty,rawer,echo=1,link=${portconfig.path}ctrl,user=${user}`];
+    console.log(`Setting up ${portconfig.path}`);
+    console.log(cmd, args.join(' '));
+    spawn(cmd, args, {stdio: 'ignore'});
+  }
+}
+
+function setupPorts() {
+  blessed.box({
+    parent: screen,
+    top: 0,
+    left: 0,
+    width: '50%',
+    height: 1,
+    tags: true,
+    content: '{center}{blue-fg}{bold}SERIAL OUTPUT{/bold}{/blue-fg}{/center}'
+  });
+  blessed.box({
+    parent: screen,
+    top: 0,
+    left: '50%',
+    width: '50%',
+    height: 1,
+    tags: true,
+    content: '{center}{blue-fg}{bold}SERIAL INPUT{/bold}{/blue-fg}{/center}'
+  });
+  const numPorts = Object.keys(ports).length;
+  const height = Math.trunc(screen.height/numPorts) - 1;
+  for (let i=0;i<numPorts;i++) {
+    const serialbox = blessed.box({
+      parent: screen,
+      top: i*height+1,
+      left: 0,
+      width: '100%',
+      height: height,
+      tags: true,
+    });
+    loadSerialPort(serialbox, ports[Object.keys(ports)[i]], (error) => {
+      setActivePort(Object.keys(ports)[i]);
+      screen.render();
+    });
+  }
+}
+
+function setupInput() {
+  blessed.text({
+    parent: screen,
+    bottom: 0,
+    left: 0,
+    bg: '#888888',
+    content: ">"
+  });
+  const serialInputBox = blessed.textarea({
+    parent: screen,
+    bottom: 0,
+    left: 1,
+    width: '100%-2',
+    height: 1,
+    inputOnFocus: true,
+    mouse: true,
+    bg: '#888888',
+    hover: {
+      bg: '#AAAAAA'
+    }
+  });
+  serialInputBox.key('enter', () => {
+    let serial = serialInputBox.getValue();
+    serialInputBox.setValue('');
+    
+    ports[activePort].port.write(serial.trim() + '\r\n');
+    
+    if (serial.endsWith('\n')) {
+      serial = serial.slice(0, -1);
+    }
+    ports[activePort].output(serial);
+  });
+  serialInputBox.key(['f1'], () => setActivePort('A'));
+  serialInputBox.key(['f2'], () => setActivePort('B'));
+  serialInputBox.key(['f3'], () => setActivePort('C'));
+  serialInputBox.key(['f4'], () => setActivePort('M'));
+  serialInputBox.focus();
+}
+
+function setActivePort(portid) {
+  if (activePort) {
+    ports[activePort].active = false;
+    updateStatus(ports[activePort]);
+  }
+  activePort = portid;
+  ports[activePort].active = true;
+  updateStatus(ports[activePort]);
+}
 
 function setupScreen() {
   const screen = blessed.screen({
@@ -26,135 +179,61 @@ function setupScreen() {
   screen.key(['C-c'], (ch, key) => {
     return process.exit(0);
   });
+
   return screen;
 }
 
-function promptForSerialPort(screen) {
-  const box = blessed.box({
-    parent: screen,
-    top: 2,
-    left: 'center',
-    width: '70%',
-    height: 12,
-    padding: 1,
-    content: INSTRUCTIONS,
-    tags: true,
-    border: {
-      type: 'line'
-    },
-    style: {
-      fg: 'white',
-      bg: 'grey',
-      border: {
-        fg: '#f0f0f0'
-      }
-    }
-  });
-
-  const serialPortPathInput = blessed.textarea({
-    parent: box,
-    bottom: 0,
-    left: 'center',
-    width: '80%',
-    height: 1,
-    mouse: true,
-    inputOnFocus: true,
-    value: process.argv[2] || "",
-    style: {
-      bg: '#888888',
-      hover: {
-        bg: '#AAAAAA'
-      }
-    }
-  });
-  serialPortPathInput.focus();
-  serialPortPathInput.key('enter', () => {
-    loadSerialPort(screen, serialPortPathInput.getValue().trim());
-    box.remove(serialPortPathInput);
-    screen.remove(box);
-
-    screen.render();
-  });
-}
-
-function loadSerialPort(screen, path) {
-  const loadingConsole = blessed.log({
-    parent: screen,
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    content: 'Loading...',
-    mouse: true,
-    tags: true
-  });
-  loadingConsole.log(`Attempting to open serial port path: {blue-fg}{bold}${path}{/bold}{/blue-fg}`);
-
-  const port = new SerialPort(path, {
+function loadSerialPort(parent, portconfig, callback) {
+  portconfig.port = new SerialPort(portconfig.path+'ctrl', {
     baudrate: 115200,
-    parser: parsers.readline("\n")
-  }, false);
-  port.open((error) => {
-    if (error) {
-      loadingConsole.log('');
-      loadingConsole.log(`{bold}{red-fg}${error}{/red-fg}{/bold}`);
-      loadingConsole.log(`{bold}An error occurred. Please press Ctrl-C to quit and try again.{/bold}`);
+    autoOpen: false,
+    parser: readline('\n'),
+  });
 
-      return;
-    }
-
-    screen.remove(loadingConsole);
-    setupPortInterface(screen, port);
-    screen.render();
+  portconfig.port.open((error) => {
+    setupPortInterface(parent, portconfig);
+    callback(error);
   });
 }
 
-function setupPortInterface(screen, port) {
-  setupStatusBar(screen, port);
+function setupPortInterface(parent, portconfig) {
+  setupStatusBar(parent, portconfig);
 
-  setupPortInputInterface(screen, (input) => port.write(input));
+  portconfig.input = setupPortInputInterface(parent);
+  portconfig.port.on('data', portconfig.input);
+  portconfig.port.handler = new SerialHandler(portconfig);
 
-  const outputHandler = setupPortOutputInterface(screen);
-  port.on('data', outputHandler);
+  portconfig.output = setupPortOutputInterface(parent);
 }
 
-function setupStatusBar(screen, port) {
-  const statusBar = blessed.box({
-    parent: screen,
+function updateStatus(portconfig) {
+  const openStatus = portconfig.port.isOpen() ? "{green-fg}connected{/green-fg}" : "{red-fg}disconnected{/red-fg}";
+  const deviceStatus = portconfig.active ? `{bold}Port: ${portconfig.device}{/bold}` : `Port: ${portconfig.device}`;
+  const status = ` ${deviceStatus}{|}${openStatus} `;
+  portconfig.statusBar.setContent(status);
+  screen.render();
+}
+
+function setupStatusBar(parent, portconfig) {
+  portconfig.statusBar = blessed.box({
+    parent: parent,
     top: 0,
     left: 0,
     width: '100%',
     height: 1,
     tags: true
   });
-  const updateStatus = () => {
-    const openStatus = port.isOpen() ? "{green-fg}connected{/green-fg}" : "{red-fg}disconnected{/red-fg}";
-    const status = ` Port: ${port.path}{|}${openStatus} `
-    statusBar.setContent(status);
-  };
-  updateStatus();
+  updateStatus(portconfig);
 
-  port.on('close', updateStatus);
+  portconfig.port.on('close', () => updateStatus(portconfig));
 }
 
-function setupPortInputInterface(screen, inputHandler) {
-  const inputContainer = blessed.box({
-    parent: screen,
+function setupPortOutputInterface(parent) {
+  const outputLog = blessed.log({
+    parent: parent,
     top: 1,
     left: 0,
-    width: '50%',
-    height: '100%-1',
-    border: {
-      type: 'line',
-    },
-    tags: true,
-    content: '{center}{blue-fg}{bold}SERIAL INPUT{/bold}{/blue-fg}{/center}'
-  });
-  const inputLog = blessed.log({
-    parent: inputContainer,
-    top: 1,
-    left: 0,
-    width: '100%-2',
+    width: '50%-1',
     height: 'shrink',
     tags: true,
     mouse: true,
@@ -163,59 +242,19 @@ function setupPortInputInterface(screen, inputHandler) {
       bg: 'gray'
     }
   });
-  blessed.text({
-    parent: inputContainer,
-    bottom: 0,
-    left: 0,
-    bg: '#888888',
-    content: ">"
-  });
-  const serialInput = blessed.textarea({
-    parent: inputContainer,
-    bottom: 0,
-    left: 1,
-    width: '100%-3',
-    height: 1,
-    inputOnFocus: true,
-    mouse: true,
-    bg: '#888888',
-    hover: {
-      bg: '#AAAAAA'
-    }
-  });
-  serialInput.focus();
-  serialInput.key('enter', () => {
-    let serial = serialInput.getValue();
-    serialInput.setValue('');
 
-    inputHandler(serial);
-
-    if (serial.endsWith('\n')) {
-      serial = serial.slice(0, -1);
-    }
+  return (line) => {
     const time = formattedTime();
-    inputLog.log(`{blue-fg}{bold}${time}{/bold}{/blue-fg} ${serial}`);
-  });
+    outputLog.log(`{blue-fg}{bold}${time}{/bold}{/blue-fg} ${line}`);
+  };
 }
 
-function setupPortOutputInterface(screen) {
-  const outputContainer = blessed.box({
-    parent: screen,
+function setupPortInputInterface(parent) {
+  const inputLog = blessed.log({
+    parent: parent,
     top: 1,
     left: '50%',
     width: '50%',
-    height: '100%-1',
-    border: {
-      type: 'line',
-    },
-    tags: true,
-    content: '{center}{blue-fg}{bold}SERIAL OUTPUT{/bold}{/blue-fg}{/center}'
-  });
-  const outputConsole = blessed.log({
-    parent: outputContainer,
-    top: 1,
-    left: 0,
-    width: '100%-2',
     height: 'shrink',
     tags: true,
     mouse: true,
@@ -224,12 +263,10 @@ function setupPortOutputInterface(screen) {
       bg: 'gray'
     }
   });
-  return (output) => {
+  return (line) => {
     const time = formattedTime();
-    for (let line of output.split('\n')) {
-      outputConsole.log(`{blue-fg}{bold}${time}{/bold}{/blue-fg} ${line}`);
-    }
-  }
+    inputLog.log(`{blue-fg}{bold}${time}{/bold}{/blue-fg} ${line}`);
+  };
 }
 
 function formattedTime() {
@@ -237,4 +274,3 @@ function formattedTime() {
   const time = currentDate.toTimeString().split(' ')[0];
   return `[${time}]`;
 }
-
