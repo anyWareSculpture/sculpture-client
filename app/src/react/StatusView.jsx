@@ -2,9 +2,9 @@ import React from 'react';
 import SculptureApp from '../app';
 import * as SerialProtocol from '../serial/serial-protocol';
 const {SerialProtocolCommandBuilder} = SerialProtocol;
-import Config from '../config';
-
-const config = new Config();
+import config from '../config';
+import InitStore from '../init-store';
+import {initStore} from '../stores';
 
 const symbolMap = {
   STRIP_A: 'A',
@@ -12,20 +12,13 @@ const symbolMap = {
   STRIP_C: 'C',
   HANDSHAKE_STRIP: 'H',
   ART_LIGHTS_STRIP: 'P',
-  Handshake: 'V',
-  connected: 'N',
+  [SerialProtocol.HANDSHAKE_COMMAND]: 'V',
+  clientConnected: 'N',
+  audioInitialized: 'S',
+  serialInitialized: 's'
 };
 
-function buildRequiredCommands() {
-  const commands = {};
-  // All required panels
-  for (const lightId of Object.keys(config.LIGHTS)) {
-    const stripId = config.LIGHTS[lightId];
-    commands[lightId] = SerialProtocolCommandBuilder.build(SerialProtocol.PANEL_SET_COMMAND, {stripId});
-  }
-  commands['Handshake'] = SerialProtocolCommandBuilder.build(SerialProtocol.HANDSHAKE_COMMAND, {});
-  return commands;
-}
+const toColor = (bool) => bool == null ? 'yellow' : bool ? 'green' : 'red';
 
 export default class StatusView extends React.Component {
   static propTypes = {
@@ -38,26 +31,27 @@ export default class StatusView extends React.Component {
 
   constructor(props) {
     super(props);
-    const buildstate = { connected: 'yellow' };
-    Object.keys(buildRequiredCommands()).forEach((name) => buildstate[name] = 'yellow');
-    this.state = buildstate;
+    this.state = this.getInitStoreState();
   }
 
-  updateSerialStatuses(serialManager) {
-    const commands = buildRequiredCommands();
-    Object.keys(commands).forEach((name) => {
-      const ports = serialManager.findTargetPorts(commands[name]);
-      this.setState({[name]: ports.size === 0 ? 'red' : 'green'});
+  getInitStoreState() {
+    const state = {
+      ready: initStore.ready,
+      audioInitialized: toColor(initStore.audioInitialized),
+      clientConnected: toColor(initStore.clientConnected),
+      serialInitialized: toColor(initStore.serialInitialized),
+    };
+    const systemState = initStore.systemState;
+    Object.keys(systemState).forEach((system) => {
+      state[system] = toColor(systemState[system]);
     });
-  }
-
-  updateNetworkStatus(connected) {
-    this.setState({connected: connected ? 'green' : 'red'});
+    return state;
   }
 
   componentWillMount() {
-    this.props.app.on(SculptureApp.EVENT_SERIAL_INITIALIZED, this.updateSerialStatuses.bind(this));
-    this.props.app.on(SculptureApp.EVENT_CLIENT_CONNECTED, this.updateNetworkStatus.bind(this));
+    initStore.on(InitStore.EVENT_CHANGE, () => {
+      this.setState(this.getInitStoreState());
+    });
   }
 
   componentWillUnmount() {
@@ -65,8 +59,8 @@ export default class StatusView extends React.Component {
   }
 
   renderIcons() {
-    const numIcons = Object.keys(this.state).length;
-    return Object.keys(this.state).map((key, idx) => {
+    const numIcons = Object.keys(this.state).length - 1;
+    return Object.keys(this.state).filter((key) => key !== 'ready').map((key, idx) => {
       const angle = idx * 2*Math.PI / numIcons;
       const xpos = Math.cos(angle)*20;
       const ypos = Math.sin(angle)*20;
@@ -78,7 +72,9 @@ export default class StatusView extends React.Component {
   }
 
   render() {
-    return this.props.center && <svg id="status-view" viewBox="-50 -50 100 100" style={{
+    if (this.state.ready) return null;
+
+    return <svg id="status-view" viewBox="-50 -50 100 100" style={{
       backgroundColor: "transparent",
       position: "absolute",
       width: "100%",

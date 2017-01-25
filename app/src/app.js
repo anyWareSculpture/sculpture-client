@@ -1,9 +1,8 @@
 import events from 'events';
-import {Dispatcher} from 'flux';
 
 import StreamingClient from 'anyware/lib/streaming-client';
-import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
 import SculptureActionCreator from 'anyware/lib/game-logic/actions/sculpture-action-creator';
+import {InitActionCreator, initActionCreator} from './init-action-creator';
 
 import HandshakeView from './views/handshake-view';
 import PanelView from './views/panel-view';
@@ -11,30 +10,29 @@ import AudioView from 'anyware/lib/views/audio-view';
 
 import SerialManager from './serial/serial-manager';
 
+import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
+import InitStore from './init-store';
+import {initStore, sculptureStore} from './stores';
+
+import config from './config';
+import dispatcher from './dispatcher';
+
 export default class SculptureApp extends events.EventEmitter {
 
-  static EVENT_SERIAL_INITIALIZED = "serial-init";
-  static EVENT_CLIENT_CONNECTED = "client-connected";
-
-  constructor(config) {
+  constructor() {
     super();
-    this.config = config;
 
-    this.dispatcher = new Dispatcher();
-    this.dispatcher.register((payload) => {
+    dispatcher.register((payload) => {
       this._log(`Sent action: ${JSON.stringify(payload)}`);
     });
 
     this.client = null;
 
     this.views = {};
-    this.audioInitialized = false;
 
-    this.serialSearched = false;
     this.serialManager = this._setupSerialManager();
 
-    this.sculpture = new SculptureStore(this.dispatcher, this.config);
-    this.sculpture.on(SculptureStore.EVENT_CHANGE, (changes) => {
+    sculptureStore.on(SculptureStore.EVENT_CHANGE, (changes) => {
       if (this.client) {
         if (this.client.connected) {
           this.client.sendStateUpdate(changes);
@@ -46,7 +44,14 @@ export default class SculptureApp extends events.EventEmitter {
       }
     });
 
-    this.sculptureActionCreator = new SculptureActionCreator(this.dispatcher);
+    // FIXME: Find a better design for such cascading actions
+    dispatcher.register((action) => {
+      if (action.actionType === InitActionCreator.READY) {
+        setTimeout(() => this._beginFirstGame(), 0);
+      }
+    });
+
+    this.sculptureActionCreator = new SculptureActionCreator(dispatcher);
 
     this._setupViews();
   }
@@ -67,16 +72,15 @@ export default class SculptureApp extends events.EventEmitter {
   }
 
   _setupViews() {
-    this.views.handshakeView = new HandshakeView(this.sculpture, this.config, this.dispatcher, this.serialManager);
-    this.views.panelView = new PanelView(this.sculpture, this.config, this.dispatcher, this.serialManager);
-    this.views.audioView = new AudioView(this.sculpture, this.config, this.dispatcher);
+    this.views.handshakeView = new HandshakeView(sculptureStore, config, dispatcher, this.serialManager);
+    this.views.panelView = new PanelView(sculptureStore, config, dispatcher, this.serialManager);
+    this.views.audioView = new AudioView(sculptureStore, config, dispatcher);
     this.views.audioView.load((err) => {
       if (err) {
         console.log(`AudioView error: ${err}`);
         return;
       }
-      this.audioInitialized = true;
-      this._beginFirstGame();
+      initActionCreator.sendAudioInitialized();
       console.log('Loaded sounds');
     });
   }
@@ -88,7 +92,7 @@ export default class SculptureApp extends events.EventEmitter {
 
     this._log(`Using username ${options.username}`);
 
-    if (this.config.SINGLE_USER_MODE) return;
+    if (config.SINGLE_USER_MODE) return;
 
     this.client = new StreamingClient(options);
 
@@ -97,30 +101,23 @@ export default class SculptureApp extends events.EventEmitter {
 
     this.client.on(StreamingClient.EVENT_ERROR, this._error.bind(this));
 
-    this.client.once(StreamingClient.EVENT_CONNECT, this._beginFirstGame.bind(this));
-
     this.client.on(StreamingClient.EVENT_STATE_UPDATE, this._onStateUpdate.bind(this));
   }
 
   _setupSerialManager() {
-    const serialIdentity = this.config.HARDWARE_USERNAME_MAPPINGS[this.config.username];
-    const serialManager = new SerialManager(this.config.SERIAL, serialIdentity);
+    const serialIdentity = config.HARDWARE_USERNAME_MAPPINGS[config.username];
+    const serialManager = new SerialManager(config.SERIAL, serialIdentity);
     serialManager.searchPorts(() => {
       console.log('Finished searching all serial ports');
 
-      this.serialSearched = true;
-      // TODO: May need the views to write out the initial state in the store
-
-      this.emit(SculptureApp.EVENT_SERIAL_INITIALIZED, serialManager);
-
-      this._beginFirstGame();
+      initActionCreator.sendSerialInitialized(serialManager);
     });
     return serialManager;
   }
 
   _onConnectionStatusChange() {
     this._log(`Streaming Client ${this.client.connected ? 'Connected' : 'Disconnected'}`);
-    this.emit(SculptureApp.EVENT_CLIENT_CONNECTED, this.client.connected);
+    initActionCreator.sendClientConnected(this.client.connected);
   }
 
   _onStateUpdate(update, metadata) {
@@ -132,13 +129,13 @@ export default class SculptureApp extends events.EventEmitter {
   }
 
   _beginFirstGame() {
-    if (this.client && !this.client.connected) return;
-    if (!this.serialSearched || !this.audioInitialized) return;
+    if (this.client && !initStore.clientConnected) return;
+    if (!initStore.serialInitialized || !initStore.audioInitialized) return;
 
     // TODO: Temporarily here until the full game transitions are implemented
-    if (this.sculpture.isPlayingNoGame) {
+    if (sculptureStore.isPlayingNoGame) {
       Object.keys(this.views).forEach((view) => this.views[view].reset());
-      const game = this.config.GAMES_SEQUENCE[0];
+      const game = config.GAMES_SEQUENCE[0];
       this._log(`Starting ${game} game...`);
       this.sculptureActionCreator.sendStartGame(game);
     }

@@ -5,10 +5,9 @@ import ReactDOM from 'react-dom';
 
 import MainScreen from './react/MainScreen';
 
-import Config from './config';
+import config from './config';
 import SculptureApp from './app';
 
-const config = new Config();
 // TODO: Don't expose this
 window.app = new SculptureApp(config);
 

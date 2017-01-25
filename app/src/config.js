@@ -2,7 +2,7 @@ import DefaultConfig from 'anyware/lib/game-logic/config/default-config';
 import Disk from 'anyware/lib/game-logic/utils/disk';
 import GAMES from 'anyware/lib/game-logic/constants/games';
 
-export default class Config extends DefaultConfig {
+class Config extends DefaultConfig {
   constructor() {
     super();
 
@@ -99,3 +99,5 @@ export default class Config extends DefaultConfig {
     this.GAMES_SEQUENCE = [ GAMES.HANDSHAKE, GAMES.MOLE, GAMES.SIMON ];
   }
 }
+
+export default new Config();

@@ -5,6 +5,10 @@ import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
 import DisksActionCreator from 'anyware/lib/game-logic/actions/disks-action-creator';
 import DiskModel from 'anyware/lib/game-logic/utils/DiskModel';
 
+import dispatcher from '../dispatcher';
+import {sculptureStore} from '../stores';
+import config from '../config';
+
 const SingleDisk = ({position, url}) => {
   return <image xlinkHref={url} x={0} y={0} height={100} width={100}
                 transform={`rotate(${position}) translate(-50 -50)`}/>;
@@ -17,14 +21,11 @@ SingleDisk.propTypes = {
 
 export default class DiskView extends React.Component {
   static propTypes = {
-    sculpture: React.PropTypes.object.isRequired,
-    config: React.PropTypes.object.isRequired,
-    dispatcher: React.PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
-    this.diskActions = new DisksActionCreator(this.props.dispatcher);
+    this.diskActions = new DisksActionCreator(dispatcher);
 
     this.physicalDisks = {
       disk0: new DiskModel(),
@@ -35,15 +36,16 @@ export default class DiskView extends React.Component {
       disk0: 0,
       disk1: 0,
       disk2: 0,
+      active: false,
     };
   }
 
   get disks() {
-    return this.props.sculpture.data.get('disks');
+    return sculptureStore.data.get('disks');
   }
 
   componentWillMount() {
-    this.props.sculpture.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
+    sculptureStore.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
     
     // Start physical disk model
     Object.keys(this.physicalDisks).forEach((diskId) => {
@@ -71,6 +73,8 @@ export default class DiskView extends React.Component {
   }
 
   _handleChanges(changes) {
+    this.setState({active: sculptureStore.isPlayingDiskGame});
+
     if (changes.hasOwnProperty('currentGame')) {
       // Reset on start of playing the disk game and on start of games cycle
       if (changes.currentGame === GAMES.DISK || changes.currentGame === GAMES.HANDSHAKE) {
@@ -129,9 +133,9 @@ export default class DiskView extends React.Component {
     }}>
       <g x="50%" y="50%" transform="scale(0.8 0.8)">
         <circle cx="0" cy="0" r="50" style={{fill: "white"}}/>
-        <SingleDisk position={this.state.disk0} url={this.props.config.diskUrls.disk0}/>
-        <SingleDisk position={this.state.disk1} url={this.props.config.diskUrls.disk1}/>
-        <SingleDisk position={this.state.disk2} url={this.props.config.diskUrls.disk2}/>
+        {this.state.active && <SingleDisk position={this.state.disk0} url={config.diskUrls.disk0}/>}
+        {this.state.active && <SingleDisk position={this.state.disk1} url={config.diskUrls.disk1}/>}
+        {this.state.active && <SingleDisk position={this.state.disk2} url={config.diskUrls.disk2}/>}
       </g>
     </svg>;
   }
