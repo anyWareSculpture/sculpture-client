@@ -115,7 +115,7 @@ export default class StatusAnimations {
   }
 
   static clearView(view) {
-    for (const stripId of view.config.LIGHTS.GAME_STRIPS) {
+    for (const stripId of view.config.GAME_STRIPS) {
       const panelIds = view.config.PANELS[stripId];
       for (let i = 0; i < panelIds.length; i++) {
         const panelId = panelIds[i];
