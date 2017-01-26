@@ -4,7 +4,6 @@ import GAMES from 'anyware/lib/game-logic/constants/games';
 import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
 import DisksActionCreator from 'anyware/lib/game-logic/actions/disks-action-creator';
 import DiskModel from 'anyware/lib/game-logic/utils/DiskModel';
-
 import dispatcher from '../dispatcher';
 import {sculptureStore} from '../stores';
 import config from '../config';
@@ -50,10 +49,7 @@ export default class DiskView extends React.Component {
     // Start physical disk model
     Object.keys(this.physicalDisks).forEach((diskId) => {
       this.physicalDisks[diskId].start();
-      this.physicalDisks[diskId].on('position', (pos) => {
-        this.setState({[diskId]: pos});
-        this.diskActions.sendDiskUpdate(diskId, { position: pos });
-      });
+      this.physicalDisks[diskId].on('position', (pos) => this.sendDiskUpdate(diskId, pos));
     });
     this.interval = setInterval(() => {
       Object.keys(this.physicalDisks).forEach((key) => this.physicalDisks[key].tick());
@@ -65,10 +61,16 @@ export default class DiskView extends React.Component {
     Object.keys(this.physicalDisks).forEach((key) => this.physicalDisks[key].removeAllListeners('position'));
   }
 
+  sendDiskUpdate(diskId, pos) {
+    this.setState({[diskId]: pos});
+    this.diskActions.sendDiskUpdate(diskId, { position: pos });
+  }
+
   resetDisks() {
     Object.keys(this.physicalDisks).forEach((key) => {
       this.physicalDisks[key].direction = Disk.STOPPED;
-      this.physicalDisks[key].position = 0;
+      this.physicalDisks[key].position = config.initialDiskPositions[key];
+      this.sendDiskUpdate(key, config.initialDiskPositions[key]);
     });
   }
 
@@ -78,7 +80,7 @@ export default class DiskView extends React.Component {
     if (changes.hasOwnProperty('currentGame')) {
       // Reset on start of playing the disk game and on start of games cycle
       if (changes.currentGame === GAMES.DISK || changes.currentGame === GAMES.HANDSHAKE) {
-        this.resetDisks();
+        setTimeout(this.resetDisks.bind(this), 0);
       }
     }
 
@@ -116,8 +118,13 @@ export default class DiskView extends React.Component {
         user = disk.getUser();
       }
 
-      if (direction !== undefined) this.physicalDisks[diskId].direction = direction;
-      if (position !== undefined) this.physicalDisks[diskId].position = position;
+      if (direction !== undefined) {
+        this.physicalDisks[diskId].direction = direction;
+      }
+      if (position !== undefined) {
+        this.physicalDisks[diskId].position = position;
+        this.setState({[diskId]: position});
+      }
       // FIXME: Update physical model "user" state?
     }
   }
