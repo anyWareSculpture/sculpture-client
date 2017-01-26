@@ -26,8 +26,8 @@ Other targets:
 ## Publish Chrome App
 
 * Make sure manifest.json has a bumped version number
-* ```gulp build```
-* ```gulp package```
+* ```npm run build```
+* ```npm run package```
 * Login to https://chrome.google.com/webstore/developer/dashboard
 * ..using anyware.sculpture@gmail.com
 * anyWare Sculpture -> edit -> Upload Updated package
