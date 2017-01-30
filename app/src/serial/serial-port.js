@@ -67,8 +67,8 @@ export default class SerialPort extends events.EventEmitter {
    * @param {Function} [callback] - The callback function to call once the connection has been closed, should take an error parameter
    */
   close(callback) {
-    this._port.close((error) => {
-      callback(error);
+    this._port.close((error, result) => {
+      if (typeof callback === 'function') callback(error, result);
     });
   }
 
@@ -174,7 +174,7 @@ export default class SerialPort extends events.EventEmitter {
   }
 
   _beginHandshake(callback) {
-    const handshake = new SerialHandshake(this.config, this);
+    const handshake = new SerialHandshake(this.config.HANDSHAKE, this);
     handshake.execute(this._completeHandshake.bind(this, callback));
   }
 

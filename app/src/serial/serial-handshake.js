@@ -2,9 +2,8 @@ import * as SerialProtocol from './serial-protocol';
 const {SerialProtocolCommandBuilder} = SerialProtocol;
 
 export default class SerialHandshake {
-  constructor(serialConfig, port) {
-    this.serialConfig = serialConfig;
-    this.handshakeConfig = this.serialConfig.HANDSHAKE;
+  constructor(handshakeConfig, port) {
+    this.handshakeConfig = handshakeConfig;
     this.port = port;
     this.callback = null;
 
