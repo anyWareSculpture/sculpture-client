@@ -91,9 +91,6 @@ class Config extends DefaultConfig {
       scale: 1,
       translate: [0, 0],
     };
-
-    // Playtest configurations:
-    this.GAMES_SEQUENCE = [ GAMES.HANDSHAKE, GAMES.MOLE, GAMES.SIMON ];
   }
 }
 
