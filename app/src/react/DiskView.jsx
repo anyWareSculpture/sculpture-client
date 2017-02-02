@@ -20,6 +20,12 @@ SingleDisk.propTypes = {
 
 export default class DiskView extends React.Component {
   static propTypes = {
+    scale: React.PropTypes.number,
+    translate: React.PropTypes.arrayOf(React.PropTypes.number),
+  };
+  static defaultProps = {
+    scale: 1,
+    translate: [0, 0],
   };
 
   constructor(props) {
@@ -100,7 +106,7 @@ export default class DiskView extends React.Component {
       const disk = this.disks.get(diskId);
       const newDiskValues = diskChanges[diskId];
 
-      let position, direction, user, targetSpeed;
+      let position, user, targetSpeed;
       if (newDiskValues.hasOwnProperty('position') && newDiskValues.position !== this.state[diskId]) {
         position = newDiskValues.position;
       }
@@ -113,12 +119,6 @@ export default class DiskView extends React.Component {
         // are no other changes, we don't need to send anything as it would be redundant.
         delete newDiskValues.position;
         if (Object.keys(newDiskValues).length === 0) continue;
-      }
-      if (newDiskValues.hasOwnProperty('direction')) {
-        direction = newDiskValues.direction;
-      }
-      else {
-        direction = disk.getDirection();
       }
       if (newDiskValues.hasOwnProperty('user')) {
         user = newDiskValues.user;
@@ -146,27 +146,20 @@ export default class DiskView extends React.Component {
 
   render() {
     return this.state.active && <svg id="disk-view" viewBox="0 0 700 700" style={{
-      position: "absolute",
+      position: "relative",
       width: "100%",
       height: "100%",
       left: 0,
       top: 0,
-      zIndex: -1,
     }}>
       <g display="none"><Graphics/></g>
-      <g className="transformOrigin">
-        <use xlinkHref="#circle"/>
-        <use xlinkHref="#disk0" style={{transform: `rotate(${this.state.disk0}deg)`}}/>
-        <use xlinkHref="#disk1" style={{transform: `rotate(${this.state.disk1}deg)`}}/>
-        <use xlinkHref="#disk2" style={{transform: `rotate(${this.state.disk2}deg)`}}/>
-        <use xlinkHref={`#level${this.state.level + 1}`}/>
+      <g className="transformOrigin" style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale})`}}>
+          <use xlinkHref="#circle"/>
+          <use xlinkHref="#disk0" style={{transform: `rotate(${this.state.disk0}deg)`}}/>
+          <use xlinkHref="#disk1" style={{transform: `rotate(${this.state.disk1}deg)`}}/>
+          <use xlinkHref="#disk2" style={{transform: `rotate(${this.state.disk2}deg)`}}/>
+          <use xlinkHref={`#level${this.state.level + 1}`}/>
       </g>
-{/*      <g x="50%" y="50%" transform="scale(0.8 0.8)">
-        <circle cx="0" cy="0" r="50" style={{fill: "white"}}/>
-        {this.state.active && <SingleDisk position={this.state.disk0} url={config.diskUrls.disk0}/>}
-        {this.state.active && <SingleDisk position={this.state.disk1} url={config.diskUrls.disk1}/>}
-        {this.state.active && <SingleDisk position={this.state.disk2} url={config.diskUrls.disk2}/>}
-      </g> */}
     </svg>;
   }
 }

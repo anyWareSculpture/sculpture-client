@@ -1,5 +1,4 @@
 html {
-  background-color: black;
   color: white;
 }
 body {
@@ -8,9 +7,18 @@ body {
 .red-status {
   stroke: #C81C25;
 }
+.red-status text {
+  fill: #C81C25;
+}
 .yellow-status {
   stroke: #C8BC40;
 }
+.yellow-status text {
+  fill: #C8BC40;
+}
 .green-status {
   stroke: #00C80A;
+}
+.green-status text {
+  fill: #00C80A;
 }

@@ -22,12 +22,13 @@ const toColor = (bool) => bool == null ? 'yellow' : bool ? 'green' : 'red';
 
 export default class StatusView extends React.Component {
   static propTypes = {
-    center: React.PropTypes.bool,
-  }
-
+    scale: React.PropTypes.number,
+    translate: React.PropTypes.arrayOf(React.PropTypes.number),
+  };
   static defaultProps = {
-    center: true,
-  }
+    scale: 1,
+    translate: [0, 0],
+  };
 
   constructor(props) {
     super(props);
@@ -62,28 +63,31 @@ export default class StatusView extends React.Component {
     const numIcons = Object.keys(this.state).length - 1;
     return Object.keys(this.state).filter((key) => key !== 'ready').map((key, idx) => {
       const angle = idx * 2*Math.PI / numIcons;
-      const xpos = Math.cos(angle)*20;
-      const ypos = Math.sin(angle)*20;
+      const radius = 70;
+      const xpos = Math.cos(angle)*(350 - 2*radius);
+      const ypos = Math.sin(angle)*(350 - 2*radius);
       return <g key={key} className={`${this.state[key]}-status`} transform={`translate(${xpos}, ${ypos})`}>
-            <circle r="10"/>
-                     <text x="0" y="0" fontSize="10" textAnchor="middle" alignmentBaseline="middle">{symbolMap[key]}</text>
-        </g>;
+        <circle r={radius} strokeWidth={2}/>
+        <text x="0" y="0" fontSize={radius} fontWeight="bold" textAnchor="middle" alignmentBaseline="middle">{symbolMap[key]}</text>
+      </g>;
     });
   }
 
   render() {
     if (this.state.ready) return null;
 
-    return <svg id="status-view" viewBox="-50 -50 100 100" style={{
-      backgroundColor: "transparent",
-      position: "absolute",
+    return <svg id="status-view" viewBox="0 0 700 700" style={{
+      position: "relative",
       width: "100%",
       height: "100%",
       right: 0,
       top: 0,
-      zIndex: 10,
     }}>
-      {this.renderIcons()}
+      <g style={{transform: "translate(350px, 350px)"}}>
+        <g className="" style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale})`}}>
+          {this.renderIcons()}
+        </g>
+      </g>
     </svg>;
   }
 }
