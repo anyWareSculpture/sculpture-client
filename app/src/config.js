@@ -87,20 +87,6 @@ class Config extends DefaultConfig {
       disk2: 270,
     };
 
-    this.DISKS_HARDWARE = {
-      ID_TO_HARDWARE_MAP: {
-        disk0: "0",
-        disk1: "1",
-        disk2: "2"
-      },
-      DIRECTION_TO_HARDWARE_MAP: {
-        [Disk.CLOCKWISE]: -1,
-        [Disk.COUNTERCLOCKWISE]: 1,
-        [Disk.STOPPED]: 0,
-        [Disk.CONFLICT]: 0
-      }
-    };
-
     // Playtest configurations:
     this.GAMES_SEQUENCE = [ GAMES.HANDSHAKE, GAMES.MOLE, GAMES.SIMON ];
   }

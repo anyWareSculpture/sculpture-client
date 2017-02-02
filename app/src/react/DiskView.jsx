@@ -1,5 +1,4 @@
 import React from 'react';
-import Disk from 'anyware/lib/game-logic/utils/disk';
 import GAMES from 'anyware/lib/game-logic/constants/games';
 import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
 import DisksActionCreator from 'anyware/lib/game-logic/actions/disks-action-creator';
@@ -7,6 +6,8 @@ import DiskModel from 'anyware/lib/game-logic/utils/DiskModel';
 import dispatcher from '../dispatcher';
 import {sculptureStore} from '../stores';
 import config from '../config';
+import Graphics from './disk-game.svg';
+import './DiskView.css';
 
 const SingleDisk = ({position, url}) => {
   return <image xlinkHref={url} x={0} y={0} height={100} width={100}
@@ -35,6 +36,7 @@ export default class DiskView extends React.Component {
       disk0: 0,
       disk1: 0,
       disk2: 0,
+      level: 0,
       active: false,
     };
   }
@@ -53,7 +55,7 @@ export default class DiskView extends React.Component {
     });
     this.interval = setInterval(() => {
       Object.keys(this.physicalDisks).forEach((key) => this.physicalDisks[key].tick());
-    }, 100);
+    }, 30);
   }
 
   componentWillUnmount() {
@@ -61,14 +63,14 @@ export default class DiskView extends React.Component {
     Object.keys(this.physicalDisks).forEach((key) => this.physicalDisks[key].removeAllListeners('position'));
   }
 
-  sendDiskUpdate(diskId, pos) {
-    this.setState({[diskId]: pos});
-    this.diskActions.sendDiskUpdate(diskId, { position: pos });
+  sendDiskUpdate(diskId, position) {
+    this.setState({[diskId]: position});
+    this.diskActions.sendDiskUpdate(diskId, { position });
   }
 
   resetDisks() {
     Object.keys(this.physicalDisks).forEach((key) => {
-      this.physicalDisks[key].direction = Disk.STOPPED;
+      this.physicalDisks[key].stop();
       this.physicalDisks[key].position = config.initialDiskPositions[key];
       this.sendDiskUpdate(key, config.initialDiskPositions[key]);
     });
@@ -77,6 +79,7 @@ export default class DiskView extends React.Component {
   _handleChanges(changes) {
     this.setState({active: sculptureStore.isPlayingDiskGame});
 
+    // Handle game changes
     if (changes.hasOwnProperty('currentGame')) {
       // Reset on start of playing the disk game and on start of games cycle
       if (changes.currentGame === GAMES.DISK || changes.currentGame === GAMES.HANDSHAKE) {
@@ -84,6 +87,13 @@ export default class DiskView extends React.Component {
       }
     }
 
+    // Handle level changes
+    const diskGameChanges = changes.disk;
+    if (diskGameChanges && diskGameChanges.level) {
+      this.setState({level: diskGameChanges.level});
+    }
+
+    // Handle disk position changes
     const diskChanges = changes.disks;
     if (!diskChanges) return;
 
@@ -91,7 +101,7 @@ export default class DiskView extends React.Component {
       const disk = this.disks.get(diskId);
       const newDiskValues = diskChanges[diskId];
 
-      let position, direction, user;
+      let position, direction, user, targetSpeed;
       if (newDiskValues.hasOwnProperty('position') && newDiskValues.position !== this.state[diskId]) {
         position = newDiskValues.position;
       }
@@ -117,9 +127,15 @@ export default class DiskView extends React.Component {
       else {
         user = disk.getUser();
       }
+      if (newDiskValues.hasOwnProperty('targetSpeed')) {
+        targetSpeed = newDiskValues.targetSpeed;
+      }
+      else {
+        targetSpeed = disk.getTargetSpeed();
+      }
 
-      if (direction !== undefined) {
-        this.physicalDisks[diskId].direction = direction;
+      if (targetSpeed !== undefined) {
+        this.physicalDisks[diskId].setTargetSpeed(targetSpeed);
       }
       if (position !== undefined) {
         this.physicalDisks[diskId].position = position;
@@ -130,7 +146,7 @@ export default class DiskView extends React.Component {
   }
 
   render() {
-    return <svg id="disk-view" viewBox="-50 -50 100 100" style={{
+    return this.state.active && <svg id="disk-view" viewBox="0 0 700 700" style={{
       position: "absolute",
       width: "100%",
       height: "100%",
@@ -138,12 +154,20 @@ export default class DiskView extends React.Component {
       top: 0,
       zIndex: -1,
     }}>
-      <g x="50%" y="50%" transform="scale(0.8 0.8)">
+      <g display="none"><Graphics/></g>
+      <g className="transformOrigin">
+        <use xlinkHref="#circle"/>
+        <use xlinkHref="#disk0" style={{transform: `rotate(${this.state.disk0}deg)`}}/>
+        <use xlinkHref="#disk1" style={{transform: `rotate(${this.state.disk1}deg)`}}/>
+        <use xlinkHref="#disk2" style={{transform: `rotate(${this.state.disk2}deg)`}}/>
+        <use xlinkHref={`#level${this.state.level + 1}`}/>
+      </g>
+{/*      <g x="50%" y="50%" transform="scale(0.8 0.8)">
         <circle cx="0" cy="0" r="50" style={{fill: "white"}}/>
         {this.state.active && <SingleDisk position={this.state.disk0} url={config.diskUrls.disk0}/>}
         {this.state.active && <SingleDisk position={this.state.disk1} url={config.diskUrls.disk1}/>}
         {this.state.active && <SingleDisk position={this.state.disk2} url={config.diskUrls.disk2}/>}
-      </g>
+      </g> */}
     </svg>;
   }
 }

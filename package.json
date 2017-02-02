@@ -69,6 +69,7 @@
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
     "react-loader": "^2.4.0",
+    "react-svg-loader": "^1.1.1",
     "run-sequence": "^1.1.0",
     "serialport": "^4.0.7",
     "style-loader": "^0.13.1",

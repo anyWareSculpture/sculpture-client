@@ -52,7 +52,7 @@ module.exports = {
       { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, use: ['file-loader'] },
       { test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, use: [{loader: 'url-loader', options: {limit: 10000, mimetype: 'application/font-woff'}}] },
       { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, use: [{loader: 'url-loader', options: {limit: 10000, mimetype: 'application/octet-stream'}}] },
-      { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, use: [{loader: 'url-loader', options: {limit: 10000, mimetype: 'image/svg+xml'}}] },
+      { test: /\.svg$/, use: ['babel-loader', {loader: 'react-svg-loader', options: {jsx: true, svgo: {plugins: [{cleanupIDs: false}]}}}] },
     ]
   }
 };
