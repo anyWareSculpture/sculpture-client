@@ -7,7 +7,6 @@ import dispatcher from '../dispatcher';
 import {sculptureStore} from '../stores';
 import config from '../config';
 import Graphics from './disk-game.svg';
-import './DiskView.css';
 
 const SingleDisk = ({position, url}) => {
   return <image xlinkHref={url} x={0} y={0} height={100} width={100}

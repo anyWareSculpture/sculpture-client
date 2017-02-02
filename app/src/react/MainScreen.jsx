@@ -1,6 +1,7 @@
 import React from 'react';
 import StatusView from './StatusView';
 import DiskView from './DiskView';
+import 'main.css';
 
 const Version = ({versionStr}) => <div id="version"><p>{versionStr}</p></div>;
 const manifest = chrome.runtime.getManifest();
