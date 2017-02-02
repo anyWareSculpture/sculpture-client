@@ -23,6 +23,28 @@ Other targets:
 * Launch without rebuild: `npm run launch`
 
 
+## Serial Emulator
+
+To test the sculpture client without a sculpture, we have a serial emulator which emulates basic behavior of the microcontrollers over virtual serial ports.
+
+### Curses interface
+
+The emulator has a curses interface where serial commands from the
+microcontrollers can be entered.  It will automatically respond to
+`HELLO` messages, but any user input has to be entered by hand.  The
+four ports opened (A, B, C, and M) corresponds to the strips and main
+(handshake) microcontroller. These can be activated by pressing
+F1-F4. When activated, input is sent over the corresponding serial
+port.
+
+To use:
+
+* Configuration:
+   * Set baud rate to 38400
+   * Make sure an initial HELLO is sent in serial-handshake
+* Run `./utilities/serial-emulator.js`
+ 
+
 ## Publish Chrome App
 
 * Make sure manifest.json has a bumped version number
