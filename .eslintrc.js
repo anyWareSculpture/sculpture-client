@@ -12,8 +12,12 @@ module.exports = {
   },
 
   "env": {
-    "shared-node-browser": true,
+    "browser": true,
     "es6": true, // Necessary for ES global symbols like Set, Symbol
+  },
+
+  "globals": {
+    "chrome": true,
   },
 
   "plugins": [
@@ -39,7 +43,7 @@ module.exports = {
     // Best practices
     "no-alert": "error",
     "no-unused-vars": "warn",
-    "no-console": "warn",
+    "no-console": "off",
 
     // ES2015
     "no-var": "error",
