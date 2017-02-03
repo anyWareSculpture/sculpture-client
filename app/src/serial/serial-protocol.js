@@ -138,17 +138,10 @@ export class SerialProtocolCommandParser {
 
 function removeOptionalParts(command) {
   let text = command.trim();
-  if (!text.endsWith(" -")) {
-    return text;
-  }
-  while (true) {
-    const dashIndex = text.lastIndexOf(" -");
-    if (dashIndex < 0) {
-      break;
-    }
-    text = text.slice(0, dashIndex).trim();
-  }
-  return text;
+  const re = /^(.*?)(\ -)+$/;
+
+  const match = text.match(re);
+  return match === null ? text : match[1];
 }
 
 export class SerialProtocolCommandBuilder {

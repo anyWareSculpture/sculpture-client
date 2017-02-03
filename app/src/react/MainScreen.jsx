@@ -5,6 +5,11 @@ import config from '../config';
 import './main.css';
 
 const Version = ({versionStr}) => <div id="version"><p>{versionStr}</p></div>;
+
+Version.propTypes = {
+  versionStr: React.PropTypes.string.isRequired,
+};
+
 const manifest = chrome.runtime.getManifest();
 
 const Canvas = ({children}) => <div style={{
@@ -21,7 +26,16 @@ const Canvas = ({children}) => <div style={{
   {children}
 </div>;
 
+Canvas.propTypes = {
+  children: React.PropTypes.node,
+};
+
 export default class MainScreen extends React.Component {
+
+  static propTypes = {
+    restart: React.PropTypes.func,
+  }
+  
   constructor(props) {
     super(props);
 
