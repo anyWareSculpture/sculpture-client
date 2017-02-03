@@ -23,7 +23,7 @@ export default class SculptureApp extends events.EventEmitter {
     super();
 
     dispatcher.register((payload) => {
-      this._log(`Sent action: ${JSON.stringify(payload)}`);
+      this._debug(`Sent action: ${JSON.stringify(payload)}`);
     });
 
     this.client = null;
@@ -36,7 +36,7 @@ export default class SculptureApp extends events.EventEmitter {
       if (this.client) {
         if (this.client.connected) {
           this.client.sendStateUpdate(changes);
-          this._log(`Sent state update: ${JSON.stringify(changes)}`);
+          this._debug(`Sent state update: ${JSON.stringify(changes)}`);
         }
         else {
           console.warn("Streaming client not connected: ignoring changes");
@@ -61,6 +61,10 @@ export default class SculptureApp extends events.EventEmitter {
    */
   connectAndSetup(options) {
     this._setupStreamingClient(options);
+  }
+
+  _debug(message) {
+//    console.log(message);
   }
 
   _log(message) {
@@ -123,7 +127,7 @@ export default class SculptureApp extends events.EventEmitter {
   _onStateUpdate(update, metadata) {
     update.metadata = metadata;
 
-    this._log(`Got state update: ${JSON.stringify(update)}`);
+    this._debug(`Got state update: ${JSON.stringify(update)}`);
 
     this.sculptureActionCreator.sendMergeState(update);
   }
