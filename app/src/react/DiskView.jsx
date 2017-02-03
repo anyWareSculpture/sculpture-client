@@ -69,7 +69,9 @@ export default class DiskView extends React.Component {
   }
 
   sendDiskUpdate(diskId, position) {
-    this.setState({[diskId]: position});
+// FIXME: Commented out this as it's handled in _handleChanges when it comes back from the store
+// Not sure if we should proactively set the state here.
+//    this.setState({[diskId]: position});
     this.diskActions.sendDiskUpdate(diskId, { position });
   }
 
