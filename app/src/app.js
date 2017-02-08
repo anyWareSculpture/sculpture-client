@@ -33,14 +33,14 @@ export default class SculptureApp extends events.EventEmitter {
     this.serialManager = this._setupSerialManager();
 
     sculptureStore.on(SculptureStore.EVENT_CHANGE, (changes) => {
-      if (this.client) {
-        if (this.client.connected) {
-          this.client.sendStateUpdate(changes);
-          this._debug(`Sent state update: ${JSON.stringify(changes)}`);
-        }
-        else {
-          console.warn("Streaming client not connected: ignoring changes");
-        }
+      if (!this.client) return;
+
+      if (this.client.connected) {
+        this.client.sendStateUpdate(changes);
+        this._debug(`Sent state update: ${JSON.stringify(changes)}`);
+      }
+      else {
+        console.warn("Streaming client not connected: ignoring changes");
       }
     });
 
@@ -90,21 +90,16 @@ export default class SculptureApp extends events.EventEmitter {
   }
 
   _setupStreamingClient(options) {
-    if (this.client) {
-      this.client.close();
-    }
+    if (this.client) this.client.close();
+    if (config.SINGLE_USER_MODE) return;
 
     this._log(`Using username ${options.username}`);
-
-    if (config.SINGLE_USER_MODE) return;
 
     this.client = new StreamingClient(options);
 
     this.client.on(StreamingClient.EVENT_CONNECT, this._onConnectionStatusChange.bind(this));
     this.client.on(StreamingClient.EVENT_DISCONNECT, this._onConnectionStatusChange.bind(this));
-
     this.client.on(StreamingClient.EVENT_ERROR, this._error.bind(this));
-
     this.client.on(StreamingClient.EVENT_STATE_UPDATE, this._onStateUpdate.bind(this));
   }
 
@@ -133,9 +128,6 @@ export default class SculptureApp extends events.EventEmitter {
   }
 
   _beginFirstGame() {
-    if (this.client && !initStore.clientConnected) return;
-    if (!initStore.serialInitialized || !initStore.audioInitialized) return;
-
     // TODO: Temporarily here until the full game transitions are implemented
     if (sculptureStore.isPlayingNoGame) {
       Object.keys(this.views).forEach((view) => this.views[view].reset());
