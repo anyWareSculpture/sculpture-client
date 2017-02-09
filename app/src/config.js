@@ -18,12 +18,6 @@ class Config extends DefaultConfig {
     };
 
     /*********** Hardware Mappings ************/
-    this.HARDWARE_USERNAME_MAPPINGS = {
-      [this.user0]: '0',
-      [this.user1]: '1',
-      [this.user2]: '2'
-    };
-
     this.SERIAL = {
       COMMAND_DELIMETER: "\n",
       BAUDRATE: 115200,

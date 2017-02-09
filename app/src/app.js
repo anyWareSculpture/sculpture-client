@@ -104,8 +104,7 @@ export default class SculptureApp extends events.EventEmitter {
   }
 
   _setupSerialManager() {
-    const serialIdentity = config.HARDWARE_USERNAME_MAPPINGS[config.username];
-    const serialManager = new SerialManager(config.SERIAL, serialIdentity);
+    const serialManager = new SerialManager(config.SERIAL);
     serialManager.searchPorts(() => {
       console.log('Finished searching all serial ports');
 
