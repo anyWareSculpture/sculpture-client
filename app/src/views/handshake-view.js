@@ -176,10 +176,10 @@ export default class HandshakeView {
       const {numUsers} = commandArgs;
 
       if (parseInt(numUsers) > 0) {
-        this.sculptureActionCreator.sendHandshakeActivate(this.config.username);
+        this.sculptureActionCreator.sendHandshakeActivate(this.store.username);
       }
       else {
-        this.sculptureActionCreator.sendHandshakeDeactivate(this.config.username);
+        this.sculptureActionCreator.sendHandshakeDeactivate(this.store.username);
       }
     }
   }
