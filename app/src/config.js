@@ -6,13 +6,13 @@ class Config extends DefaultConfig {
   constructor() {
     super();
 
-    this.username = "sculpture0";
+    this.username = "anyware";
     this.SINGLE_USER_MODE = false;
     this.CLIENT_CONNECTION_OPTIONS = {
       default: {
         protocol: "ws",
-        username: "sculpture0",
-        password: "7f24a3e73b91dc9f51f15861d75c888a",
+        username: "anyware",
+        password: "anyware",
         host: "broker.shiftr.io"
       }
     };
