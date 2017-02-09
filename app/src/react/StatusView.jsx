@@ -38,6 +38,7 @@ export default class StatusView extends React.Component {
   getInitStoreState() {
     const state = {
       ready: initStore.ready,
+      username: initStore.username,
       audioInitialized: toColor(initStore.audioInitialized),
       clientConnected: toColor(initStore.clientConnected),
       serialInitialized: toColor(initStore.serialInitialized),
@@ -59,13 +60,16 @@ export default class StatusView extends React.Component {
     // FIXME: this.props.app.removeListener() ?
   }
 
-  renderIcons() {
-    const numIcons = Object.keys(this.state).length - 1;
+  renderIcons(isReady) {
+    const numIcons = Object.keys(this.state).length - 2;
+    const startAngle = isReady ? (-45 * Math.PI / 180) : 0;
+    const stepAngle = isReady ? (8 * Math.PI / 180) : (2 * Math.PI / numIcons);
     return Object.keys(this.state).filter((key) => key !== 'ready').map((key, idx) => {
-      const angle = idx * 2*Math.PI / numIcons;
-      const radius = 70;
-      const xpos = Math.cos(angle)*(350 - 2*radius);
-      const ypos = Math.sin(angle)*(350 - 2*radius);
+      const angle = startAngle + idx * stepAngle;
+      const radius = isReady ? 10 : 70;
+      const offset = isReady ? (2 * radius) : (-2 * radius);
+      const xpos = Math.cos(angle)*(350 + offset);
+      const ypos = Math.sin(angle)*(350 + offset);
       return <g key={key} className={`${this.state[key]}-status`} transform={`translate(${xpos}, ${ypos})`}>
         <circle r={radius} strokeWidth={2}/>
         <text x="0" y="0" fontSize={radius} fontWeight="bold" textAnchor="middle" alignmentBaseline="middle">{symbolMap[key]}</text>
@@ -73,19 +77,33 @@ export default class StatusView extends React.Component {
     });
   }
 
-  render() {
-    if (this.state.ready) return null;
+  renderUsername(isReady) {
+    let transform = '';
+    let fontSize = 30;
+    if (isReady) {
+      transform = `translate(400, 0) rotate(90)`;
+      fontSize = 15;
+    }
+    return <g transform={transform}>
+      <text x="0" y="0" fontSize={fontSize} textAnchor="middle" alignmentBaseline="middle" fill="#ffffff">
+        {this.state.username}
+      </text>
+    </g>;
+  }
 
+  render() {
     return <svg id="status-view" viewBox="0 0 700 700" style={{
-      position: "relative",
+      position: "absolute",
       width: "100%",
       height: "100%",
       right: 0,
       top: 0,
+      zIndex: 10,
     }}>
       <g style={{transform: "translate(350px, 350px)"}}>
         <g className="" style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale})`}}>
-          {this.renderIcons()}
+          {this.renderIcons(this.state.ready)}
+          {this.renderUsername(this.state.ready)}
         </g>
       </g>
     </svg>;
