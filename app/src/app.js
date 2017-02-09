@@ -1,5 +1,4 @@
 import events from 'events';
-
 import StreamingClient from 'anyware/lib/streaming-client';
 import SculptureActionCreator from 'anyware/lib/game-logic/actions/sculpture-action-creator';
 import {InitActionCreator, initActionCreator} from './init-action-creator';
@@ -30,6 +29,8 @@ export default class SculptureApp extends events.EventEmitter {
 
     this.views = {};
 
+    this._getUsername();
+
     this.serialManager = this._setupSerialManager();
 
     sculptureStore.on(SculptureStore.EVENT_CHANGE, (changes) => {
@@ -46,21 +47,27 @@ export default class SculptureApp extends events.EventEmitter {
 
     // FIXME: Find a better design for such cascading actions
     dispatcher.register((action) => {
-      if (action.actionType === InitActionCreator.READY) {
+      switch (action.actionType) {
+      case InitActionCreator.USERNAME_FOUND:
+        if (!config.SINGLE_USER_MODE) {
+          const connectionOptions = {
+            ...config.CLIENT_CONNECTION_OPTIONS.default,
+            username: action.username,
+            password: config.CLIENT_CONNECTION_OPTIONS.credentials[action.username],
+          };
+          this._setupStreamingClient(connectionOptions);
+        }
+        break;
+      case InitActionCreator.READY:
         setTimeout(() => this._beginFirstGame(), 0);
+        break;
+      default:
       }
     });
 
     this.sculptureActionCreator = new SculptureActionCreator(dispatcher);
 
     this._setupViews();
-  }
-
-  /**
-   * Connects to the streaming server and sets up the rest of the application
-   */
-  connectAndSetup(options) {
-    this._setupStreamingClient(options);
   }
 
   _debug(message) {
@@ -73,6 +80,15 @@ export default class SculptureApp extends events.EventEmitter {
 
   _error(message) {
     console.error(message);
+  }
+
+  /**
+   * Get username from local storage
+   */
+  _getUsername() {
+    chrome.storage.local.get("username", (items) => {
+      initActionCreator.sendUsernameFound(items.username ? items.username : 'anyware');
+    });
   }
 
   _setupViews() {
@@ -91,7 +107,6 @@ export default class SculptureApp extends events.EventEmitter {
 
   _setupStreamingClient(options) {
     if (this.client) this.client.close();
-    if (config.SINGLE_USER_MODE) return;
 
     this._log(`Using username ${options.username}`);
 

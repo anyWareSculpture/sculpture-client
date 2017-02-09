@@ -25,6 +25,7 @@ export default class InitStore extends EventEmitter {
     super();
     this.dispatcher = dispatcher;
     this.state = {
+      username: null,
       audioInitialized: null,
       clientConnected: null,
       serialInitialized: null,
@@ -42,6 +43,12 @@ export default class InitStore extends EventEmitter {
 
   actionHandler(action) {
     switch (action.actionType) {
+    case InitActionCreator.USERNAME_FOUND:
+      console.log(`Usename found: ${action.username}`);
+      this.state.username = action.username;
+      this.emitChange();
+      this._readyHandler();
+      break;
     case InitActionCreator.AUDIO_INITIALIZED:
       if (this.state.audioInitialized !== true) {
         this.state.audioInitialized = true;
@@ -81,7 +88,7 @@ export default class InitStore extends EventEmitter {
   }
 
   _readyHandler() {
-    if (!this.state.ready &&
+    if (!this.state.ready && this.state.username && 
         this.state.audioInitialized && this.state.clientConnected && this.state.serialInitialized) {
       // FIXME: Also require all subsystems to be ready?
       // Wait 2 secs before starting game
@@ -97,6 +104,10 @@ export default class InitStore extends EventEmitter {
       systems[name] =  ports.size !== 0;
     });
     return systems;
+  }
+
+  get username() {
+    return this.state.username;
   }
 
   get audioInitialized() {
