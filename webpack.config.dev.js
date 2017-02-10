@@ -2,6 +2,10 @@ const { resolve } = require('path');
 const webpack = require("webpack");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
+const production = process.env.NODE_ENV === 'production';
+
+console.log(`Building for ${production ? 'production' : 'development'}`);
+
 module.exports = {
   devtool: 'source-map',
   entry: [
@@ -33,7 +37,8 @@ module.exports = {
       { from: 'app/application.html' },
       { from: 'app/application.css' },
       { from: 'manifest.json' },
-      { from: 'scripts/background.js' },
+      { from: `scripts/background${production ? '-production' : ''}.js`,
+        to: 'background.js' },
     ]),
   ],
   module: {

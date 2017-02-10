@@ -7,8 +7,10 @@
     "test": "test"
   },
   "scripts": {
-    "dev": "npm run build && npm run launch",
-    "build": "webpack --config webpack.config.dev.js",
+    "dev": "npm run build-dev && npm run launch",
+    "build": "NODE_ENV=production npm run webpack",
+    "build-dev": "npm run webpack",
+    "webpack": "webpack --config webpack.config.dev.js",
     "launch": "chrome --load-and-launch-app=$PWD/build",
     "package": "mkdir -p dist && cd build && zip -r ../dist/anyware-sculpture.zip * && cd -",
     "lint": "eslint --ext=.js,.jsx app",
