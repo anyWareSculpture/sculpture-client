@@ -10,6 +10,7 @@ const symbolMap = {
   STRIP_A: 'A',
   STRIP_B: 'B',
   STRIP_C: 'C',
+  RGB_STRIPS: 'R',
   HANDSHAKE_STRIP: 'H',
   ART_LIGHTS_STRIP: 'P',
   [SerialProtocol.HANDSHAKE_COMMAND]: 'V',
