@@ -3,7 +3,7 @@ import dispatcher from './dispatcher';
 
 class InitActionCreator extends BaseActionCreator {
   // Action types
-  static USERNAME_FOUND = 'username-found';
+  static SCULPTURE_ID_FOUND = 'sculpture-id-found';
   static AUDIO_INITIALIZED = 'audio-initialized';
   static CLIENT_CONNECTED = 'client-connected';
   static SERIAL_INITIALIZED = 'serial-initialized';
@@ -13,8 +13,8 @@ class InitActionCreator extends BaseActionCreator {
     super(dispatcher);
   }
 
-  sendUsernameFound(username) {
-    this._dispatch(InitActionCreator.USERNAME_FOUND, { username });
+  sendSculptureIdFound(sculptureId) {
+    this._dispatch(InitActionCreator.SCULPTURE_ID_FOUND, { sculptureId });
   }
 
   sendAudioInitialized() {

@@ -6,7 +6,6 @@ class Config extends DefaultConfig {
   constructor() {
     super();
 
-    this.username = "anyware";
     this.SINGLE_USER_MODE = false;
     this.CLIENT_CONNECTION_OPTIONS = {
       default: {
@@ -46,23 +45,23 @@ class Config extends DefaultConfig {
     this.HANDSHAKE_HARDWARE = {
       // Delay between consequtive pulses in the handshake game
       PULSE_DELAY: 4000, // ms
-      USER_PANELS: {
-        // username : panelId
-        [this.user0]: '0',
-        [this.user1]: '1',
-        [this.user2]: '2'
+      LOCATION_PANELS: {
+        // sculptureId : panelId
+        [this.sculpture1]: '0',
+        [this.sculpture2]: '1',
+        [this.sculpture3]: '2'
       },
-      USER_PANEL_ON_INTENSITY: 100,
-      USER_PANEL_OFF_INTENSITY: 0,
-      USER_PANEL_ON_EASING: 'easein',
-      USER_PANEL_OFF_EASING: 'easein',
+      LOCATION_PANEL_ON_INTENSITY: 100,
+      LOCATION_PANEL_OFF_INTENSITY: 0,
+      LOCATION_PANEL_ON_EASING: 'easein',
+      LOCATION_PANEL_OFF_EASING: 'easein',
 
       MIDDLE_PANEL: '3',
       // Settings for the middle part of the handshake
       MIDDLE_ON_INTENSITY: 100,
       MIDDLE_OFF_INTENSITY: 0,
       // The color settings here represent the color of the middle
-      // setting ON_COLOR to null makes it default to the user color
+      // setting ON_COLOR to null makes it default to the location color
       MIDDLE_ON_COLOR: null,
       MIDDLE_OFF_COLOR: 'white',
       MIDDLE_ON_EASING: 'easein',

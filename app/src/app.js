@@ -29,7 +29,7 @@ export default class SculptureApp extends events.EventEmitter {
 
     this.views = {};
 
-    this._getUsername();
+    this._getSculptureId();
 
     this.serialManager = this._setupSerialManager();
 
@@ -48,12 +48,12 @@ export default class SculptureApp extends events.EventEmitter {
     // FIXME: Find a better design for such cascading actions
     dispatcher.register((action) => {
       switch (action.actionType) {
-      case InitActionCreator.USERNAME_FOUND:
+      case InitActionCreator.SCULPTURE_ID_FOUND:
         if (!config.SINGLE_USER_MODE) {
           const connectionOptions = {
             ...config.CLIENT_CONNECTION_OPTIONS.default,
-            username: action.username,
-            password: config.CLIENT_CONNECTION_OPTIONS.credentials[action.username],
+            username: action.sculptureId,
+            password: config.CLIENT_CONNECTION_OPTIONS.credentials[action.sculptureId],
           };
           this._setupStreamingClient(connectionOptions);
         }
@@ -83,11 +83,11 @@ export default class SculptureApp extends events.EventEmitter {
   }
 
   /**
-   * Get username from local storage
+   * Get sculpture ID from local storage
    */
-  _getUsername() {
-    chrome.storage.local.get("username", (items) => {
-      initActionCreator.sendUsernameFound(items.username ? items.username : 'anyware');
+  _getSculptureId() {
+    chrome.storage.local.get("sculptureId", (items) => {
+      initActionCreator.sendSculptureIdFound(items.sculptureId ? items.sculptureId : config.defaultSculptureId);
     });
   }
 
@@ -108,7 +108,7 @@ export default class SculptureApp extends events.EventEmitter {
   _setupStreamingClient(options) {
     if (this.client) this.client.close();
 
-    this._log(`Using username ${options.username}`);
+    this._log(`Streaming client: Using username ${options.username}`);
 
     this.client = new StreamingClient(options);
 

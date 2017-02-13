@@ -41,11 +41,11 @@ export default class HandshakeView {
 
     this._updateHandshakeVibrationIntensity();
 
-    for (const username of Object.keys(handshakesChanges)) {
-      if (handshakesChanges[username]) {
-        this._activateUserPanel(username);
+    for (const sculptureId of Object.keys(handshakesChanges)) {
+      if (handshakesChanges[sculptureId]) {
+        this._activateLocationPanel(sculptureId);
 
-        if (username === this.store.username) {
+        if (sculptureId === this.store.me) {
           // Pulsing needs to be stopped if the user has activated the
           // handshake because both cannot happen at once
           this._endPulsing();
@@ -53,33 +53,33 @@ export default class HandshakeView {
         }
       }
       else {
-        this._deactivateUserPanel(username);
+        this._deactivateLocationPanel(sculptureId);
 
-        if (username === this.store.username) {
+        if (sculptureId === this.store.me) {
           this._deactivateMiddlePanel();
         }
       }
     }
   }
 
-  _activateUserPanel(username) {
-    const intensity = this.config.HANDSHAKE_HARDWARE.USER_PANEL_ON_INTENSITY;
-    const color = this.config.getUserColor(username);
-    const easing = this.config.HANDSHAKE_HARDWARE.USER_PANEL_ON_EASING;
+  _activateLocationPanel(sculptureId) {
+    const intensity = this.config.HANDSHAKE_HARDWARE.LOCATION_PANEL_ON_INTENSITY;
+    const color = this.config.getLocationColor(sculptureId);
+    const easing = this.config.HANDSHAKE_HARDWARE.LOCATION_PANEL_ON_EASING;
 
-    this._userPanelSet(username, {intensity, color, easing});
+    this._locationPanelSet(sculptureId, {intensity, color, easing});
   }
 
-  _deactivateUserPanel(username) {
-    const intensity = this.config.HANDSHAKE_HARDWARE.USER_PANEL_OFF_INTENSITY;
-    const easing = this.config.HANDSHAKE_HARDWARE.USER_PANEL_OFF_EASING;
+  _deactivateLocationPanel(sculptureId) {
+    const intensity = this.config.HANDSHAKE_HARDWARE.LOCATION_PANEL_OFF_INTENSITY;
+    const easing = this.config.HANDSHAKE_HARDWARE.LOCATION_PANEL_OFF_EASING;
 
-    this._userPanelSet(username, {intensity, easing});
+    this._locationPanelSet(sculptureId, {intensity, easing});
   }
 
   _activateMiddlePanel() {
     const intensity = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_INTENSITY;
-    const color = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_COLOR || this.store.userColor;
+    const color = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_COLOR || this.store.locationColor;
     const easing = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_EASING;
 
     this._middlePanelSet({intensity, color, easing});
@@ -93,10 +93,10 @@ export default class HandshakeView {
     this._middlePanelSet({intensity, color, easing});
   }
 
-  _userPanelSet(username, {intensity, color, easing}) {
-    const userPanel = this.config.HANDSHAKE_HARDWARE.USER_PANELS[username];
+  _locationPanelSet(sculptureId, {intensity, color, easing}) {
+    const locationPanel = this.config.HANDSHAKE_HARDWARE.LOCATION_PANELS[sculptureId];
 
-    this._handshakePanelSet(userPanel, {intensity, color, easing});
+    this._handshakePanelSet(locationPanel, {intensity, color, easing});
   }
 
   _middlePanelSet({intensity, color, easing}) {
@@ -117,7 +117,7 @@ export default class HandshakeView {
 
   _updateHandshakeVibrationIntensity() {
     const handshakes = this.handshakes;
-    const count = Array.from(handshakes).reduce((total, username) => total + (handshakes.get(username) ? 1 : 0), 0);
+    const count = Array.from(handshakes).reduce((total, sculptureId) => total + (handshakes.get(sculptureId) ? 1 : 0), 0);
     const commandString = SerialProtocolCommandBuilder.buildHandshake({
       numUsers: count
     });
@@ -176,10 +176,10 @@ export default class HandshakeView {
       const {numUsers} = commandArgs;
 
       if (parseInt(numUsers) > 0) {
-        this.sculptureActionCreator.sendHandshakeActivate(this.store.username);
+        this.sculptureActionCreator.sendHandshakeActivate(this.store.me);
       }
       else {
-        this.sculptureActionCreator.sendHandshakeDeactivate(this.store.username);
+        this.sculptureActionCreator.sendHandshakeDeactivate(this.store.me);
       }
     }
   }

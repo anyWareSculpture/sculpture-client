@@ -25,7 +25,7 @@ export default class InitStore extends EventEmitter {
     super();
     this.dispatcher = dispatcher;
     this.state = {
-      username: null,
+      sculptureId: null,
       audioInitialized: null,
       clientConnected: null,
       serialInitialized: null,
@@ -43,9 +43,9 @@ export default class InitStore extends EventEmitter {
 
   actionHandler(action) {
     switch (action.actionType) {
-    case InitActionCreator.USERNAME_FOUND:
-      console.log(`Usename found: ${action.username}`);
-      this.state.username = action.username;
+    case InitActionCreator.SCULPTURE_ID_FOUND:
+      console.log(`SculptureId found: ${action.sculptureId}`);
+      this.state.sculptureId = action.sculptureId;
       this.emitChange();
       this._readyHandler();
       break;
@@ -88,7 +88,7 @@ export default class InitStore extends EventEmitter {
   }
 
   _readyHandler() {
-    if (!this.state.ready && this.state.username && 
+    if (!this.state.ready && this.state.sculptureId && 
         this.state.audioInitialized && this.state.clientConnected && this.state.serialInitialized) {
       // FIXME: Also require all subsystems to be ready?
       // Wait 2 secs before starting game
@@ -106,8 +106,8 @@ export default class InitStore extends EventEmitter {
     return systems;
   }
 
-  get username() {
-    return this.state.username;
+  get sculptureId() {
+    return this.state.sculptureId;
   }
 
   get audioInitialized() {

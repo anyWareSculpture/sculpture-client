@@ -38,7 +38,7 @@ export default class StatusView extends React.Component {
   getInitStoreState() {
     const state = {
       ready: initStore.ready,
-      username: initStore.username,
+      sculptureId: initStore.sculptureId,
       audioInitialized: toColor(initStore.audioInitialized),
       clientConnected: toColor(initStore.clientConnected),
       serialInitialized: toColor(initStore.serialInitialized),
@@ -77,7 +77,7 @@ export default class StatusView extends React.Component {
     });
   }
 
-  renderUsername(isReady) {
+  renderSculptureId(isReady) {
     let transform = '';
     let fontSize = 30;
     if (isReady) {
@@ -86,7 +86,7 @@ export default class StatusView extends React.Component {
     }
     return <g transform={transform}>
       <text x="0" y="0" fontSize={fontSize} textAnchor="middle" alignmentBaseline="middle" fill="#ffffff">
-        {this.state.username}
+        {this.state.sculptureId}
       </text>
     </g>;
   }
@@ -103,7 +103,7 @@ export default class StatusView extends React.Component {
       <g style={{transform: "translate(350px, 350px)"}}>
         <g className="" style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale})`}}>
           {this.renderIcons(this.state.ready)}
-          {this.renderUsername(this.state.ready)}
+          {this.renderSculptureId(this.state.ready)}
         </g>
       </g>
     </svg>;
