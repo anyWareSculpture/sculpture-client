@@ -33,11 +33,11 @@ export default class SculptureApp extends events.EventEmitter {
 
     this.serialManager = this._setupSerialManager();
 
-    sculptureStore.on(SculptureStore.EVENT_CHANGE, (changes) => {
+    sculptureStore.on(SculptureStore.EVENT_CHANGE, (changes, metadata) => {
       if (!this.client) return;
 
       if (this.client.connected) {
-        this.client.sendStateUpdate(changes);
+        this.client.sendStateUpdate(changes, metadata);
         this._debug(`Sent state update: ${JSON.stringify(changes)}`);
       }
       else {
