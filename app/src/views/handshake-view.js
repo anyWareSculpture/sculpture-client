@@ -54,7 +54,6 @@ export default class HandshakeView {
 
     this._updateHandshakeVibrationIntensity();
 
-    console.log(JSON.stringify(handshakesChanges));
     for (const sculptureId of Object.keys(handshakesChanges)) {
       switch (handshakesChanges[sculptureId]) {
       case SculptureStore.HANDSHAKE_ACTIVE:
@@ -173,7 +172,8 @@ export default class HandshakeView {
 
   _refreshActivityTimeout() {
     if (this._activityTimeout) clearTimeout(this._activityTimeout);
-    this._activityTimeout = setTimeout(this._activityTimeoutCB.bind(this), this.config.ACTIVITY_TIMEOUT);
+    this._activityTimeout = setTimeout(this._activityTimeoutCB.bind(this),
+                                       this.config.ACTIVITY_TIMEOUT * 1000);
   }
 
   _activityTimeoutCB() {
@@ -181,15 +181,17 @@ export default class HandshakeView {
     this.sculptureActionCreator.sendHandshakeAction(this.store.me, SculptureStore.HANDSHAKE_OFF);
   }
 
+  // Command from serial
   _handleCommand(commandName, commandArgs) {
 
+    // Refresh timeout on any interaction, but don't start a new timeout unless it's a handshake
     if (this._activityTimeout) this._refreshActivityTimeout();
 
     if (commandName === SerialProtocol.HANDSHAKE_COMMAND) {
       // numUsers is really just an active flag (0 or 1), but has this name for historic reasons
-      const {numUsers} = commandArgs;
+      const {numUsers: active} = commandArgs;
 
-      if (parseInt(numUsers) > 0) {
+      if (parseInt(active) > 0) {
         this.sculptureActionCreator.sendHandshakeAction(this.store.me, SculptureStore.HANDSHAKE_ACTIVE);
       }
       else {
