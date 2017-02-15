@@ -6,6 +6,8 @@ import config from '../config';
 import InitStore from '../init-store';
 import {initStore} from '../stores';
 
+const manifest = chrome.runtime.getManifest();
+
 const symbolMap = {
   STRIP_A: 'A',
   STRIP_B: 'B',
@@ -92,6 +94,16 @@ export default class StatusView extends React.Component {
     </g>;
   }
 
+  renderVersion(isReady) {
+    if (isReady) return null;
+
+    return <g transform={'translate(0,50)'}>
+      <text x="0" y="0" fontSize={30} textAnchor="middle" alignmentBaseline="middle" fill="#ffffff">
+        {`V${manifest.version}`}
+      </text>
+    </g>;
+  }
+
   render() {
     return <svg id="status-view" viewBox="0 0 700 700" style={{
       position: "absolute",
@@ -105,6 +117,7 @@ export default class StatusView extends React.Component {
         <g className="" style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale})`}}>
           {this.renderIcons(this.state.ready)}
           {this.renderSculptureId(this.state.ready)}
+          {this.renderVersion(this.state.ready)}
         </g>
       </g>
     </svg>;
