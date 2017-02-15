@@ -4,6 +4,9 @@ import DiskView from './DiskView';
 import config from '../config';
 import './main.css';
 
+// Debug mode (shows info while running)
+const debug = true;
+
 const Version = ({versionStr}) => <div id="version"><p>{versionStr}</p></div>;
 
 Version.propTypes = {
@@ -47,11 +50,13 @@ export default class MainScreen extends React.Component {
   render() {
     return <div>
       <Canvas>
-        <StatusView  {...config.projectionParameters}/>
+        <StatusView debug={debug} {...config.projectionParameters}/>
         <DiskView {...config.projectionParameters}/>
       </Canvas>
-      <Version versionStr={`V${manifest.version}`}/>
-      <button onClick={this.props.restart} style={{zIndex: 20, position: "relative"}}>Restart</button>
+      {debug && <div>
+        <Version versionStr={`V${manifest.version}`}/>
+        <button onClick={this.props.restart} style={{zIndex: 20, position: "relative"}}>Restart</button>
+      </div>}
     </div>;
   }
 }

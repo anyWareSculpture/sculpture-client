@@ -27,6 +27,7 @@ export default class StatusView extends React.Component {
   static propTypes = {
     scale: React.PropTypes.number,
     translate: React.PropTypes.arrayOf(React.PropTypes.number),
+    debug: React.PropTypes.bool,
   };
   static defaultProps = {
     scale: 1,
@@ -64,6 +65,8 @@ export default class StatusView extends React.Component {
   }
 
   renderIcons(isReady) {
+    if (isReady && !this.props.debug) return null;
+
     const numIcons = Object.keys(this.state).length - 2;
     const startAngle = isReady ? (-45 * Math.PI / 180) : 0;
     const stepAngle = isReady ? (8 * Math.PI / 180) : (2 * Math.PI / numIcons);
@@ -81,6 +84,8 @@ export default class StatusView extends React.Component {
   }
 
   renderSculptureId(isReady) {
+    if (isReady && !this.props.debug) return null;
+
     let transform = '';
     let fontSize = 30;
     if (isReady) {
