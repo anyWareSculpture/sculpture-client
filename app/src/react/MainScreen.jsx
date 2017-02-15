@@ -20,7 +20,7 @@ const Canvas = ({children}) => <div style={{
   right: 0,
   overflow: "auto",
   background: "black",
-  border: "1px solid red",
+// For projection debugging  border: "1px solid red",
   zIndex: -1,
 }}>
   {children}
