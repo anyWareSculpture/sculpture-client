@@ -138,10 +138,11 @@ export default class SculptureApp extends events.EventEmitter {
   }
 
   _onStateUpdate(update, metadata) {
+    // Ignore our own state update. FIXME: Can this be configured with MQTT instead?
+    if (metadata.from === sculptureStore.me) return;
+
     update.metadata = metadata;
-
     this._debug(`Got state update: ${JSON.stringify(update)}`);
-
     this.sculptureActionCreator.sendMergeState(update);
   }
 
