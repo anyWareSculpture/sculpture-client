@@ -81,8 +81,8 @@ class Config extends DefaultConfig {
     };
 
     this.projectionParameters = {
-      scale: 0.85,
-      translate: [-10, 20],
+      scale: 0.90,
+      translate: [-8, 8],
     };
   }
 }
