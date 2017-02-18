@@ -26,7 +26,7 @@ class Config extends DefaultConfig {
         // The time to wait for a valid HELLO
         // Measurements show that it takes 1700-1800 ms to get a HELLO from an
         // Arduino after reset (tested on a Mac)
-        TIMEOUT: 2000 // ms
+        TIMEOUT: 5000 // ms
       },
       // Serial port paths matching these patterns will be ignored
       HARDWARE_INVALID_PATH_PATTERNS: [
