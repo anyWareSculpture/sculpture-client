@@ -112,6 +112,7 @@ export default class SculptureApp extends events.EventEmitter {
 
     this.client = new StreamingClient(options);
 
+    // FIXME: If the onConnectionStatusChange is triggered, it will dispatch other actions (sendClientConnected and sendLogin) in the context of this dispatch. We need to decouple these.
     this.client.on(StreamingClient.EVENT_CONNECT, this._onConnectionStatusChange.bind(this));
     this.client.on(StreamingClient.EVENT_DISCONNECT, this._onConnectionStatusChange.bind(this));
     this.client.on(StreamingClient.EVENT_ERROR, this._error.bind(this));
