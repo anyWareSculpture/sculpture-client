@@ -76,10 +76,11 @@ export default class DiskView extends React.Component {
   }
 
   resetDisks() {
-    Object.keys(this.physicalDisks).forEach((key) => {
-      this.physicalDisks[key].stop();
-      this.physicalDisks[key].position = config.initialDiskPositions[key];
-      this.sendDiskUpdate(key, config.initialDiskPositions[key]);
+    Object.keys(this.physicalDisks).forEach((diskId) => {
+      this.physicalDisks[diskId].stop();
+      const pos = this.disks.get(diskId).get('position');
+      this.physicalDisks[diskId].position = pos;
+      this.sendDiskUpdate(diskId, pos);
     });
   }
 
@@ -157,9 +158,9 @@ export default class DiskView extends React.Component {
       <g display="none"><Graphics/></g>
       <g className="transformOrigin" style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale})`}}>
           <use xlinkHref="#circle"/>
-          <use xlinkHref="#disk0" style={{transform: `rotate(${this.state.disk0}deg)`}}/>
-          <use xlinkHref="#disk1" style={{transform: `rotate(${this.state.disk1}deg)`}}/>
-          <use xlinkHref="#disk2" style={{transform: `rotate(${this.state.disk2}deg)`}}/>
+          <use xlinkHref="#disk0" style={{transformOrigin: "192px 213px ", transform: `rotate(${this.state.disk0}deg)`}}/>
+          <use xlinkHref="#disk1" style={{transformOrigin: "468.5px 426.5px", transform: `rotate(${this.state.disk1}deg)`}}/>
+          <use xlinkHref="#disk2" style={{transformOrigin: "350px 350px", transform: `rotate(${this.state.disk2}deg)`}}/>
           <use xlinkHref={`#level${this.state.level + 1}`}/>
       </g>
     </svg>;

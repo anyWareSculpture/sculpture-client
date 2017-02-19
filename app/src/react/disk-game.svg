@@ -7,38 +7,24 @@
 	<circle fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" cx="350" cy="350" r="350"/>
 </g>
 <g id="disk0">
-	<path opacity="0.33" fill="#020000" stroke="#000000" stroke-miterlimit="10" d="M430.203,690.693
-		c0,0,168.289-320.629-133.621-304.03C87.187,398.177,216.683,274.635,527.129,48.087
-		C795.632,211.66,739.906,617.984,430.203,690.693z"/>
+	<circle fill="none" stroke="#000000" stroke-miterlimit="10" cx="192" cy="213" r="140"/>
+	<path opacity="0.33" fill="#020000" stroke="#000000" stroke-miterlimit="10" d="M309.717,288.807
+		c-12.995-1.493-26.886-2.12-41.717-1.807c-111.623,2.355-148.338,32.197-182,12c-32.395-19.437,18.074-131.801,188.333-199.231
+		C333.75,140,350,229,309.717,288.807z"/>
 </g>
 <g id="disk1">
-	<path opacity="0.33" fill="#020000" stroke="#000000" stroke-miterlimit="10" d="M201.456,666.945
-		c0,0,244.991-225.962,309.128-471.764C580.582-73.076,190.921,492.399,0.134,337.641
-		C-1.857,584.673,201.456,666.945,201.456,666.945z"/>
+	<circle fill="none" stroke="#000000" stroke-miterlimit="10" cx="468.5" cy="426.5" r="207.5"/>
+	<path opacity="0.33" fill="#020000" stroke="#000000" stroke-miterlimit="10" d="M453.756,633.48
+		c42.777-150.406,29.222-322.634-140.822-344.285C341.068,262.732,385.5,219,478,219c122.5,8.5,190.5,100.5,197.219,197.44
+		C682.543,522.111,591.5,642.5,453.756,633.48z"/>
 </g>
 <g id="disk2">
-	<path opacity="0.33" fill="#020000" stroke="#000000" stroke-miterlimit="10" d="M400.924,696.343
-		c76.497-12.921-42.068-466.554-313.983-577.31C-146.54,401.11,118.327,744.076,400.924,696.343z"/>
-</g>
-<g id="level1">
-	<circle fill="#020000" stroke="#000000" stroke-width="4" stroke-miterlimit="10" cx="422" cy="350" r="44"/>
-	<circle fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" cx="182" cy="122" r="44"/>
-	<circle fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" cx="525" cy="407" r="44"/>
-	<path fill="#020000" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M569,407c0,24.301-19.699,44-44,44
-		s-44-19.699-44-44H569z"/>
-</g>
-<g id="level2">
-	<circle fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" cx="202" cy="585" r="44"/>
-	<circle fill="#020000" stroke="#000000" stroke-width="4" stroke-miterlimit="10" cx="371" cy="429" r="44"/>
-	<circle fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" cx="246" cy="211" r="44"/>
-	<path fill="#020000" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M290,211c0,24.301-19.699,44-44,44
-		s-44-19.699-44-44H290z"/>
-</g>
-<g id="level3">
-	<circle fill="#020000" stroke="#000000" stroke-width="4" stroke-miterlimit="10" cx="270" cy="341" r="44"/>
-	<circle fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" cx="187" cy="573" r="44"/>
-	<path fill="#020000" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M231,573c0,24.301-19.699,44-44,44
-		s-44-19.699-44-44H231z"/>
-	<circle fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" cx="99" cy="195" r="44"/>
+	<circle fill="none" stroke="#000000" stroke-miterlimit="10" cx="350" cy="350" r="350"/>
+	<circle fill="none" stroke="#000000" stroke-miterlimit="10" cx="468.5" cy="426.5" r="207.5"/>
+	<path opacity="0.33" fill="#020000" stroke="#000000" stroke-miterlimit="10" d="M434.203,689.693
+		c6.938-17.835,13.188-36.353,18.553-55.213C620.5,640.5,705.5,488.5,664.574,362.09C600.731,191.402,409,181.5,312.349,289.72
+		l-3.386,0.115C344.5,233.5,343.735,150.802,274.071,99.569c66.251-26.238,152.573-44.475,257.275-48.984
+		C810.669,227,723,619,434.203,689.693z"/>
+	<circle fill="none" stroke="#000000" stroke-miterlimit="10" cx="192" cy="213" r="140"/>
 </g>
 </svg>
