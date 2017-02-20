@@ -30,37 +30,60 @@ publish() {
     scp build/manifest.json build/application.* pi@${1}.local:build
 }
 
-# $1 - <start|stop|restart|reboot|halt|publish>
-# $2 - sculptureId
+# $1 - build-name sculptureId
+version() {
+    ssh pi@${2}.local cp -R builds/${1}/* build
+}
+
+# Args:
+#   operation <start|stop|restart|reboot|halt|publish|version>
+#   [operation args]
+#   sculptureId
 anyware() {
     op=$1
+    shift
 
-    if [ -z "$2" ]; then
+    case $op in
+        start)
+            ;;
+        stop)
+            ;;
+        restart)
+            ;;
+        reboot)
+            ;;
+        halt)
+            ;;
+        publish)
+            ;;
+        version)
+             build=$1
+             shift
+            ;;
+        *)
+            echo "Unknown operation $op"
+            op=""
+            ;;
+    esac
+
+    if [ -z "$1" ]; then
         sculptures="sculpture1 sculpture2 sculpture3"
     else
-        sculptures=$2
+        sculptures=$1
     fi
     for sculpture in $sculptures; do
         echo "$op: $sculpture"
         case $op in
-            start)
-                start $sculpture
-                ;;
-            stop)
-                stop $sculpture
-                ;;
-            restart)
-                restart $sculpture
-                ;;
-            reboot)
-                reboot $sculpture
-                ;;
-            halt)
-                halt $sculpture
-                ;;
             publish)
-                publish $sculpture
+                $op $sculpture
                 restart $sculpture
+                ;;
+            version)
+                $op $build $sculpture
+                restart $sculpture
+                ;;
+            *)
+                $op $sculpture
                 ;;
         esac
     done
