@@ -61,8 +61,9 @@ anyware() {
              shift
             ;;
         *)
-            echo "Unknown operation $op"
+            echo "Unknown operation '$op'"
             op=""
+            return
             ;;
     esac
 
