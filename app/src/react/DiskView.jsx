@@ -47,7 +47,7 @@ export default class DiskView extends React.Component {
   }
 
   get disks() {
-    return sculptureStore.data.get('disks');
+    return sculptureStore.data.get('disk').get('disks');
   }
 
   componentWillMount() {
@@ -95,16 +95,19 @@ export default class DiskView extends React.Component {
       }
     }
 
-    // Handle level changes
+    if (!changes.disk) return; // Only deal with disk game changes
+
     const diskGameChanges = changes.disk;
-    if (diskGameChanges && diskGameChanges.level) {
+
+    // Handle level changes
+    if (diskGameChanges.level) {
       this.setState({level: diskGameChanges.level});
     }
 
     // Handle disk position changes
-    const diskChanges = changes.disks;
-    if (!diskChanges) return;
+    if (!diskGameChanges.disks) return;
 
+    const diskChanges = diskGameChanges.disks;
     for (const diskId of Object.keys(diskChanges)) {
       const disk = this.disks.get(diskId);
       const newDiskValues = diskChanges[diskId];
