@@ -5,10 +5,17 @@ The embedded system code for the sculpture itself. This will run as a chrome app
 
 Dependencies: node.js, npm, Google Chrome
 
-   npm install
-   npm run dev
+    npm install
+    npm run dev
 
-## Building, Packaging, & Launching the app
+This will launch the dev version locally.
+
+## Build and run debug version for sculptures
+
+    npm run build
+    ./scripts/anyware.sh publish [<sculptureId>]
+
+## Package Chrome App for App Store
 
 Build the app into the build/ directory:
 
@@ -17,11 +24,6 @@ Build the app into the build/ directory:
 Package as a Chrome packaged app (dist/anyware-sculpture.zip)
 
     npm run package
-
-Other targets:
-
-* Launch without rebuild: `npm run launch`
-
 
 ## Serial Emulator
 
