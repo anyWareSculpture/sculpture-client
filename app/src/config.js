@@ -2,11 +2,14 @@ import DefaultConfig from 'anyware/lib/game-logic/config/default-config';
 import Disk from 'anyware/lib/game-logic/utils/disk';
 import GAMES from 'anyware/lib/game-logic/constants/games';
 
+const production = process.env.NODE_ENV === 'production';
+console.log(`Built for ${production ? 'production' : 'development'}`);
+
 class Config extends DefaultConfig {
   constructor() {
     super();
 
-    this.DEBUG = false;
+    this.DEBUG = !production;
 
     this.SINGLE_USER_MODE = false;
     this.CLIENT_CONNECTION_OPTIONS = {

@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "npm run build-dev && npm run launch",
-    "build": "NODE_ENV=production npm run webpack",
+    "build": "NODE_ENV=production npm run webpack -- -p",
     "build-dev": "npm run webpack",
     "webpack": "webpack --config webpack.config.dev.js",
     "launch": "chrome --load-and-launch-app=$PWD/build",
