@@ -14,7 +14,7 @@
     "launch": "chrome --load-and-launch-app=$PWD/build",
     "package": "mkdir -p dist && cd build && zip -r ../dist/anyware-sculpture.zip * && cd -",
     "lint": "eslint --ext=.js,.jsx app",
-    "test": "npm run lint && npm run mocha",
+    "test": "npm run lint",
     "serial-emulator": "babel-node --stage 0 utilities/serial-emulator.js"
   },
   "repository": {
