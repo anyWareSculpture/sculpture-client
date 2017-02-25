@@ -1,0 +1,4 @@
+module.exports = {
+  DEBUG: false,
+};
+

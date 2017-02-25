@@ -8,19 +8,25 @@ console.log(`Building for ${production ? 'production' : 'development'}`);
 
 module.exports = {
   devtool: 'source-map',
-  entry: [
-    './app/src/index.js'
-  ],
+  entry: {
+    vendor: ['react', 'react-dom', 'lodash'],
+    config: './app/config.js',
+    application: './app/src/index.js',
+  },
   output: {
     path: resolve(__dirname, 'build'),
     publicPath: '/',
-    filename: 'application.js',
+    filename: '[name].js',
   },
   resolve: {
     // Allowed implicit extensions for require/import
     extensions: ['.js', '.jsx']
   },
   plugins: [
+    new webpack.optimize.CommonsChunkPlugin({
+      names: ['config', 'vendor'],
+      minChunks: Infinity,
+    }),
     new CopyWebpackPlugin([
       { context: 'node_modules/@anyware/sound-assets',
         from: '**/*.wav',
