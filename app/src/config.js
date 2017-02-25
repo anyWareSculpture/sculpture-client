@@ -6,6 +6,8 @@ class Config extends DefaultConfig {
   constructor() {
     super();
 
+    this.DEBUG = false;
+
     this.SINGLE_USER_MODE = false;
     this.CLIENT_CONNECTION_OPTIONS = {
       default: {
