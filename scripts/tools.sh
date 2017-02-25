@@ -30,13 +30,18 @@ publish() {
     scp build/manifest.json build/application.* pi@${1}.local:build
 }
 
+# $1 - sculptureId
+fullpublish() {
+    scp -r build/* pi@${1}.local:build
+}
+
 # $1 - build-name sculptureId
 version() {
     ssh pi@${2}.local cp -R builds/${1}/* build
 }
 
 # Args:
-#   operation <start|stop|restart|reboot|halt|publish|version>
+#   operation <start|stop|restart|reboot|halt|publish|fullpublish|version>
 #   [operation args]
 #   sculptureId
 anyware() {
@@ -44,18 +49,13 @@ anyware() {
     shift
 
     case $op in
-        start)
-            ;;
-        stop)
-            ;;
-        restart)
-            ;;
-        reboot)
-            ;;
-        halt)
-            ;;
-        publish)
-            ;;
+        start) ;;
+        stop) ;;
+        restart) ;;
+        reboot) ;;
+        halt) ;;
+        publish) ;;
+        fullpublish) ;;
         version)
              build=$1
              shift
@@ -75,7 +75,7 @@ anyware() {
     for sculpture in $sculptures; do
         echo "$op: $sculpture"
         case $op in
-            publish)
+            publish|fullpublish)
                 $op $sculpture
                 restart $sculpture
                 ;;
