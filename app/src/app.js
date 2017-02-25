@@ -71,7 +71,7 @@ export default class SculptureApp extends events.EventEmitter {
   }
 
   _debug(message) {
-//    console.log(message);
+    if (config.DEBUG) console.debug(message);
   }
 
   _log(message) {
