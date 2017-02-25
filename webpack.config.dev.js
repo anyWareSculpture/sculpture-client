@@ -10,7 +10,6 @@ module.exports = {
   devtool: 'source-map',
   entry: {
     vendor: ['react', 'react-dom', 'lodash'],
-    config: './app/config.js',
     application: './app/src/index.js',
   },
   output: {
@@ -24,7 +23,7 @@ module.exports = {
   },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({
-      names: ['config', 'vendor'],
+      names: ['vendor'],
       minChunks: Infinity,
     }),
     new CopyWebpackPlugin([
@@ -42,6 +41,7 @@ module.exports = {
       },
       { from: 'app/application.html' },
       { from: 'app/application.css' },
+      { from: 'app/config.js' },
       { from: 'manifest.json' },
       { from: `scripts/background${production ? '-production' : ''}.js`,
         to: 'background.js' },

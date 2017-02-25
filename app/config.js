@@ -1,4 +1,3 @@
-module.exports = { // eslint-disable-line no-undef
-  DEBUG: false,
+anyware_config = {
+// DEBUG: true,
 };
-
