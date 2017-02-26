@@ -1,3 +1,3 @@
-anyware_config = { // eslint-disable-line no-undef
+anyware_config = {
 // DEBUG: true,
 };

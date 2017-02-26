@@ -18,6 +18,8 @@ module.exports = {
 
   "globals": {
     "chrome": true,
+    "process": true, // Webpack will set NODE_ENV
+    "anyware_config": true, // Global config override
   },
 
   "plugins": [
