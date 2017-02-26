@@ -16,7 +16,8 @@
     "lint": "eslint --ext=.js,.jsx app",
     "test": "npm run lint",
     "serial-emulator": "babel-node --stage 0 utilities/serial-emulator.js",
-    "svg": "svgo -f ./app/src/react/svg/status-icons -o out && svg-sprite-generate -d out -o ./app/src/react/svg/status-sprites.svg"
+    "svg": "svgo -f ./app/src/react/svg/status-icons -o out && svg-sprite-generate -d out -o ./app/src/react/svg/status-sprites.svg",
+    "anyware": "./scripts/anyware.sh"
   },
   "repository": {
     "type": "git",
