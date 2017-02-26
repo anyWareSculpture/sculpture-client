@@ -7,9 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "dev": "npm run build-dev && npm run launch",
+    "dev": "npm run build-dev && npm run launch && npm run build-dev -- --watch",
     "build": "NODE_ENV=production npm run webpack -- -p",
-    "build-dev": "npm run webpack",
+    "build-dev": "npm run webpack --",
     "webpack": "webpack --config webpack.config.dev.js",
     "launch": "chrome --load-and-launch-app=$PWD/build",
     "package": "mkdir -p dist && cd build && zip -r ../dist/anyware-sculpture.zip * && cd -",
