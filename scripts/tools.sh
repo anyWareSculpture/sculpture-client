@@ -27,7 +27,7 @@ halt() {
 
 # $1 - sculptureId
 publish() {
-    scp build/manifest.json build/application.js* build/vendor.js* pi@${1}.local:build
+    scp build/manifest.json build/application.* build/vendor.js* pi@${1}.local:build
 }
 
 # $1 - sculptureId
