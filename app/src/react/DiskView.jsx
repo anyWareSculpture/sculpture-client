@@ -6,7 +6,7 @@ import DiskModel from 'anyware/lib/game-logic/utils/DiskModel';
 import dispatcher from '../dispatcher';
 import {sculptureStore} from '../stores';
 import config from '../config';
-import Graphics from './disk-game.svg';
+import Graphics from './svg/disk-game.svg';
 
 const SingleDisk = ({position, url}) => {
   return <image xlinkHref={url} x={0} y={0} height={100} width={100}
