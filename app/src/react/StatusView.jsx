@@ -87,7 +87,7 @@ export default class StatusView extends React.Component {
 
       const angle = startAngle + idx * stepAngle;
       const radius = isReady ? 10 : 70;
-      const offset = isReady ? (2 * radius) : (-2 * radius);
+      const offset = isReady ? 0 : (-2 * radius);
       const xpos = Math.cos(angle)*(350 + offset);
       const ypos = Math.sin(angle)*(350 + offset);
       return <g key={key} className={`status-icon ${col}-status`} transform={`translate(${xpos}, ${ypos})`}>
@@ -102,7 +102,7 @@ export default class StatusView extends React.Component {
     let transform = '';
     let fontSize = 30;
     if (isReady) {
-      transform = `translate(400, 0) rotate(90)`;
+      transform = `translate(320, 0) rotate(90)`;
       fontSize = 15;
     }
     return <g transform={transform}>
@@ -132,7 +132,7 @@ export default class StatusView extends React.Component {
       zIndex: 10,
     }}>
       <g display="none"><Sprites/></g>
-      <g style={{transform: "translate(350px, 350px)"}}>
+      <g style={{transform: "translate(350px, 350px) rotate(35deg)"}}>
         <g className="" style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale})`}}>
           {this.renderIcons(this.state.ready)}
           {this.renderSculptureId(this.state.ready)}
