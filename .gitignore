@@ -29,6 +29,7 @@ node_modules
 # Build/distrubution directories
 build/
 dist/
+out/
 
 ### Vim ###
 [._]*.s[a-w][a-z]

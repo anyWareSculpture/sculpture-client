@@ -15,7 +15,8 @@
     "package": "mkdir -p dist && cd build && zip -r ../dist/anyware-sculpture.zip * && cd -",
     "lint": "eslint --ext=.js,.jsx app",
     "test": "npm run lint",
-    "serial-emulator": "babel-node --stage 0 utilities/serial-emulator.js"
+    "serial-emulator": "babel-node --stage 0 utilities/serial-emulator.js",
+    "svg": "svgo -f ./app/src/react/svg/status-icons -o out && svg-sprite-generate -d out -o ./app/src/react/svg/status-sprites.svg"
   },
   "repository": {
     "type": "git",
@@ -75,6 +76,8 @@
     "run-sequence": "^1.1.0",
     "serialport": "^4.0.7",
     "style-loader": "^0.13.1",
+    "svg-sprite-generator": "0.0.7",
+    "svgo": "^0.7.2",
     "through2": "^2.0.0",
     "url-loader": "^0.5.7",
     "username": "^2.3.0",

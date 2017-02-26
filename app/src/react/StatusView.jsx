@@ -5,20 +5,24 @@ const {SerialProtocolCommandBuilder} = SerialProtocol;
 import config from '../config';
 import InitStore from '../init-store';
 import {initStore} from '../stores';
+import Sprites from './svg/status-sprites.svg';
+
+const COLORS = {
+  SEARCHING: 'yellow',
+  OK: 'green',
+  FAILED: 'red',
+};
 
 const manifest = chrome.runtime.getManifest();
 
-const symbolMap = {
-  STRIP_A: 'A',
-  STRIP_B: 'B',
-  STRIP_C: 'C',
-  RGB_STRIPS: 'R',
-  HANDSHAKE_STRIP: 'H',
-  ART_LIGHTS_STRIP: 'P',
-  [SerialProtocol.HANDSHAKE_COMMAND]: 'V',
-  clientConnected: 'N',
-  audioInitialized: 'S',
-  serialInitialized: 's'
+const symbols = {
+  a: { states: ['STRIP_A'] },
+  b: { states: ['STRIP_B'] },
+  c: { states: ['STRIP_C'] },
+  mega: { states: ['RGB_STRIPS', 'HANDSHAKE_STRIP', 'ART_LIGHTS_STRIP', SerialProtocol.HANDSHAKE_COMMAND] },
+  network: { states: ['clientConnected'] },
+  sound: { states: ['audioInitialized'] },
+  serial: { states: ['serialInitialized'] },
 };
 
 const toColor = (bool) => bool == null ? 'yellow' : bool ? 'green' : 'red';
@@ -64,21 +68,30 @@ export default class StatusView extends React.Component {
     // FIXME: this.props.app.removeListener() ?
   }
 
+  colorFromStates(states) {
+    let ret = COLORS.OK;
+    for (let state of states) {
+      if (this.state[state] === COLORS.FAILED) return COLORS.FAILED;
+      if (this.state[state] === COLORS.SEARCHING) ret = COLORS.SEARCHING;
+    }
+    return ret;
+  }
+
   renderIcons(isReady) {
     if (isReady && !this.props.debug) return null;
-
-    const numIcons = Object.keys(this.state).length - 2;
-    const startAngle = isReady ? (-45 * Math.PI / 180) : 0;
+    const numIcons = Object.keys(symbols).length;
+    const startAngle = isReady ? (-(numIcons-1)/2 * 8 * Math.PI / 180) : 0;
     const stepAngle = isReady ? (8 * Math.PI / 180) : (2 * Math.PI / numIcons);
-    return Object.keys(this.state).filter((key) => key !== 'ready').map((key, idx) => {
+    return Object.keys(symbols).map((key, idx) => {
+      const col = this.colorFromStates(symbols[key].states);
+
       const angle = startAngle + idx * stepAngle;
       const radius = isReady ? 10 : 70;
       const offset = isReady ? (2 * radius) : (-2 * radius);
       const xpos = Math.cos(angle)*(350 + offset);
       const ypos = Math.sin(angle)*(350 + offset);
-      return <g key={key} className={`${this.state[key]}-status`} transform={`translate(${xpos}, ${ypos})`}>
-        <circle r={radius} strokeWidth={2}/>
-        <text x="0" y="0" fontSize={radius} fontWeight="bold" textAnchor="middle" alignmentBaseline="middle">{symbolMap[key]}</text>
+      return <g key={key} className={`status-icon ${col}-status`} transform={`translate(${xpos}, ${ypos})`}>
+          <use x={-radius} y={-radius} width={radius*2} height={radius*2} xlinkHref={`#${key}`}/>
       </g>;
     });
   }
@@ -118,6 +131,7 @@ export default class StatusView extends React.Component {
       top: 0,
       zIndex: 10,
     }}>
+      <g display="none"><Sprites/></g>
       <g style={{transform: "translate(350px, 350px)"}}>
         <g className="" style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale})`}}>
           {this.renderIcons(this.state.ready)}
