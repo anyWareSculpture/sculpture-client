@@ -130,7 +130,7 @@ export default class SculptureApp extends events.EventEmitter {
     const serialManager = new SerialManager(config.SERIAL);
 
     // FIXME: Should we just stop after a while? instead of moving on?
-    let numTries = 20;
+    let numTries = 6;
     const tryPorts = () => {
       numTries -= 1;
       serialManager.searchPorts();
