@@ -8,11 +8,13 @@ function buildRequiredCommands() {
   // All required panels
   for (const lightId of Object.keys(config.LIGHTS)) {
     const stripId = config.LIGHTS[lightId];
-    commands[lightId] = SerialProtocolCommandBuilder.build(PANEL_SET_COMMAND, {stripId});
+    commands[SerialProtocolCommandBuilder.build(PANEL_SET_COMMAND, {stripId})] = lightId;
   }
-  commands[HANDSHAKE_COMMAND] = SerialProtocolCommandBuilder.build(HANDSHAKE_COMMAND, {});
+  commands[SerialProtocolCommandBuilder.build(HANDSHAKE_COMMAND, {})] = HANDSHAKE_COMMAND;
   return commands;
 }
+
+const requiredCommands = buildRequiredCommands();
 
 /*!
  * Stores initialization state of physical and logical subsystems
@@ -32,7 +34,7 @@ export default class InitStore extends EventEmitter {
       systems: {},
       ready: false,
     };
-    Object.keys(buildRequiredCommands()).forEach((name) => this.state.systems[name] = null);
+    Object.keys(requiredCommands).forEach((name) => this.state.systems[requiredCommands[name]] = null);
 
     this.dispatcher.register(this.actionHandler.bind(this));
   }
@@ -69,10 +71,26 @@ export default class InitStore extends EventEmitter {
         if (action.connected) this._readyHandler();
       }
       break;
+    case InitActionCreator.PATTERNS_FOUND:
+      for (let pattern of action.patterns) {
+        for (let cmd of Object.keys(requiredCommands)) {
+          if (new RegExp(pattern).test(cmd)) {
+            this.state.systems[requiredCommands[cmd]] = true;
+            this.emitChange();
+          }
+        }
+      }
+      break;
     case InitActionCreator.SERIAL_INITIALIZED:
       if (this.state.serialInitialized !== true) {
         this.state.serialInitialized = true;
-        this.state.systems = this._querySystems(action.serialManager);
+
+        for (let cmd of Object.keys(requiredCommands)) {
+          if (!this.state.systems[requiredCommands[cmd]]) {
+            this.state.systems[requiredCommands[cmd]] = false;
+          }
+        }
+
         this.emitChange();
         this._readyHandler();
       }
@@ -91,19 +109,8 @@ export default class InitStore extends EventEmitter {
     if (!this.state.ready && this.state.sculptureId && 
         this.state.audioInitialized && this.state.clientConnected && this.state.serialInitialized) {
       // FIXME: Also require all subsystems to be ready?
-      // Wait 2 secs before starting game
-      setTimeout(() => initActionCreator.sendReady(), 2000);
+      setTimeout(() => initActionCreator.sendReady(), 0);
     }
-  }
-
-  _querySystems(serialManager) {
-    const systems = {};
-    const commands = buildRequiredCommands();
-    Object.keys(commands).forEach((name) => {
-      const ports = serialManager.findTargetPorts(commands[name]);
-      systems[name] =  ports.size !== 0;
-    });
-    return systems;
   }
 
   get sculptureId() {
@@ -129,4 +136,9 @@ export default class InitStore extends EventEmitter {
   get ready() {
     return this.state.ready;
   }
+
+  get requiredPatternsFound() {
+    return Object.keys(requiredCommands).every((name) => this.state.systems[requiredCommands[name]]);
+  }
+
 }

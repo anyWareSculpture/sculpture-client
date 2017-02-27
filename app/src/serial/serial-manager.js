@@ -17,6 +17,10 @@ const DELAY_BETWEEN_SERIAL_COMMANDS = 10; // ms
    Maps supported commands, and routes these to the appropriate serial port.
 */
 export default class SerialManager extends events.EventEmitter {
+  // Emitted when a pattern was found during port search
+  static PATTERNS_FOUND = "patterns";
+  // Emitted when we're done searching all compatible ports
+  static PORTS_SEARCHED = "searched";
   /**
    * Fired when the serial manager receives a command from a serial port
    * Arguments for handler: [commandName, commandData]
@@ -73,47 +77,69 @@ export default class SerialManager extends events.EventEmitter {
     return targetPorts;
   }
 
-  /**
-   * Goes through all serial ports searching for valid connections
-   * @param {Function} callback - The callback to call once all possible connections have been searched
-   */
-  searchPorts(callback) {
+  _findCompatiblePorts(callback) {
     serialport.list((err, ports) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      const done = [];
-      for (let i = 0; i < ports.length; i++) {
-        done.push(false);
-      }
-
-      ports.forEach((portInfo, index) => {
+      if (err) return callback(err);
+      callback(null, ports.filter((portInfo) => {
         if (this._isValidPort(portInfo)) {
           console.log(`Found compatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`);
-          const portPath = portInfo.comName;
-
-          this._createSerialPort(portPath, () => {
-            done[index] = true;
-
-            // If every item is true
-            if (done.every((d) => d)) {
-              callback();
-            }
-          });
+          return portInfo;
         }
         else {
           console.log(`Skipping incompatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`);
-          done[index] = true;
-          if (done.every((d) => d)) callback();
+        }
+      }));
+    });
+  }
+
+  /**
+   * Goes through all serial ports searching for valid connections.
+   * Emits PORTS_SEARCHED when all ports are searched
+   */
+  searchPorts() {
+    // FIXME: Should we also check for new serial ports, to allow hot-plugging?
+    if (!this._remainingPorts) {
+      this._findCompatiblePorts((err, ports) => {
+        if (err) return console.error(err);
+        this._remainingPorts = {};
+        for (let portInfo of ports) this._remainingPorts[portInfo.comName] = portInfo;
+        this._searchRemainingPorts();
+      });
+    }
+    else {
+      this._searchRemainingPorts();
+    }
+  }
+
+  get requiredPatternsFound() {
+    return false;
+  }
+
+  _searchRemainingPorts() {
+    const done = Array(Object.keys(this._remainingPorts).length).fill(false);
+    Object.keys(this._remainingPorts).forEach((portPath, index) => {
+      this._createSerialPort(portPath, (err, port) => {
+        if (!err) {
+          port.on(SerialPort.EVENT_COMMAND, (commandName, commandData) => this._handleCommand(port, commandName, commandData));
+          port.on(SerialPort.EVENT_ERROR, this._handleError.bind(this));
+          // FIXME: If we've got both tty and cu port, remove the "sister" port?
+          delete this._remainingPorts[portPath];
+        }
+        // FIXME: else if this is not a timeout, remove from remainingPorts
+
+        done[index] = true;
+        // If every item is true
+        if (done.every((d) => d)) {
+          console.debug(`Remaining ports: ${Object.keys(this._remainingPorts).join(' ')}`);
+          this.emit(SerialManager.PORTS_SEARCHED);
         }
       });
-
-      if (!done.length) {
-        console.debug("No serial ports connected");
-        callback();
-      }
     });
+
+    if (!done.length) {
+      console.debug("No serial ports connected");
+      this.emit(SerialManager.PORTS_SEARCHED);
+    }
   }
 
   _isValidPort(portInfo) {
@@ -145,16 +171,15 @@ export default class SerialManager extends events.EventEmitter {
     });
     port.initialize((error) => {
       if (error) {
+        port.close();
         console.warn(`ERROR: Failed to open serial port ${port.path}: ${error.message}`);
       }
       else {
         this._addPortPatterns(port);
         console.log(`Successfully initialized serial port ${port.path}`);
       }
-      callback(error);
+      callback(error, port);
     });
-    port.on(SerialPort.EVENT_COMMAND, (commandName, commandData) => this._handleCommand(port, commandName, commandData));
-    port.on(SerialPort.EVENT_ERROR, this._handleError.bind(this));
   }
 
   _addPortPatterns(port) {
@@ -169,6 +194,7 @@ export default class SerialManager extends events.EventEmitter {
 
       this.patterns[pattern].push(portId);
     }
+    this.emit(SerialManager.PATTERNS_FOUND, port.supportedPatterns);
   }
 
   _handleCommand(port, commandName, commandData) {

@@ -33,6 +33,13 @@ export default class SculptureApp extends events.EventEmitter {
 
     this.serialManager = this._setupSerialManager();
 
+    initStore.on(InitStore.EVENT_CHANGE, () => {
+      console.debug('APP: initStore EVENT_CHANGE');
+      if (initStore.requiredPatternsFound) {
+        console.debug('All patterns found!');
+        setTimeout(() => initActionCreator.sendSerialInitialized(), 0);
+      }
+    });
     sculptureStore.on(SculptureStore.EVENT_CHANGE, (changes, metadata) => {
       if (!this.client) return;
 
@@ -121,11 +128,29 @@ export default class SculptureApp extends events.EventEmitter {
 
   _setupSerialManager() {
     const serialManager = new SerialManager(config.SERIAL);
-    serialManager.searchPorts(() => {
-      console.log('Finished searching all serial ports');
 
-      initActionCreator.sendSerialInitialized(serialManager);
+    // FIXME: Should we just stop after a while? instead of moving on?
+    let numTries = 20;
+    const tryPorts = () => {
+      numTries -= 1;
+      serialManager.searchPorts();
+    };
+    serialManager.on(SerialManager.PATTERNS_FOUND, (patterns) => {
+      console.log(`Patterns found: ${patterns.join(' ')}`);
+      initActionCreator.sendPatternsFound(patterns);
     });
+    serialManager.on(SerialManager.PORTS_SEARCHED, () => {
+      if (initStore.requiredPatternsFound || numTries === 0) {
+        console.log('Finished searching all serial ports');
+        setTimeout(() => initActionCreator.sendSerialInitialized(), 2000);
+      }
+      else {
+        console.log('Failed to find all devices - retrying...');
+        setTimeout(tryPorts, 5000);
+      }
+    });
+
+    tryPorts();
     return serialManager;
   }
 

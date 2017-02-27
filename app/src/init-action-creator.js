@@ -6,6 +6,7 @@ class InitActionCreator extends BaseActionCreator {
   static SCULPTURE_ID_FOUND = 'sculpture-id-found';
   static AUDIO_INITIALIZED = 'audio-initialized';
   static CLIENT_CONNECTED = 'client-connected';
+  static PATTERNS_FOUND = 'patterns-found';
   static SERIAL_INITIALIZED = 'serial-initialized';
   static READY = 'ready';
 
@@ -25,8 +26,12 @@ class InitActionCreator extends BaseActionCreator {
     this._dispatch(InitActionCreator.CLIENT_CONNECTED, {connected});
   }
 
-  sendSerialInitialized(serialManager) {
-    this._dispatch(InitActionCreator.SERIAL_INITIALIZED, {serialManager});
+  sendPatternsFound(patterns) {
+    this._dispatch(InitActionCreator.PATTERNS_FOUND, {patterns});
+  }
+
+  sendSerialInitialized() {
+    this._dispatch(InitActionCreator.SERIAL_INITIALIZED);
   }
 
   sendReady() {
