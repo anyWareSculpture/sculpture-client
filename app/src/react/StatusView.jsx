@@ -78,12 +78,12 @@ export default class StatusView extends React.Component {
   }
 
   renderIcons(isReady) {
-    if (isReady && !this.props.debug) return null;
     const numIcons = Object.keys(symbols).length;
     const startAngle = isReady ? (-(numIcons-1)/2 * 8 * Math.PI / 180) : 0;
     const stepAngle = isReady ? (8 * Math.PI / 180) : (2 * Math.PI / numIcons);
     return Object.keys(symbols).map((key, idx) => {
       const col = this.colorFromStates(symbols[key].states);
+      if (isReady && !this.props.debug && col !== COLORS.FAILED) return null;
 
       const angle = startAngle + idx * stepAngle;
       const radius = isReady ? 10 : 70;
