@@ -9,7 +9,7 @@ class Config extends DefaultConfig {
   constructor() {
     super();
 
-    this.DEBUG = !production;
+    this.DEBUG.status = !production;
 
     this.SINGLE_USER_MODE = false;
     this.CLIENT_CONNECTION_OPTIONS = {

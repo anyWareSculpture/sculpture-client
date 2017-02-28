@@ -1,3 +1,6 @@
 anyware_config = {
-// DEBUG: true,
+  DEBUG: {
+    status: true,
+    console: false,
+  }
 };
