@@ -3,6 +3,24 @@ import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
 import {sculptureStore} from '../stores';
 import Graphics from './svg/disk-game.svg';
 
+const diskOrigins = {
+  level0: {
+    disk0: [361.018, 342.819],
+    disk1: [577.422, 344.821],
+    disk2: [122.86, 343.82],
+  },
+  level1: {
+    disk0: [350, 350],
+    disk1: [350, 350],
+    disk2: [350, 350],
+  },
+  level2: {
+    disk0: [192, 213],
+    disk1: [468.5, 426.5],
+    disk2: [350, 350],
+  },
+};
+
 const SingleDisk = ({position, url}) => {
   return <image xlinkHref={url} x={0} y={0} height={100} width={100}
                 transform={`rotate(${position}) translate(-50 -50)`}/>;
@@ -65,7 +83,7 @@ export default class DiskView extends React.Component {
   }
 
   render() {
-    return this.state.active && <svg id="disk-view" viewBox="0 0 700 700" style={{
+    return this.state.active && this.state.level < 3 && <svg id="disk-view" viewBox="0 0 700 700" style={{
       position: "relative",
       width: "100%",
       height: "100%",
@@ -75,9 +93,10 @@ export default class DiskView extends React.Component {
       <g display="none"><Graphics/></g>
       <g className="transformOrigin" style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale})`}}>
           <use xlinkHref="#circle"/>
-          <use xlinkHref={`#level${this.state.level}-disk0`} style={{transformOrigin: "192px 213px ", transform: `rotate(${this.state.disk0}deg)`}}/>
-          <use xlinkHref={`#level${this.state.level}-disk1`} style={{transformOrigin: "468.5px 426.5px", transform: `rotate(${this.state.disk1}deg)`}}/>
-          <use xlinkHref={`#level${this.state.level}-disk2`} style={{transformOrigin: "350px 350px", transform: `rotate(${this.state.disk2}deg)`}}/>
+          <use xlinkHref={`#level${this.state.level}`}/>
+      { ['disk0', 'disk1', 'disk2'].map((diskId) => {
+        return <use key={diskId} xlinkHref={`#level${this.state.level}-${diskId}`} style={{transformOrigin: diskOrigins[`level${this.state.level}`][diskId].map((c) => `${c}px`).join(' '), transform: `rotate(${this.state[diskId]}deg)`}}/>;
+      }) }
       </g>
     </svg>;
   }
