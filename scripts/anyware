@@ -1,0 +1,38 @@
+#!/bin/sh
+
+get_script_dir() {
+    SOURCE="${BASH_SOURCE[0]}"
+    # While $SOURCE is a symlink, resolve it
+    while [ -h "$SOURCE" ]; do
+        DIR=`cd -P "$( dirname "$SOURCE" )" && pwd`
+        SOURCE=`readlink "$SOURCE"`
+        # If $SOURCE was a relative symlink (so no "/" as prefix, need to resolve it relative to the symlink base directory
+        [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+    done
+    DIR=`cd -P "$(dirname "$SOURCE")" && pwd`
+    echo "$DIR"
+}
+
+DIR=`get_script_dir`
+if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+. "$DIR/tools.sh"
+
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <command> [<sculptureId>]"
+    echo ""
+    echo "  sculptureId         One or more of sculpture1, sculpture2 or sculpture3. Defaults to all sculptures"
+    echo ""
+    echo "Commands:"
+    echo "  start               Start the sculpture(s)"
+    echo "  stop                Stop the sculpture(s)"
+    echo "  restart             Restart the sculpture(s)"
+    echo "  reboot              Reboot the Raspberry Pi(s)"
+    echo "  halt                Shut down the Raspberry Pi(s)"
+    echo "  config <config.js>  Upload and use the given config file"
+    echo "  publish             Publish the local development build"
+    echo "  fullpublish         Publish with all assets (takes more time)"
+    echo "  version <build>     Select software version by name"
+    exit 1
+fi
+
+do_anyware $@

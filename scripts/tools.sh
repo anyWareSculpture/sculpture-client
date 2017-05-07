@@ -25,6 +25,12 @@ halt() {
     ssh pi@${1}.local sudo halt &
 }
 
+# $1 - config file
+# $2 - sculptureId
+config() {
+    scp "$1" pi@${2}.local:build/config.js
+}
+
 # $1 - sculptureId
 publish() {
     scp build/manifest.json build/application.* build/vendor.js* pi@${1}.local:build
@@ -35,7 +41,8 @@ fullpublish() {
     scp -r build/* pi@${1}.local:build
 }
 
-# $1 - build-name sculptureId
+# $1 - build-name
+# $2 - sculptureId
 version() {
     ssh pi@${2}.local cp -R builds/${1}/* build
 }
@@ -44,7 +51,7 @@ version() {
 #   operation <start|stop|restart|reboot|halt|publish|fullpublish|version>
 #   [operation args]
 #   sculptureId
-anyware() {
+do_anyware() {
     op=$1
     shift
 
@@ -54,6 +61,10 @@ anyware() {
         restart) ;;
         reboot) ;;
         halt) ;;
+        config)
+             config=$1
+             shift
+            ;;
         publish) ;;
         fullpublish) ;;
         version)
@@ -75,6 +86,10 @@ anyware() {
     for sculpture in $sculptures; do
         echo "$op: $sculpture"
         case $op in
+            config)
+                $op $config $sculpture
+                restart $sculpture
+                ;;
             publish|fullpublish)
                 $op $sculpture
                 restart $sculpture
