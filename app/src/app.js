@@ -97,11 +97,11 @@ export default class SculptureApp extends events.EventEmitter {
     this.views.audioView = new AudioView(sculptureStore, config, dispatcher);
     this.views.audioView.load((err) => {
       if (err) {
-        console.log(`AudioView error: ${err}`);
+        this._log(`AudioView error: ${err}`);
         return;
       }
       initActionCreator.sendAudioInitialized();
-      console.log('Loaded sounds');
+      this._log('Loaded sounds');
     });
   }
 
@@ -122,8 +122,8 @@ export default class SculptureApp extends events.EventEmitter {
   _setupSerialManager() {
     const serialManager = new SerialManager(config.SERIAL);
     serialManager.searchPorts(() => {
-      console.log('Finished searching all serial ports');
-
+      this._log('Finished searching all serial ports');
+      serialManager.printPatterns();
       initActionCreator.sendSerialInitialized(serialManager);
     });
     return serialManager;

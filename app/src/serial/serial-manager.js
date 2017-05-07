@@ -171,6 +171,12 @@ export default class SerialManager extends events.EventEmitter {
     }
   }
 
+  printPatterns() {
+    for (let key of Object.keys(this.patterns)) {
+      console.log(`  ${key}: ${this.patterns[key].join(' ')}`);
+    }
+  }
+
   _handleCommand(port, commandName, commandData) {
     if (commandName === SerialProtocol.DEBUG_COMMAND) {
       console.log(`DEBUG ${port.path}: ${commandData.message}`);
@@ -182,7 +188,7 @@ export default class SerialManager extends events.EventEmitter {
   }
 
   _debug(message) {
-//    console.log(message);
+    console.log(message);
   }
 
   _handleError(error) {
