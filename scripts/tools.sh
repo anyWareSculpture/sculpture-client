@@ -31,6 +31,21 @@ config() {
     scp "$1" pi@${2}.local:build/config.js
 }
 
+# $1 - what
+# $2 - sculptureId
+get() {
+    case $1 in
+        config)
+	    dest=config-$2.js
+	    scp pi@${2}.local:build/config.js $dest
+	    echo "Saved as $dest"
+	    ;;
+        *)
+            echo "Unknown get '$$1'"
+            ;;
+    esac
+}
+
 # $1 - sculptureId
 publish() {
     scp build/manifest.json build/application.* build/vendor.js* pi@${1}.local:build
@@ -61,6 +76,10 @@ do_anyware() {
         restart) ;;
         reboot) ;;
         halt) ;;
+        get)
+             what=$1
+             shift
+            ;;
         config)
              config=$1
              shift
@@ -86,6 +105,9 @@ do_anyware() {
     for sculpture in $sculptures; do
         echo "$op: $sculpture"
         case $op in
+            get)
+                $op $what $sculpture
+                ;;
             config)
                 $op $config $sculpture
                 restart $sculpture

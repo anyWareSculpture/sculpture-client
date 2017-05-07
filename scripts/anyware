@@ -28,6 +28,7 @@ if [ $# -lt 1 ]; then
     echo "  restart             Restart the sculpture(s)"
     echo "  reboot              Reboot the Raspberry Pi(s)"
     echo "  halt                Shut down the Raspberry Pi(s)"
+    echo "  get config          Downloads the current config from the sculpture(s)"
     echo "  config <config.js>  Upload and use the given config file"
     echo "  publish             Publish the local development build"
     echo "  fullpublish         Publish with all assets (takes more time)"
