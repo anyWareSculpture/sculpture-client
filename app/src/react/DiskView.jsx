@@ -5,9 +5,9 @@ import Graphics from './svg/disk-game.svg';
 
 const diskOrigins = {
   level0: {
-    disk0: [361.018, 342.819],
-    disk1: [577.422, 344.821],
-    disk2: [122.86, 343.82],
+    disk0: [374.66, 570.39],
+    disk1: [219.369, 322.276],
+    disk2: [439.437, 161.5],
   },
   level1: {
     disk0: [350, 350],
@@ -15,9 +15,9 @@ const diskOrigins = {
     disk2: [350, 350],
   },
   level2: {
-    disk0: [192, 213],
+    disk0: [350, 350],
     disk1: [468.5, 426.5],
-    disk2: [350, 350],
+    disk2: [192, 213],
   },
 };
 
