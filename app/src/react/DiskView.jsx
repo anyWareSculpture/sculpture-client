@@ -2,6 +2,7 @@ import React from 'react';
 import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
 import {sculptureStore} from '../stores';
 import Graphics from './svg/disk-game.svg';
+import config from './config';
 
 const diskOrigins = {
   level0: {
@@ -50,11 +51,17 @@ export default class DiskView extends React.Component {
       disk2: 0,
       level: 0,
       active: false,
+      showCircle: false,
+      showPuzzle: false,
     };
   }
 
   get disks() {
     return sculptureStore.data.get('disk').get('disks');
+  }
+
+  get lightArray() {
+    return sculptureStore.data.get('lights');
   }
 
   componentWillMount() {
@@ -69,9 +76,18 @@ export default class DiskView extends React.Component {
   _handleChanges(changes) {
     this.setState({active: sculptureStore.isPlayingDiskGame});
 
-    // Handle level changes
-    if (changes.disk && changes.disk.hasOwnProperty('level')) {
-      this.setState({level: changes.disk.level});
+    if (changes.lights && changes.lights[config.LIGHTS.ART_LIGHTS_STRIP]) {
+      this.setState({showCircle: this.lightArray.getIntensity(config.LIGHTS.ART_LIGHTS_STRIP, '3') > 0});
+    }
+    if (changes.disk) {
+      // Show puzzle when active
+      if (changes.disk.hasOwnProperty('active')) {
+        this.setState({showPuzzle: changes.disk.active});
+      }
+      // Handle level changes
+      if (changes.disk.hasOwnProperty('level')) {
+        this.setState({level: changes.disk.level});
+      }
     }
   }
 
@@ -92,10 +108,21 @@ export default class DiskView extends React.Component {
     }}>
       <g display="none"><Graphics/></g>
       <g className="transformOrigin" style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale})`}}>
-          <use xlinkHref="#circle"/>
-          <use xlinkHref={`#level${this.state.level}`}/>
+          {this.state.showCircle && <use xlinkHref="#circle"/>}
+          <use xlinkHref={`#level${this.state.level}`}
+               style={{
+                 opacity: this.state.showPuzzle ? 1 : 0,
+                 transition: "opacity 2s ease-in",
+               }}/>
       { ['disk0', 'disk1', 'disk2'].map((diskId) => {
-        return <use key={diskId} xlinkHref={`#level${this.state.level}-${diskId}`} style={{transformOrigin: diskOrigins[`level${this.state.level}`][diskId].map((c) => `${c}px`).join(' '), transform: `rotate(${this.state[diskId]}deg)`}}/>;
+        return <use key={diskId}
+                    xlinkHref={`#level${this.state.level}-${diskId}`}
+                    style={{
+                      transformOrigin: diskOrigins[`level${this.state.level}`][diskId].map((c) => `${c}px`).join(' '),
+                      transform: `rotate(${this.state[diskId]}deg)`,
+                      opacity: this.state.showPuzzle ? 1 : 0,
+                      transition: "opacity 2s ease-in",
+                    }}/>;
       }) }
       </g>
     </svg>;
