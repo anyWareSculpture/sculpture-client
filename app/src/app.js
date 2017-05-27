@@ -21,6 +21,11 @@ export default class SculptureApp extends events.EventEmitter {
   constructor() {
     super();
 
+    // For easier in-browser debugging
+    window.anyware = window.anyware || {};
+    window.anyware.initStore = initStore;
+    window.anyware.sculptureStore = sculptureStore;
+
     dispatcher.register((payload) => {
       this._debug(`Sent action: ${JSON.stringify(payload)}`);
     });
