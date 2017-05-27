@@ -2,7 +2,7 @@ import React from 'react';
 import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
 import {sculptureStore} from '../stores';
 import Graphics from './svg/disk-game.svg';
-import config from './config';
+import config from '../config';
 
 const diskOrigins = {
   level0: {
