@@ -18,7 +18,7 @@ const Canvas = ({children}) => <div style={{
   left: 0,
   bottom: 0,
   right: 0,
-  overflow: "auto",
+  overflow: "visible",
   background: "black",
 // For projection debugging  border: "1px solid red",
   zIndex: -1,
