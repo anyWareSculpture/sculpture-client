@@ -10,7 +10,6 @@ import AudioView from 'anyware/lib/views/audio-view';
 import SerialManager from './serial/serial-manager';
 
 import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
-import InitStore from './init-store';
 import {initStore, sculptureStore} from './stores';
 
 import config from './config';
@@ -126,10 +125,17 @@ export default class SculptureApp extends events.EventEmitter {
 
   _setupSerialManager() {
     const serialManager = new SerialManager(config.SERIAL);
-    serialManager.searchPorts(() => {
-      this._log('Finished searching all serial ports');
+    serialManager.searchPorts();
+    serialManager.on(SerialManager.PORT_CREATED, (port) => {
+      initActionCreator.sendSerialPortInitialized(serialManager, port);
+    });
+    serialManager.on(SerialManager.PORT_ERROR, (err) => {
+      initActionCreator.sendSerialPortError(serialManager, err);
+    });
+    serialManager.on(SerialManager.SEARCH_COMPLETE, (err) => {
+      this._log(`Finished searching all serial ports: ${err ? err.message : ''}`);
       serialManager.printPatterns();
-      initActionCreator.sendSerialInitialized(serialManager);
+      initActionCreator.sendSerialComplete(serialManager);
     });
     return serialManager;
   }

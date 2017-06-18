@@ -14,6 +14,8 @@ function buildRequiredCommands() {
   return commands;
 }
 
+const requiredCommands = buildRequiredCommands();
+
 /*!
  * Stores initialization state of physical and logical subsystems
  */
@@ -28,11 +30,11 @@ export default class InitStore extends EventEmitter {
       sculptureId: null,
       audioInitialized: null,
       clientConnected: null,
-      serialInitialized: null,
+      serialComplete: null,
       systems: {},
       ready: false,
     };
-    Object.keys(buildRequiredCommands()).forEach((name) => this.state.systems[name] = null);
+    Object.keys(requiredCommands).forEach((name) => this.state.systems[name] = null);
 
     this.dispatcher.register(this.actionHandler.bind(this));
   }
@@ -69,10 +71,18 @@ export default class InitStore extends EventEmitter {
         if (action.connected) this._readyHandler();
       }
       break;
-    case InitActionCreator.SERIAL_INITIALIZED:
-      if (this.state.serialInitialized !== true) {
-        this.state.serialInitialized = true;
-        this.state.systems = this._querySystems(action.serialManager);
+    case InitActionCreator.SERIAL_PORT_INITIALIZED:
+      this.state.systems = this._querySystems(action.serialManager, false);
+      this.emitChange();
+      break;
+    case InitActionCreator.SERIAL_PORT_ERROR:
+      this.state.systems = this._querySystems(action.serialManager, false);
+      this.emitChange();
+      break;
+    case InitActionCreator.SERIAL_COMPLETE:
+      if (this.state.serialComplete !== true) {
+        this.state.serialComplete = true;
+        this.state.systems = this._querySystems(action.serialManager, true);
         this.emitChange();
         this._readyHandler();
       }
@@ -89,19 +99,21 @@ export default class InitStore extends EventEmitter {
 
   _readyHandler() {
     if (!this.state.ready && this.state.sculptureId && 
-        this.state.audioInitialized && this.state.clientConnected && this.state.serialInitialized) {
+        this.state.audioInitialized && this.state.clientConnected && this.state.serialComplete) {
       // FIXME: Also require all subsystems to be ready?
       // Wait 2 secs before starting game
       setTimeout(() => initActionCreator.sendReady(), 2000);
     }
   }
 
-  _querySystems(serialManager) {
+  // Pass complete = true if all ports are searched; this will make any failed states false rather
+  // than uninitialized.
+  _querySystems(serialManager, complete) {
     const systems = {};
-    const commands = buildRequiredCommands();
-    Object.keys(commands).forEach((name) => {
-      const ports = serialManager.findTargetPorts(commands[name]);
-      systems[name] =  ports.size !== 0;
+    Object.keys(requiredCommands).forEach((name) => {
+      const ports = serialManager.findTargetPorts(requiredCommands[name]);
+      if (ports.size !== 0) systems[name] = true;
+      else if (complete) systems[name] = false;
     });
     return systems;
   }
@@ -118,8 +130,8 @@ export default class InitStore extends EventEmitter {
     return this.state.clientConnected;
   }
 
-  get serialInitialized() {
-    return this.state.serialInitialized;
+  get serialComplete() {
+    return this.state.serialComplete;
   }
 
   get systemState() {

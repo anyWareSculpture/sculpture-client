@@ -1,8 +1,5 @@
 import React from 'react';
-import SculptureApp from '../app';
 import * as SerialProtocol from '../serial/serial-protocol';
-const {SerialProtocolCommandBuilder} = SerialProtocol;
-import config from '../config';
 import InitStore from '../init-store';
 import {initStore} from '../stores';
 import Sprites from './svg/status-sprites.svg';
@@ -22,10 +19,10 @@ const symbols = {
   mega: { states: ['RGB_STRIPS', 'HANDSHAKE_STRIP', 'ART_LIGHTS_STRIP', SerialProtocol.HANDSHAKE_COMMAND] },
   network: { states: ['clientConnected'] },
   sound: { states: ['audioInitialized'] },
-  serial: { states: ['serialInitialized'] },
+  serial: { states: ['serialComplete'] },
 };
 
-const toColor = (bool) => bool == null ? 'yellow' : bool ? 'green' : 'red';
+const toColor = (bool) => typeof bool !== 'boolean' ? 'yellow' : bool ? 'green' : 'red';
 
 export default class StatusView extends React.Component {
   static propTypes = {
@@ -49,7 +46,7 @@ export default class StatusView extends React.Component {
       sculptureId: initStore.sculptureId,
       audioInitialized: toColor(initStore.audioInitialized),
       clientConnected: toColor(initStore.clientConnected),
-      serialInitialized: toColor(initStore.serialInitialized),
+      serialComplete: toColor(initStore.serialComplete),
     };
     const systemState = initStore.systemState;
     Object.keys(systemState).forEach((system) => {

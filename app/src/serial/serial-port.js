@@ -37,6 +37,7 @@ export default class SerialPort extends events.EventEmitter {
 
     this._nextCommandHandler = null;
     this._initialized = false;
+    this._connectionAttemptsRemaining = 2;
   }
 
   /**
@@ -85,22 +86,30 @@ export default class SerialPort extends events.EventEmitter {
   }
 
   initialize(callback) {
-    this._port.open((error) => {
-      if (error) {
-        callback(error);
-        return;
-      }
+    if (this._connectionAttemptsRemaining === 0) {
+      return this._completeHandshake(callback, new Error('No response after multiple connection attempts'));
+    }
+    this._connectionAttemptsRemaining -= 1;
+    this._port.open((error) => this._handleOpen(error, callback));
+  }
 
-      this._port.on("data", this._handleData.bind(this));
-      this._port.on("error", this._handleError.bind(this));
-      this._port.on("close", this._handleClose.bind(this));
+  _handleOpen(error, callback) {
+    if (error) return callback(error);
 
-      this._beginHandshake(callback);
-    });
+    console.log(`Serial port opened: ${this._port.path}`);
+    this._port.on("data", this._handleData.bind(this));
+    this._port.on("error", this._handleError.bind(this));
+    this._port.on("close", this._handleClose.bind(this));
+    this._beginHandshake(callback);
   }
 
   _handleData(data) {
     this._buffer += data;
+
+    // FIXME: Aggressive debugging of a serial port
+//    if (this.path === '/dev/ttyACM2') {
+//      console.log(`ttyACM2: ${("" + data).trim()}`);
+//    }
 
     this._parseBuffer();
   }
@@ -142,7 +151,9 @@ export default class SerialPort extends events.EventEmitter {
       // Filter by expected errors
       if (error instanceof Error) {
         parseError = error;
-        console.warn(`Parse error: ${error}\nOriginal string: "${commandString}"\nThis command just may not be supported yet`);
+        console.warn(`Parse error: ${error}
+Original string: "${commandString}" from ${this.path}
+This command just may not be supported yet`);
       }
       // Throw unexpected errors
       else {
@@ -175,15 +186,24 @@ export default class SerialPort extends events.EventEmitter {
 
   _beginHandshake(callback) {
     const handshake = new SerialHandshake(this.config.HANDSHAKE, this);
-    handshake.execute(this._completeHandshake.bind(this, callback));
+    handshake.on(SerialHandshake.EVENT_FAILED, (err) => {
+      this._completeHandshake(callback, err);
+    });
+    handshake.on(SerialHandshake.EVENT_TIMEOUT, () => {
+      console.log(`${this.path} timed out. ${this._connectionAttemptsRemaining} attempts remaining`);
+      this._port.close(() => {
+        this.initialize(callback);
+      });
+    });
+    handshake.on(SerialHandshake.EVENT_COMPLETE, () => {
+      this._completeHandshake(callback);
+    });
+    handshake.execute();
   }
 
   _completeHandshake(callback, error) {
     console.log(`Handshake ended for ${this.path} ${error ? `with error: ${error.toString()}`: "(no errors)"}`);
-    if (error) {
-      callback(error);
-      return;
-    }
+    if (error) return callback(error);
 
     this._initialized = true;
     callback();

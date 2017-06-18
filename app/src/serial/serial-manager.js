@@ -23,6 +23,25 @@ export default class SerialManager extends events.EventEmitter {
    * @event SerialManager.EVENT_COMMAND
    */
   static EVENT_COMMAND = "command";
+  /**
+   * Fired when the serial manager finished creating and initializing a port
+   * Arguments for handler: SerialPort object
+   * @event SerialManager.PORT_CREATED
+   */
+  static PORT_CREATED = "created";
+  /**
+   * Fired if the serial manager fails to open or initialize a port
+   * Arguments for handler: error object
+   * @event SerialManager.PORT_ERROR
+   */
+  static PORT_ERROR = "error";
+  /**
+   * Fired when the serial manager finalizes searching for serial ports.
+   * This will always be called _once_.
+   * Arguments for handler: Error object or undefined
+   * @event SerialManager.SEARCH_COMPLETE
+   */
+  static SEARCH_COMPLETE = "complete";
 
   constructor(serialConfig) {
     super();
@@ -75,44 +94,37 @@ export default class SerialManager extends events.EventEmitter {
 
   /**
    * Goes through all serial ports searching for valid connections
-   * @param {Function} callback - The callback to call once all possible connections have been searched
    */
-  searchPorts(callback) {
+  searchPorts() {
     serialport.list((err, ports) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      const done = [];
-      for (let i = 0; i < ports.length; i++) {
-        done.push(false);
-      }
+      if (err) return this.emit(SerialManager.SEARCH_COMPLETE, err);
+      if (ports.length === 0) return this.emit(SerialManager.SEARCH_COMPLETE, new Error('No serial ports found'));
 
-      ports.forEach((portInfo, index) => {
+      // FIXME: Rewrite to using promises
+      let remaining = ports.length;
+
+      ports.forEach((portInfo) => {
         if (this._isValidPort(portInfo)) {
           console.log(`Found compatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`);
           const portPath = portInfo.comName;
 
-          this._createSerialPort(portPath, () => {
-            done[index] = true;
+          this._createSerialPort(portPath, (error, port) => {
+            remaining -= 1;
+
+            if (error) this.emit(SerialManager.PORT_ERROR, error);
+            else this.emit(SerialManager.PORT_CREATED, port);
 
             // If every item is true
-            if (done.every((d) => d)) {
-              callback();
-            }
+            if (remaining === 0) this.emit(SerialManager.SEARCH_COMPLETE);
           });
         }
         else {
-          console.log(`Skipping incompatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`);
-          done[index] = true;
-          if (done.every((d) => d)) callback();
+          this.emit(SerialManager.PORT_ERROR,
+                      new Error(`Skipping incompatible port: ${portInfo.comName} ${portInfo.manufacturer} ${portInfo.vendorId}`));
+          remaining -= 1;
+          if (remaining === 0) this.emit(SerialManager.SEARCH_COMPLETE);
         }
       });
-
-      if (!done.length) {
-        console.debug("No serial ports connected");
-        callback();
-      }
     });
   }
 
@@ -151,7 +163,7 @@ export default class SerialManager extends events.EventEmitter {
         this._addPortPatterns(port);
         console.log(`Successfully initialized serial port ${port.path}`);
       }
-      callback(error);
+      callback(error, port);
     });
     port.on(SerialPort.EVENT_COMMAND, (commandName, commandData) => this._handleCommand(port, commandName, commandData));
     port.on(SerialPort.EVENT_ERROR, this._handleError.bind(this));

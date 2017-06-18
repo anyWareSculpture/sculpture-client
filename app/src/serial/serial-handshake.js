@@ -1,18 +1,39 @@
+import events from 'events';
 import * as SerialProtocol from './serial-protocol';
 const {SerialProtocolCommandBuilder} = SerialProtocol;
 
-export default class SerialHandshake {
+export default class SerialHandshake extends events.EventEmitter {
+  /**
+   * Fired when the serial port handshake fails
+   * Arguments for handler: Error object
+   * @event SerialManager.EVENT_FAILED
+   */
+  static EVENT_FAILED = "failed";
+
+  /**
+   * Fired when we time out waiting for a response from a serial port
+   * Arguments for handler: none
+   * @event SerialManager.EVENT_TIMEOUT
+   */
+  static EVENT_TIMEOUT = "timeout";
+
+  /**
+   * Fired when a handshake successfully completes
+   * Arguments for handler: none
+   * @event SerialManager.EVENT_COMPLETE
+   */
+  static EVENT_COMPLETE = "complete";
+
   constructor(handshakeConfig, port) {
+    super();
     this.handshakeConfig = handshakeConfig;
     this.port = port;
-    this.callback = null;
 
     this._helloSucceeded = false;
     this._helloAttempts = 0;
   }
 
-  execute(callback) {
-    this.callback = callback;
+  execute() {
     // If we always use auto-resetting microcontrollers, we don't need to send an initial HELLO.
     // Note: If we do send an initial HELLO, we run the risk of triggering bootloader mode, which could
     // cause a 6-8 second startup delay.
@@ -103,11 +124,11 @@ export default class SerialHandshake {
     if (!message) {
       return;
     }
-    this.callback(new Error(message.toString()));
+    this.emit(SerialHandshake.EVENT_FAILED, new Error(message.toString()));
   }
 
   _finish() {
-    this.callback();
+    this.emit(SerialHandshake.EVENT_COMPLETE);
   }
 
   _beginTimeout() {
@@ -115,7 +136,7 @@ export default class SerialHandshake {
       if (!this._helloSucceeded) {
         // no arguments resets it all
         this._handleNextCommandWith();
-        this._error(`Connection to ${this.port.path} timed out after ${this.handshakeConfig.TIMEOUT} ms`);
+        this.emit(SerialHandshake.EVENT_TIMEOUT);
       }
     }, this.handshakeConfig.TIMEOUT);
   }
