@@ -6,11 +6,11 @@ import Sprites from './svg/status-sprites.svg';
 const COLORS = {
   SEARCHING: 'yellow',
   OK: 'green',
-  FAILED: 'red',
+  FAILED: 'red'
 };
 
 const symbols = {
-  master: { states: ['master'] },
+  master: { states: ['master'] }
 };
 
 const toColor = (bool) => typeof bool !== 'boolean' ? 'yellow' : bool ? 'green' : 'red';
@@ -28,8 +28,8 @@ export default class DebugView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        master: false,
-        status: '',
+      master: false,
+      status: '',
     };
   }
 
@@ -43,15 +43,15 @@ export default class DebugView extends React.Component {
   }
 
   _handleLocalChanges() {
-      this.setState({
-          master: toColor(sculptureStore.isMaster())
-      });
+    this.setState({
+      master: toColor(sculptureStore.isMaster())
+    });
   }
 
   _handleChanges() {
-      this.setState({
-          status: sculptureStore.getStatus()
-      });
+    this.setState({
+      status: sculptureStore.getStatus()
+    });
   }
 
   colorFromStates(states) {
