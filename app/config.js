@@ -1,6 +1,7 @@
 anyware_config = {
   DEBUG: {
-    status: true,      // Persistent status icons
+    status: false,     // Persistent status icons
+    debugView: false,  // Show game debug view
     console: false,    // Javascript console debug output
   },
   // Local sculptures will time out after this number of seconds without interaction
