@@ -1,6 +1,7 @@
 import React from 'react';
 import StatusView from './StatusView';
 import DiskView from './DiskView';
+import DebugView from './DebugView';
 import config from '../config';
 import './main.css';
 
@@ -48,6 +49,7 @@ export default class MainScreen extends React.Component {
     return <div>
       <Canvas>
         <StatusView debug={config.DEBUG.status} {...config.projectionParameters}/>
+        {config.DEBUG.debugView && <DebugView {...config.projectionParameters}/>}
         <DiskView {...config.projectionParameters}/>
       </Canvas>
       {config.DEBUG.status && <div>
