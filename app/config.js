@@ -96,10 +96,10 @@ anyware_config = {
     PATTERN_LEVELS: [
       // level 0 sequence
       {
-        stripId: '2',
+        stripId: '0',
         // Each array of panel IDs is lit up one at a time
         // Each array within this array is called a "frame" in the "sequence"
-        panelSequence: ['4', '5', '6'],
+        panelSequence: ['1', '2', '3'],
         frameDelay: 750 // Overriding default frame delay to make first level slower
       },
       // level 1 sequence
@@ -109,7 +109,7 @@ anyware_config = {
       },
       // level 2 sequence
       {
-        stripId: '0',
+        stripId: '2',
         panelSequence: ['3', '6', '2', '9']
       }
     ],
