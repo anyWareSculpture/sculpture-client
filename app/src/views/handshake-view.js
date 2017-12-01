@@ -22,41 +22,24 @@ export default class HandshakeView {
     this.sculptureActionCreator = new SculptureActionCreator(dispatcher);
 
     this._pulseInterval = null;
-    this._complete = false;
     this._activityTimeout = null;
 
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
 
+    // FIXME: We begin by pulsing. Not the best design..
+    this._beginPulsing();
   }
 
-  get handshakes() {
-    return this.store.data.get('handshakes');
+  _getHandshakes() {
+    return this.store.data.get('handshake').get('handshakes');
   }
 
   _handleChanges(changes) {
-    this._handleCurrentGameChanges(changes);
-    this._handleHandshakesChanges(changes);
-  }
-
-  _handleCurrentGameChanges(changes) {
-    if (!changes.hasOwnProperty("currentGame")) return;
-
-    if (changes.currentGame === GAMES.HANDSHAKE) {
-      // starting handshake game
-      this._complete = false;
-      this._beginPulsing();
-    }
-    else {
-      this._endPulsing();
-      this._complete = true;
-    }
-  }
-
-  _handleHandshakesChanges(changes) {
-    if (!changes.hasOwnProperty("handshakes") || !this.store.isReady) return;
+    if (!this.store.isReady || !changes.hasOwnProperty('handshake') || !changes.handshake.hasOwnProperty('handshakes')) return;
 
     this._updateHandshakeVibrationIntensity();
 
+    const handshakesChanges = changes.handshake.handshakes;
     for (const sculptureId of Object.keys(handshakesChanges)) {
       switch (handshakesChanges[sculptureId]) {
       case HandshakeGameLogic.HANDSHAKE_ACTIVE:
@@ -76,6 +59,9 @@ export default class HandshakeView {
         break;
       case HandshakeGameLogic.HANDSHAKE_OFF:
         this._deactivateLocationPanel(sculptureId);
+        if (sculptureId === this.store.me) {
+          this._beginPulsing();
+        }
         break;
       }
     }
@@ -98,7 +84,7 @@ export default class HandshakeView {
 
   _activateMiddlePanel() {
     const intensity = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_INTENSITY;
-    const color = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_COLOR || this.store.locationColor;
+    const color = this.store.locationColor;
     const easing = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_EASING;
 
     this._middlePanelSet({intensity, color, easing});
@@ -106,7 +92,7 @@ export default class HandshakeView {
 
   _deactivateMiddlePanel() {
     const intensity = this.config.HANDSHAKE_HARDWARE.MIDDLE_OFF_INTENSITY;
-    const color = this.config.HANDSHAKE_HARDWARE.MIDDLE_OFF_COLOR;
+    const color = this.store.locationColor;
     const easing = this.config.HANDSHAKE_HARDWARE.MIDDLE_OFF_EASING;
 
     this._middlePanelSet({intensity, color, easing});
@@ -136,7 +122,7 @@ export default class HandshakeView {
   }
 
   _updateHandshakeVibrationIntensity() {
-    const handshakes = this.handshakes;
+    const handshakes = this._getHandshakes();
     const numUsers = Array.from(handshakes).reduce((total, sculptureId) => total + (handshakes.get(sculptureId) === HandshakeGameLogic.HANDSHAKE_ACTIVE ? 1 : 0), 0);
     const commandString = SerialProtocolCommandBuilder.buildHandshake({ numUsers });
     this.serialManager.dispatchCommand(commandString);
@@ -149,10 +135,6 @@ export default class HandshakeView {
     this._pulse();
 
     this._pulseInterval = setInterval(() => {
-      if (this._complete) {
-        return;
-      }
-
       this._pulse();
     }, this.config.HANDSHAKE_HARDWARE.PULSE_DELAY);
   }
