@@ -23,9 +23,6 @@ export default class PanelView {
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
   }
 
-  reset() {
-  }
-
   get lightArray() {
     return this.store.data.get('lights');
   }

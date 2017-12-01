@@ -26,9 +26,7 @@ export default class HandshakeView {
     this._activityTimeout = null;
 
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
-  }
 
-  reset() {
   }
 
   get handshakes() {
