@@ -6,7 +6,7 @@ anyware_config = {
   },
 
     // The sequence of the games to be run. The first game is run on startup
-  GAMES_SEQUENCE: [ "mole", "disk", "simon", ],
+  GAMES_SEQUENCE: [ "mole", "disk", "simon" ],
 
   // These settings effect the default behaviour of panels outside of
   // any custom logic in any of the games
