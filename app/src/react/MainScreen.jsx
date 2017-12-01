@@ -45,7 +45,6 @@ export default class MainScreen extends React.Component {
     };
   }
 
-  // FIXME: Pass the center prop to StatusView based on game status (isPlayingNoGame?)
   render() {
     return <div>
       <Canvas>
