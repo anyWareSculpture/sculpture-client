@@ -37,6 +37,7 @@ export default class SculptureApp extends events.EventEmitter {
 
     this.serialManager = this._setupSerialManager();
 
+    sculptureStore.init();
     sculptureStore.on(SculptureStore.EVENT_CHANGE, (changes, metadata) => {
       if (!this.client) return;
 
@@ -63,7 +64,7 @@ export default class SculptureApp extends events.EventEmitter {
         }
         break;
       case InitActionCreator.READY:
-        setTimeout(() => this._beginFirstGame(), 0);
+        console.log('Ready');
         break;
       default:
       }
@@ -155,15 +156,5 @@ export default class SculptureApp extends events.EventEmitter {
     update.metadata = metadata;
     this._debug(`Got state update: ${JSON.stringify(update)}`);
     this.sculptureActionCreator.sendMergeState(update);
-  }
-
-  _beginFirstGame() {
-    // TODO: Temporarily here until the full game transitions are implemented
-    if (sculptureStore.isPlayingNoGame) {
-      Object.keys(this.views).forEach((view) => this.views[view].reset());
-      const game = config.GAMES_SEQUENCE[0];
-      this._log(`Starting ${game} game...`);
-      this.sculptureActionCreator.sendStartGame(game);
-    }
   }
 }

@@ -4,11 +4,9 @@ anyware_config = {
     debugView: false,  // Show game debug view
     console: false,    // Javascript console debug output
   },
-  // Local sculptures will time out after this number of seconds without interaction
-  ACTIVITY_TIMEOUT: 60,
 
     // The sequence of the games to be run. The first game is run on startup
-  GAMES_SEQUENCE: [ "handshake", "mole", "disk", "simon", ],
+  GAMES_SEQUENCE: [ "mole", "disk", "simon" ],
 
   // These settings effect the default behaviour of panels outside of
   // any custom logic in any of the games
@@ -19,7 +17,7 @@ anyware_config = {
 
   /******* GAMES CONFIGURATION *******/
 
-  HANDSHAKE_GAME: {
+  HANDSHAKE: {
     TRANSITION_OUT_TIME: 4000 // Time (ms) from handshake is touched until we start the next game
   },
 
@@ -59,7 +57,6 @@ anyware_config = {
 
   DISK_GAME: {
     SPEEDS: [6, 15, 21, 30, 72], // degrees/sec
-    ABSOLUTE_TOLERANCE: 8, // sum of degrees tolerance for the absolute disk positions
     // The intensity of the panels that the user can use to play the sequence
     CONTROL_PANEL_COLOR: 'white',
     CONTROL_PANEL_INTENSITIES: [10, 20, 30, 40, 50],

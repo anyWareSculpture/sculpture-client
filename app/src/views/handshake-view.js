@@ -1,11 +1,17 @@
 import GAMES from 'anyware/lib/game-logic/constants/games';
 import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
+import HandshakeGameLogic from 'anyware/lib/game-logic/logic/handshake-game-logic';
 import SculptureActionCreator from 'anyware/lib/game-logic/actions/sculpture-action-creator';
 
 import SerialManager from '../serial/serial-manager';
 import * as SerialProtocol from '../serial/serial-protocol';
 const {SerialProtocolCommandBuilder} = SerialProtocol;
 
+/**
+ * This view manages communication with the handshake interface.
+ * We're also responsible for the timeout handling of the handshake by listening for all actions
+ * and triggering the corresponding action.
+ */
 export default class HandshakeView {
   constructor(store, config, dispatcher, serialManager) {
     this.store = store;
@@ -16,47 +22,27 @@ export default class HandshakeView {
     this.sculptureActionCreator = new SculptureActionCreator(dispatcher);
 
     this._pulseInterval = null;
-    this._complete = false;
     this._activityTimeout = null;
 
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
+
+    // FIXME: We begin by pulsing. Not the best design..
+    this._beginPulsing();
   }
 
-  reset() {
-  }
-
-  get handshakes() {
-    return this.store.data.get('handshakes');
+  _getHandshakes() {
+    return this.store.data.get('handshake').get('handshakes');
   }
 
   _handleChanges(changes) {
-    this._handleCurrentGameChanges(changes);
-    this._handleHandshakesChanges(changes);
-  }
-
-  _handleCurrentGameChanges(changes) {
-    if (!changes.hasOwnProperty("currentGame")) return;
-
-    if (changes.currentGame === GAMES.HANDSHAKE) {
-      // starting handshake game
-      this._complete = false;
-      this._beginPulsing();
-    }
-    else {
-      this._endPulsing();
-      this._complete = true;
-    }
-  }
-
-  _handleHandshakesChanges(changes) {
-    const handshakesChanges = changes.handshakes;
-    if (!handshakesChanges || !this.store.isReady) return;
+    if (!this.store.isReady || !changes.hasOwnProperty('handshake') || !changes.handshake.hasOwnProperty('handshakes')) return;
 
     this._updateHandshakeVibrationIntensity();
 
+    const handshakesChanges = changes.handshake.handshakes;
     for (const sculptureId of Object.keys(handshakesChanges)) {
       switch (handshakesChanges[sculptureId]) {
-      case SculptureStore.HANDSHAKE_ACTIVE:
+      case HandshakeGameLogic.HANDSHAKE_ACTIVE:
         this._activateLocationPanel(sculptureId);
 
         if (sculptureId === this.store.me) {
@@ -66,13 +52,16 @@ export default class HandshakeView {
           this._activateMiddlePanel();
         }
         break;
-      case SculptureStore.HANDSHAKE_PRESENT:
+      case HandshakeGameLogic.HANDSHAKE_PRESENT:
         if (sculptureId === this.store.me) {
           this._deactivateMiddlePanel();
         }
         break;
-      case SculptureStore.HANDSHAKE_OFF:
+      case HandshakeGameLogic.HANDSHAKE_OFF:
         this._deactivateLocationPanel(sculptureId);
+        if (sculptureId === this.store.me) {
+          this._beginPulsing();
+        }
         break;
       }
     }
@@ -95,7 +84,7 @@ export default class HandshakeView {
 
   _activateMiddlePanel() {
     const intensity = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_INTENSITY;
-    const color = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_COLOR || this.store.locationColor;
+    const color = this.store.locationColor;
     const easing = this.config.HANDSHAKE_HARDWARE.MIDDLE_ON_EASING;
 
     this._middlePanelSet({intensity, color, easing});
@@ -103,7 +92,7 @@ export default class HandshakeView {
 
   _deactivateMiddlePanel() {
     const intensity = this.config.HANDSHAKE_HARDWARE.MIDDLE_OFF_INTENSITY;
-    const color = this.config.HANDSHAKE_HARDWARE.MIDDLE_OFF_COLOR;
+    const color = this.store.locationColor;
     const easing = this.config.HANDSHAKE_HARDWARE.MIDDLE_OFF_EASING;
 
     this._middlePanelSet({intensity, color, easing});
@@ -133,8 +122,8 @@ export default class HandshakeView {
   }
 
   _updateHandshakeVibrationIntensity() {
-    const handshakes = this.handshakes;
-    const numUsers = Array.from(handshakes).reduce((total, sculptureId) => total + (handshakes.get(sculptureId) === SculptureStore.HANDSHAKE_ACTIVE ? 1 : 0), 0);
+    const handshakes = this._getHandshakes();
+    const numUsers = Array.from(handshakes).reduce((total, sculptureId) => total + (handshakes.get(sculptureId) === HandshakeGameLogic.HANDSHAKE_ACTIVE ? 1 : 0), 0);
     const commandString = SerialProtocolCommandBuilder.buildHandshake({ numUsers });
     this.serialManager.dispatchCommand(commandString);
   }
@@ -146,10 +135,6 @@ export default class HandshakeView {
     this._pulse();
 
     this._pulseInterval = setInterval(() => {
-      if (this._complete) {
-        return;
-      }
-
       this._pulse();
     }, this.config.HANDSHAKE_HARDWARE.PULSE_DELAY);
   }
@@ -173,31 +158,30 @@ export default class HandshakeView {
   _refreshActivityTimeout() {
     if (this._activityTimeout) clearTimeout(this._activityTimeout);
     this._activityTimeout = setTimeout(this._activityTimeoutCB.bind(this),
-                                       this.config.ACTIVITY_TIMEOUT * 1000);
+                                       this.config.ALONE_MODE_SECONDS * 1000);
   }
 
   _activityTimeoutCB() {
     this._activityTimeout = null;
-    this.sculptureActionCreator.sendHandshakeAction(this.store.me, SculptureStore.HANDSHAKE_OFF);
+    this.sculptureActionCreator.sendHandshakeAction(this.store.me, HandshakeGameLogic.HANDSHAKE_OFF);
   }
 
   // Command from serial
   _handleCommand(commandName, commandArgs) {
 
-    // Refresh timeout on any interaction, but don't start a new timeout unless it's a handshake
-    if (this._activityTimeout) this._refreshActivityTimeout();
+    // Refresh timeout on any interaction
+    this._refreshActivityTimeout();
 
     if (commandName === SerialProtocol.HANDSHAKE_COMMAND) {
       // numUsers is really just an active flag (0 or 1), but has this name for historic reasons
       const {numUsers: active} = commandArgs;
 
       if (parseInt(active) > 0) {
-        this.sculptureActionCreator.sendHandshakeAction(this.store.me, SculptureStore.HANDSHAKE_ACTIVE);
+        this.sculptureActionCreator.sendHandshakeAction(this.store.me, HandshakeGameLogic.HANDSHAKE_ACTIVE);
       }
       else {
-        this.sculptureActionCreator.sendHandshakeAction(this.store.me, SculptureStore.HANDSHAKE_PRESENT);
+        this.sculptureActionCreator.sendHandshakeAction(this.store.me, HandshakeGameLogic.HANDSHAKE_PRESENT);
       }
-      if (!this._activityTimeout) this._refreshActivityTimeout();
     }
   }
 }
