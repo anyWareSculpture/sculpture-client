@@ -18,7 +18,13 @@ class Config extends DefaultConfig {
         username: "anyware",
         password: "anyware",
         host: "broker.shiftr.io"
-      }
+      },
+      credentials: {
+        sculpture1: '3ca778a7d51ac0ea4717d09ea7e97150',
+        sculpture2: '72d90e9afadc2f055fe5477aebd0616b',
+        sculpture3: '7f24a3e73b91dc9f51f15861d75c888a',
+        anyware: 'anyware',
+      },
     };
 
     /*********** Hardware Mappings ************/
@@ -36,7 +42,8 @@ class Config extends DefaultConfig {
       // Serial port paths matching these patterns will be ignored
       HARDWARE_INVALID_PATH_PATTERNS: [
         "Bluetooth",
-        "WirelessiAP"
+        "WirelessiAP",
+        "ctrl"
       ],
       HARDWARE_VENDOR_IDS: new Set([
         "0x0",    // Generic/Unspecified (for Macs)
