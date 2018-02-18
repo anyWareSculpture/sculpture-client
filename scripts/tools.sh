@@ -46,6 +46,19 @@ get() {
     esac
 }
 
+# $1 - what
+# $2 - sculptureId
+clear() {
+    case $1 in
+        config)
+	    ssh pi@${2}.local 'echo "anyware_config = {}" > build/config.js'
+	    ;;
+        *)
+            echo "Unknown get '$$1'"
+            ;;
+    esac
+}
+
 # $1 - sculptureId
 publish() {
     scp build/manifest.json build/application.* build/vendor.js* pi@${1}.local:build
@@ -76,7 +89,7 @@ do_anyware() {
         restart) ;;
         reboot) ;;
         halt) ;;
-        get)
+        get|clear)
              what=$1
              shift
             ;;
@@ -107,6 +120,10 @@ do_anyware() {
         case $op in
             get)
                 $op $what $sculpture
+                ;;
+            clear)
+                $op $what $sculpture
+                restart $sculpture
                 ;;
             config)
                 $op $config $sculpture

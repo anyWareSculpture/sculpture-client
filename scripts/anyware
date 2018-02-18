@@ -29,6 +29,7 @@ if [ $# -lt 1 ]; then
     echo "  reboot              Reboot the Raspberry Pi(s)"
     echo "  halt                Shut down the Raspberry Pi(s)"
     echo "  get config          Downloads the current config from the sculpture(s)"
+    echo "  clear config        Clears any custom config on the sculpture(s)"
     echo "  config <config.js>  Upload and use the given config file"
     echo "  publish             Publish the local development build"
     echo "  fullpublish         Publish with all assets (takes more time)"
