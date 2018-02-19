@@ -18,7 +18,7 @@ if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
 . "$DIR/tools.sh"
 
 if [ $# -lt 1 ]; then
-    echo "Usage: $0 <command> [<sculptureId>]"
+    echo "Usage: $0 <command> [<sculptureId> ...]"
     echo ""
     echo "  sculptureId         One or more of sculpture1, sculpture2 or sculpture3. Defaults to all sculptures"
     echo ""

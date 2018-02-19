@@ -113,7 +113,7 @@ do_anyware() {
     if [ -z "$1" ]; then
         sculptures="sculpture1 sculpture2 sculpture3"
     else
-        sculptures=$1
+        sculptures=$@
     fi
     for sculpture in $sculptures; do
         echo "$op: $sculpture"
