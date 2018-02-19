@@ -72,10 +72,6 @@ class Config extends DefaultConfig {
       // Settings for the middle part of the handshake
       MIDDLE_ON_INTENSITY: 100,
       MIDDLE_OFF_INTENSITY: 0,
-      // The color settings here represent the color of the middle
-      // setting ON_COLOR to null makes it default to the location color
-      MIDDLE_ON_COLOR: null,
-      MIDDLE_OFF_COLOR: 'white',
       MIDDLE_ON_EASING: 'easein',
       MIDDLE_OFF_EASING: 'easein'
     };
