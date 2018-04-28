@@ -6,8 +6,6 @@ import SerialManager from '../serial/serial-manager';
 import * as SerialProtocol from '../serial/serial-protocol';
 const {SerialProtocolCommandBuilder} = SerialProtocol;
 
-import StatusAnimations from './animations/status-animations';
-
 export default class PanelView {
   constructor(store, config, dispatcher, serialManager) {
     this.store = store;
@@ -17,8 +15,6 @@ export default class PanelView {
 
     this.panelsActionCreator = new PanelsActionCreator(dispatcher);
     this.sculptureActionCreator = new SculptureActionCreator(dispatcher);
-
-    this._animating = false;
 
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
   }
@@ -47,8 +43,6 @@ export default class PanelView {
   }
 
   _handleChanges(changes) {
-    if (this._animating) return;
-
     this._handleStatusChanges(changes);
     this._handleLightChanges(changes);
   }
@@ -89,37 +83,6 @@ export default class PanelView {
   }
 
   _handleStatusChanges(changes) {
-    const statusAnimations = {
-      [SculptureStore.STATUS_SUCCESS]: this._playSuccessAnimation.bind(this),
-      [SculptureStore.STATUS_FAILURE]: this._playFailureAnimation.bind(this)
-    };
-
-    const animationMethod = statusAnimations[changes.status];
-    if (animationMethod) animationMethod();
   }
 
-  _playSuccessAnimation() {
-    StatusAnimations.playSuccessAnimation(this, this._animationComplete.bind(this));
-  }
-
-  _playFailureAnimation() {
-    // FIXME: This is a hack to support failure animation on one panel
-    if (this.store.isPlayingSimonGame) {
-      const simongame = this.store.currentGameLogic;
-      StatusAnimations.playSingleStripFailureAnimation(simongame.currentStrip, this, this._animationComplete.bind(this));
-    }
-    else {
-      StatusAnimations.playFailureAnimation(this, this._animationComplete.bind(this));
-    }
-  }
-
-  _animationComplete() {
-    this._animating = false;
-    this.sculptureActionCreator.sendFinishStatusAnimation();
-
-    // FIXME: setTimeout is used here as a hack to compensate
-    // FIXME: for the problem with many commands sent at once
-    // FIXME: being garbled up together
-    setTimeout(() => this.showAllPanels(), 500);
-  }
 }
