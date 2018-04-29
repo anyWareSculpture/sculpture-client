@@ -27,7 +27,6 @@ build/Release
 node_modules
 
 # Build/distrubution directories
-build/
 dist/
 out/
 
