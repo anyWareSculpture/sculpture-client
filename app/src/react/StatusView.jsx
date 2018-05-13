@@ -28,11 +28,13 @@ export default class StatusView extends React.Component {
   static propTypes = {
     scale: React.PropTypes.number,
     translate: React.PropTypes.arrayOf(React.PropTypes.number),
+    rotate: React.PropTypes.number,
     debug: React.PropTypes.bool,
   };
   static defaultProps = {
     scale: 1,
     translate: [0, 0],
+    rotate: 0,
   };
 
   constructor(props) {
@@ -129,8 +131,8 @@ export default class StatusView extends React.Component {
       zIndex: 10,
     }}>
       <g display="none"><Sprites/></g>
-      <g style={{transform: "translate(350px, 350px) rotate(35deg)"}}>
-        <g className="" style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale})`}}>
+      <g style={{transform: "translate(350px, 350px) rotate(0deg)"}}>
+        <g style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale}) rotate(${this.props.rotate + 90}deg)`}}>
           {this.renderIcons(this.state.ready)}
           {this.renderSculptureId(this.state.ready)}
           {this.renderVersion(this.state.ready)}

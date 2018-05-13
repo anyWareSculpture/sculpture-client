@@ -103,8 +103,8 @@ export default class DebugView extends React.Component {
       zIndex: 10,
     }}>
       <g display="none"><Sprites/></g>
-      <g style={{transform: "translate(350px, 350px) rotate(155deg)"}}>
-        <g className="" style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale}) rotate(${this.props.rotate})`}}>
+      <g style={{transform: "translate(350px, 350px) rotate(0deg)"}}>
+        <g style={{transform: `translate(${this.props.translate[0]}px, ${this.props.translate[1]}px) scale(${this.props.scale}) rotate(${this.props.rotate + 50}deg)`}}>
           {this.renderIcons()}
           {this.renderStatus(this.state.status)}
         </g>
