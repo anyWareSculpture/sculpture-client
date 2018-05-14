@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/anyWareSculpture/sculpture-client#readme",
   "dependencies": {
-    "@anyware/sound-assets": "anyWareSculpture/sound-assets",
+    "@anyware/sound-assets": "^1.3.0",
     "anyware": "*",
     "babel-polyfill": "^6.9.1",
     "browser-serialport": "^2.1.0",
