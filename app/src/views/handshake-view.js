@@ -59,9 +59,9 @@ export default class HandshakeView {
         }
         break;
       case HandshakeGameLogic.HANDSHAKE_OFF:
-        this._deactivateMiddlePanel();
         this._deactivateLocationPanel(sculptureId);
         if (sculptureId === this.store.me) {
+          this._deactivateMiddlePanel();
           this._beginPulsing();
         }
         break;
