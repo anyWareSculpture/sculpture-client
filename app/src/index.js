@@ -35,5 +35,5 @@ window.onload = async () => {
   // Apply config from the global variable anyware_config
   config.applyLocalConfig(anyware_config);
   const app = new SculptureApp(config);
-  ReactDOM.render(<MainScreen app={app} restart={() => chrome.runtime.reload()}/>, document.getElementById('anyware-root'));
+  ReactDOM.render(<MainScreen app={app}/>, document.getElementById('anyware-root'));
 };

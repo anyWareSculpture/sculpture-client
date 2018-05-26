@@ -112,10 +112,22 @@ export default class StatusView extends React.Component {
   }
 
   renderVersion(isReady) {
-    if (isReady) return null;
+    if (isReady && !this.props.debug) return null;
 
-    return <g transform={'translate(0,50)'}>
-      <text x="0" y="0" fontSize={30} textAnchor="middle" alignmentBaseline="middle" fill="#ffffff">
+    let fontSize = 30;
+    let xpos = 0;
+    let ypos = 50;
+    let rotation = 0;
+    if (isReady) {
+      const angle = 20;
+      xpos = Math.cos(angle * Math.PI / 180)*320;
+      ypos = Math.sin(angle * Math.PI / 180)*320;
+      rotation = 90+angle;
+      fontSize = 15;
+    }
+    const transform = `translate(${xpos}, ${ypos}) rotate(${rotation})`;
+    return <g transform={transform}>
+      <text x="0" y="0" fontSize={fontSize} textAnchor="middle" alignmentBaseline="middle" fill="#ffffff">
         {`V${manifest.version}`}
       </text>
     </g>;

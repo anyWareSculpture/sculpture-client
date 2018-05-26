@@ -6,12 +6,6 @@ import {sculptureStore} from '../stores';
 import config from '../config';
 import './main.css';
 
-const Version = ({versionStr}) => <div id="version"><p>{versionStr}</p></div>;
-
-Version.propTypes = {
-  versionStr: React.PropTypes.string.isRequired,
-};
-
 const manifest = chrome.runtime.getManifest();
 
 const Canvas = ({children}) => <div style={{
@@ -34,10 +28,6 @@ Canvas.propTypes = {
 
 export default class MainScreen extends React.Component {
 
-  static propTypes = {
-    restart: React.PropTypes.func,
-  }
-  
   constructor(props) {
     super(props);
 
@@ -52,10 +42,6 @@ export default class MainScreen extends React.Component {
         {config.DEBUG.debugView && <DebugView {...config.projectionParameters}/>}
         <DiskView store={sculptureStore} config={config} {...config.projectionParameters}/>
       </Canvas>
-      {config.DEBUG.status && <div>
-        <Version versionStr={`V${manifest.version}`}/>
-        <button onClick={this.props.restart} style={{zIndex: 20, position: "relative"}}>Restart</button>
-      </div>}
     </div>;
   }
 }
