@@ -111,13 +111,13 @@ export default class HandshakeView {
     this._handshakePanelSet(panel, {intensity, color, easing});
   }
 
-  _handshakePanelSet(panel, {intensity, color, easing}) {
+  _handshakePanelSet(panelId, {intensity, color, easing}) {
     const commandString = SerialProtocolCommandBuilder.buildPanelSet({
       stripId: this.config.LIGHTS.HANDSHAKE_STRIP,
-      panelId: panel,
-      intensity: intensity,
-      color: color,
-      easing: easing
+      panelId,
+      intensity,
+      color,
+      easing,
     });
     console.log(commandString);
     this.serialManager.dispatchCommand(commandString);
@@ -141,6 +141,8 @@ export default class HandshakeView {
     this._pulse();
 
     this._pulseInterval = setInterval(() => {
+      // As a precaution, make sure it pulses back to black
+      this._handshakePanelSet(this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL, {intensity: 0, color: 'white'});
       this._pulse();
     }, this.config.HANDSHAKE_HARDWARE.PULSE_DELAY);
   }
@@ -153,7 +155,7 @@ export default class HandshakeView {
   _pulse() {
     const commandString = SerialProtocolCommandBuilder.buildPanelPulse({
       stripId: this.config.LIGHTS.HANDSHAKE_STRIP,
-      panelId: '3',
+      panelId: this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL,
       intensity: 100,
       color: 'white',
       easing: 'sleep'
