@@ -42,6 +42,7 @@ export default class HandshakeView {
     const handshakesChanges = changes.handshake.handshakes;
     for (const sculptureId of Object.keys(handshakesChanges)) {
       switch (handshakesChanges[sculptureId]) {
+      case HandshakeGameLogic.HANDSHAKE_ACTIVATING:
       case HandshakeGameLogic.HANDSHAKE_ACTIVE:
         this._activateLocationPanel(sculptureId);
 
@@ -123,7 +124,11 @@ export default class HandshakeView {
 
   _updateHandshakeVibrationIntensity() {
     const handshakes = this._getHandshakes();
-    const numUsers = Array.from(handshakes).reduce((total, sculptureId) => total + (handshakes.get(sculptureId) === HandshakeGameLogic.HANDSHAKE_ACTIVE ? 1 : 0), 0);
+    const numUsers = Array.from(handshakes).reduce((total, sculptureId) => {
+        return total +
+            (handshakes.get(sculptureId) === HandshakeGameLogic.HANDSHAKE_ACTIVATING ? 1 : 0) +
+            (handshakes.get(sculptureId) === HandshakeGameLogic.HANDSHAKE_ACTIVE ? 1 : 0);
+    }, 0);
     const commandString = SerialProtocolCommandBuilder.buildHandshake({ numUsers });
     this.serialManager.dispatchCommand(commandString);
   }
