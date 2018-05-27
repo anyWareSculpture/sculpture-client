@@ -43,7 +43,7 @@ export default class SerialHandshake extends events.EventEmitter {
   }
 
   _sendHello() {
-    const commandString = SerialProtocolCommandBuilder.buildHello({debug: true});
+    const commandString = SerialProtocolCommandBuilder.buildHello({debug: false});
     this.port.write(commandString, this._error.bind(this));
   }
 
