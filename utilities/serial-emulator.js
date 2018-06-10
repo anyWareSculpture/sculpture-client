@@ -27,21 +27,21 @@ const ports = {
     path: '/dev/tty.usbserial0',
     device: 'A',
     handlers: {
-      'HELLO': `HELLO panel\nSUPPORTED\nPANEL-SET 0\nPANEL-PULSE 0\nPANEL-INTENSITY 0\nPANEL-ANIMATE\nPANEL-STATE\nENDSUPPORTED\n`,
+      'HELLO': `HELLO panel\nSUPPORTED\nPANEL-SET 0\nPANEL-PULSE 0\nPANEL-INTENSITY 0\nENDSUPPORTED\n`,
     },
   },
   B: {
     path: '/dev/tty.usbserial1',
     device: 'B',
     handlers: {
-      'HELLO': `HELLO panel\nSUPPORTED\nPANEL-SET 1\nPANEL-PULSE 1\nPANEL-INTENSITY 1\nPANEL-ANIMATE\nPANEL-STATE\nENDSUPPORTED\n`,
+      'HELLO': `HELLO panel\nSUPPORTED\nPANEL-SET 1\nPANEL-PULSE 1\nPANEL-INTENSITY 1\nENDSUPPORTED\n`,
     },
   },
   C: {
     path: '/dev/tty.usbserial2',
     device: 'C',
     handlers: {
-      'HELLO': `HELLO panel\nSUPPORTED\nPANEL-SET 2\nPANEL-PULSE 2\nPANEL-INTENSITY 2\nPANEL-ANIMATE\nPANEL-STATE\nENDSUPPORTED\n`,
+      'HELLO': `HELLO panel\nSUPPORTED\nPANEL-SET 2\nPANEL-PULSE 2\nPANEL-INTENSITY 2\nENDSUPPORTED\n`,
     },
   },
   M: {
