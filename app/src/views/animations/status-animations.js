@@ -93,7 +93,8 @@ export default class StatusAnimations {
         for (const [panelId, intensity, color] of panelsProperties) {
           const commandString = SerialProtocolCommandBuilder.buildPanelSet({
             stripId: stripId,
-            panelId: panelId,
+            // FIXME: If we reintroduce status animations, optimize this to send multiple panels when applicable
+            panelIds: panelId,
             intensity: intensity,
             color: color
           });
@@ -121,7 +122,8 @@ export default class StatusAnimations {
         const panelId = panelIds[i];
         const commandString = SerialProtocolCommandBuilder.buildPanelSet({
           stripId: stripId,
-          panelId: panelId,
+          // FIXME: If we reintroduce status animations, optimize this to send multiple panels when applicable
+          panelIds: panelId,
           intensity: 0,
           color: "black"
         });

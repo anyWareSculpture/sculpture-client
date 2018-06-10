@@ -114,7 +114,7 @@ export default class HandshakeView {
   _handshakePanelSet(panelId, {intensity, color, easing}) {
     const commandString = SerialProtocolCommandBuilder.buildPanelSet({
       stripId: this.config.LIGHTS.HANDSHAKE_STRIP,
-      panelId,
+      panelIds: panelId,
       intensity,
       color,
       easing,
@@ -155,7 +155,7 @@ export default class HandshakeView {
   _pulse() {
     const commandString = SerialProtocolCommandBuilder.buildPanelPulse({
       stripId: this.config.LIGHTS.HANDSHAKE_STRIP,
-      panelId: this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL,
+      panelIds: this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL,
       intensity: 100,
       color: 'white',
       easing: 'sleep'

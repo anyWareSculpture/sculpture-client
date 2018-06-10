@@ -27,15 +27,24 @@ export default class PanelView {
     const lightArray = this.lightArray;
     for (const stripId of lightArray.stripIds) {
       const panelIds = lightArray.get(stripId).panelIds;
+      const colorGroups = {};
       for (const panelId of panelIds) {
         const intensity = lightArray.getIntensity(stripId, panelId);
         const color = lightArray.getColor(stripId, panelId);
-
+        const key = `${color} ${intensity}`;
+        if (colorGroups.hasOwnProperty(key)) {
+          colorGroups[key].panelIds.push(panelId);
+        }
+        else {
+          colorGroups[key] = {panelIds: [panelId], intensity, color};
+        }
+      }
+      for (const group of Object.values(colorGroups)) {
         const commandString = SerialProtocolCommandBuilder.buildPanelSet({
-          stripId: stripId,
-          panelId: panelId,
-          intensity: intensity,
-          color: color
+          stripId,
+          panelIds: group.panelIds.join(''),
+          intensity: group.intensity,
+          color: group.color
         });
         this.serialManager.dispatchCommand(commandString);
       }
@@ -56,20 +65,30 @@ export default class PanelView {
     const lightArray = this.lightArray;
     for (const stripId of Object.keys(lightChanges)) {
       const panels = lightChanges[stripId].panels;
+      const colorGroups = {};
       for (const panelId of Object.keys(panels)) {
         const panelChanges = panels[panelId];
 
         if (panelChanges.hasOwnProperty("intensity") || panelChanges.hasOwnProperty("color")) {
           const intensity = panelChanges.intensity || lightArray.getIntensity(stripId, panelId);
           const color = panelChanges.color || lightArray.getColor(stripId, panelId);
-          const commandString = SerialProtocolCommandBuilder.buildPanelSet({
-            stripId: stripId,
-            panelId: panelId,
-            intensity: intensity,
-            color: color
-          });
-          this.serialManager.dispatchCommand(commandString);
+          const key = `${color} ${intensity}`;
+          if (colorGroups.hasOwnProperty(key)) {
+            colorGroups[key].panelIds.push(panelId);
+          }
+          else {
+            colorGroups[key] = {panelIds: [panelId], intensity, color};
+          }
         }
+      }
+      for (const group of Object.values(colorGroups)) {
+        const commandString = SerialProtocolCommandBuilder.buildPanelSet({
+          stripId,
+          panelIds: group.panelIds.join(''),
+          intensity: group.intensity,
+          color: group.color
+        });
+        this.serialManager.dispatchCommand(commandString);
       }
     }
   }

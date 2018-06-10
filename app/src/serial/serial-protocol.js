@@ -201,19 +201,7 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildPanelSet(data) {
-    let command = `${PANEL_SET_COMMAND}`;
-
-    if (data.stripId !== undefined) {
-      command += ` ${data.stripId}`;
-    }
-
-    if (data.panelId !== undefined) {
-      command += ` ${data.panelId}`;
-    }
-
-    if (data.intensity !== undefined) {
-      command += ` ${data.intensity}`;
-    }
+    let command = `${PANEL_SET_COMMAND} ${data.stripId || ''} ${data.panelIds || ''} ${data.intensity || ''}`.trim();
 
     if (data.color) {
       command += ` ${data.color}`;
@@ -239,7 +227,7 @@ export class SerialProtocolCommandBuilder {
   }
 
   static buildPanelPulse(data) {
-    let command = `${PANEL_PULSE_COMMAND} ${data.stripId || ""} ${data.panelId || ""} ${data.intensity || ""}`.trim();
+    let command = `${PANEL_PULSE_COMMAND} ${data.stripId || ''} ${data.panelIds || ''} ${data.intensity || ''}`.trim();
 
     if (data.color) {
       command += ` ${data.color}`;
