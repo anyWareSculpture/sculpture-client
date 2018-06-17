@@ -8,6 +8,8 @@ anyware_config = {
   // The sequence of the games to be run. The first game is run on startup
   GAMES_SEQUENCE: [ "mole", "disk", "simon", ],
 
+  SPACE_BETWEEN_GAMES_SECONDS: 2,
+
   MOLE_GAME: {
     GAME_END: 3,
   },
