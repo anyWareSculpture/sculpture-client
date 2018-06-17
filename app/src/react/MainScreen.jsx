@@ -1,6 +1,7 @@
 import React from 'react';
 import StatusView from './StatusView';
 import DiskView from 'anyware/lib/views/DiskView';
+import SimonView from 'anyware/lib/views/SimonView';
 import DebugView from './DebugView';
 import {sculptureStore} from '../stores';
 import config from '../config';
@@ -41,6 +42,7 @@ export default class MainScreen extends React.Component {
         <StatusView debug={config.DEBUG.status} {...config.projectionParameters}/>
         {config.DEBUG.debugView && <DebugView {...config.projectionParameters}/>}
         <DiskView store={sculptureStore} config={config} {...config.projectionParameters}/>
+        <SimonView store={sculptureStore} config={config} {...config.projectionParameters}/>
       </Canvas>
     </div>;
   }
