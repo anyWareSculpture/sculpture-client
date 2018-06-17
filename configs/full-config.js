@@ -8,7 +8,10 @@ anyware_config = {
   // The sequence of the games to be run. The first game is run on startup
   GAMES_SEQUENCE: [ "mole", "disk", "simon", ],
 
+  // Will enter alone mode after this number of seconds
   ALONE_MODE_SECONDS: 60,
+  // Space between games (in black/off state)
+  SPACE_BETWEEN_GAMES_SECONDS: 10,
 
   // These settings effect the default behaviour of panels outside of
   // any custom logic in any of the games
@@ -132,7 +135,5 @@ anyware_config = {
     INPUT_TIMEOUT: 10000,
     // The default color to set the panels to when
     DEFAULT_SIMON_PANEL_COLOR: 'white',
-    // Wait while playing final sound
-    TRANSITION_OUT_TIME: 13000
   }
 };
