@@ -69,13 +69,13 @@ anyware_config = {
       // disks: { diskId: initial position }
       
       // level 0
-      { rule: 'absolute', disks: { disk0: -90, disk1: 90, disk2: 120 } },
-      
+      { rule: 'absolute', disks: { disk0: -60, disk1: 160, disk2: 120 } },
+
       // level 1
-      { rule: 'absolute', disks: { disk0: 90, disk1: -90, disk2: -120 } },
-      
+      { rule: 'absolute', disks: { disk0: 45, disk1: -100, disk2: -130 } },
+
       // level 2
-      { rule: 'absolute', disks: { disk0: 170, disk1: 45, disk2: -90 } },
+      { rule: 'absolute', disks: { disk0: 170, disk1: 45, disk2: -80 } },
       
     ],
     CONTROL_MAPPINGS: {
