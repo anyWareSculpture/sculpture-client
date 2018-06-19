@@ -21,13 +21,15 @@ export default class HandshakeView {
 
     this.sculptureActionCreator = new SculptureActionCreator(dispatcher);
 
-    this._pulseInterval = null;
+    this._pulseIntervals = {};
     this._activityTimeout = null;
 
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
 
     // FIXME: We begin by pulsing. Not the best design..
-    this._beginPulsing();
+    this._beginPulsing(this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL,
+                       this.config.HANDSHAKE_HARDWARE.PULSE_DELAY,
+                       this._sleepPulse.bind(this));
   }
 
   _getHandshakes() {
@@ -44,16 +46,17 @@ export default class HandshakeView {
       switch (handshakesChanges[sculptureId]) {
       case HandshakeGameLogic.HANDSHAKE_ACTIVATING:
       case HandshakeGameLogic.HANDSHAKE_ACTIVE:
-        this._activateLocationPanel(sculptureId);
+        this._pulseLocationPanel(sculptureId);
 
         if (sculptureId === this.store.me) {
           // Pulsing needs to be stopped if the user has activated the
           // handshake because both cannot happen at once
-          this._endPulsing();
+          this._endPulsing(this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL);
           this._activateMiddlePanel();
         }
         break;
       case HandshakeGameLogic.HANDSHAKE_PRESENT:
+        this._activateLocationPanel(sculptureId);
         if (sculptureId === this.store.me) {
           this._activateMiddlePanel();
         }
@@ -62,14 +65,34 @@ export default class HandshakeView {
         this._deactivateLocationPanel(sculptureId);
         if (sculptureId === this.store.me) {
           this._deactivateMiddlePanel();
-          this._beginPulsing();
+          this._beginPulsing(this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL,
+                             this.config.HANDSHAKE_HARDWARE.PULSE_DELAY,
+                             this._sleepPulse.bind(this));
         }
         break;
       }
     }
   }
 
+  _pulseLocationPanel(sculptureId) {
+      const locationPanel = this.config.HANDSHAKE_HARDWARE.LOCATION_PANELS[sculptureId];
+      this._beginPulsing(locationPanel, 1000, () => {
+          const color = this.config.getLocationColor(sculptureId);
+          const intensity = this.config.HANDSHAKE_HARDWARE.LOCATION_PANEL_ON_INTENSITY;
+          this._handshakePanelSet(locationPanel, {intensity, color});
+          if (sculptureId === this.store.me) {
+              this._handshakePanelSet(this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL, {intensity, color});
+          }
+          this._handshakePanelPulse(locationPanel, {intensity: 50, easing: 'pulse'});
+          if (sculptureId === this.store.me) {
+              this._handshakePanelPulse(this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL, {intensity: 50, easing: 'pulse'});
+          }
+      });
+  }
+
   _activateLocationPanel(sculptureId) {
+    const locationPanel = this.config.HANDSHAKE_HARDWARE.LOCATION_PANELS[sculptureId];
+    this._endPulsing(locationPanel);
     const intensity = this.config.HANDSHAKE_HARDWARE.LOCATION_PANEL_ON_INTENSITY;
     const color = this.config.getLocationColor(sculptureId);
     const easing = this.config.HANDSHAKE_HARDWARE.LOCATION_PANEL_ON_EASING;
@@ -78,6 +101,8 @@ export default class HandshakeView {
   }
 
   _deactivateLocationPanel(sculptureId) {
+    const locationPanel = this.config.HANDSHAKE_HARDWARE.LOCATION_PANELS[sculptureId];
+    this._endPulsing(locationPanel);
     const intensity = this.config.HANDSHAKE_HARDWARE.LOCATION_PANEL_OFF_INTENSITY;
     const easing = this.config.HANDSHAKE_HARDWARE.LOCATION_PANEL_OFF_EASING;
 
@@ -106,6 +131,12 @@ export default class HandshakeView {
     this._handshakePanelSet(locationPanel, {intensity, color, easing});
   }
 
+  _locationPanelPulse(sculptureId, {intensity, color, easing}) {
+    const locationPanel = this.config.HANDSHAKE_HARDWARE.LOCATION_PANELS[sculptureId];
+
+    this._handshakePanelPulse(locationPanel, {intensity, color, easing});
+  }
+
   _middlePanelSet({intensity, color, easing}) {
     const panel = this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL;
     this._handshakePanelSet(panel, {intensity, color, easing});
@@ -123,6 +154,17 @@ export default class HandshakeView {
     this.serialManager.dispatchCommand(commandString);
   }
 
+  _handshakePanelPulse(panelId, {intensity, color, easing}) {
+    const commandString = SerialProtocolCommandBuilder.buildPanelPulse({
+      stripId: this.config.LIGHTS.HANDSHAKE_STRIP,
+      panelIds: panelId,
+      intensity,
+      color,
+      easing,
+    });
+    this.serialManager.dispatchCommand(commandString);
+  }
+
   _updateHandshakeVibrationIntensity() {
     const handshakes = this._getHandshakes();
     const numUsers = Array.from(handshakes).reduce((total, sculptureId) => {
@@ -134,33 +176,22 @@ export default class HandshakeView {
     this.serialManager.dispatchCommand(commandString);
   }
 
-  _beginPulsing() {
+  _beginPulsing(panelId, period, pulseFunction) {
     // ensure that we can never orphan a timer
-    this._endPulsing();
+    this._endPulsing(panelId);
 
-    this._pulse();
-
-    this._pulseInterval = setInterval(() => {
-      // As a precaution, make sure it pulses back to black
-      this._handshakePanelSet(this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL, {intensity: 0, color: 'white'});
-      this._pulse();
-    }, this.config.HANDSHAKE_HARDWARE.PULSE_DELAY);
+    pulseFunction();
+    this._pulseIntervals[panelId] = setInterval(pulseFunction, period);
   }
 
-  _endPulsing() {
-    clearInterval(this._pulseInterval);
-    this._pulseInterval = null;
+  _endPulsing(panelId) {
+    clearInterval(this._pulseIntervals[panelId]);
+    this._pulseIntervals[panelId] = null;
   }
 
-  _pulse() {
-    const commandString = SerialProtocolCommandBuilder.buildPanelPulse({
-      stripId: this.config.LIGHTS.HANDSHAKE_STRIP,
-      panelIds: this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL,
-      intensity: 100,
-      color: 'white',
-      easing: 'sleep'
-    });
-    this.serialManager.dispatchCommand(commandString);
+  _sleepPulse() {
+    this._handshakePanelSet(this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL, {intensity: 0, color: 'white'});
+    this._handshakePanelPulse(this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL, {intensity: 100, color: 'white', easing: 'sleep'});
   }
 
   _refreshActivityTimeout() {
