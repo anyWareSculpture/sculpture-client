@@ -1,7 +1,7 @@
 {
-  "name": "anyWare 1.7.4",
+  "name": "anyWare 1.7.6",
   "description": "The physical anyWare sculpture",
-  "version": "1.7.4",
+  "version": "1.7.6",
   "manifest_version":  2,
   "update_url": "https://clients2.google.com/service/update2/crx",
   "permissions": [
