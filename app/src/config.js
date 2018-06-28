@@ -14,10 +14,12 @@ class Config extends DefaultConfig {
     this.SINGLE_USER_MODE = false;
     this.CLIENT_CONNECTION_OPTIONS = {
       default: {
-        protocol: "ws",
         username: "anyware",
         password: "anyware",
-        host: "broker.shiftr.io"
+//        protocol: "ws",
+//        host: "broker.shiftr.io"
+        protocol: "wss",
+        host: "excellent-model.cloudmqtt.com",
       },
       credentials: {
         sculpture1: '3ca778a7d51ac0ea4717d09ea7e97150',
