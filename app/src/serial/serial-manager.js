@@ -69,7 +69,7 @@ export default class SerialManager extends events.EventEmitter {
     }
 
     if (targetPorts.size > 0) {
-      this._debug(`Queued command "${command.trim()}" for: ${Array.from(targetPorts)} (queue: ${this.commandQueue.length})`);
+//      this._debug(`Queued command "${command.trim()}" for: ${Array.from(targetPorts)} (queue: ${this.commandQueue.length})`);
     }
     else {
       console.warn(`No destination port for command "${command.trim()}"`);
@@ -194,7 +194,7 @@ export default class SerialManager extends events.EventEmitter {
       console.log(`DEBUG ${port.path}: ${commandData.message}`);
       return;
     }
-    this._debug(`Received command "${commandName}": ${JSON.stringify(commandData)} from "${port.path}"`);
+//    this._debug(`Received command "${commandName}": ${JSON.stringify(commandData)} from "${port.path}"`);
 
     this.emit(SerialManager.EVENT_COMMAND, commandName, commandData);
   }
