@@ -8,6 +8,9 @@ anyware_config = {
   // The sequence of the games to be run. The first game is run on startup
   GAMES_SEQUENCE: [ "mole", "disk", "simon", ],
 
+  // Set this to true to enable synchronized restart
+  SYNCHRONIZED_RESTART:  true,
+
   // Will enter alone mode after this number of seconds
   ALONE_MODE_SECONDS: 60,
   // Space between games (in black/off state)
