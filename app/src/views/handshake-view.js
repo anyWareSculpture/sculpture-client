@@ -37,7 +37,7 @@ export default class HandshakeView {
   }
 
   _handleChanges(changes) {
-    if (!this.store.isReady || !changes.hasOwnProperty('handshake') || !changes.handshake.hasOwnProperty('handshakes')) return;
+    if (!(this.store.isReady || this.store.isInit) || !changes.hasOwnProperty('handshake') || !changes.handshake.hasOwnProperty('handshakes')) return;
 
     this._updateHandshakeVibrationIntensity();
 

@@ -65,6 +65,7 @@ export default class SculptureApp extends events.EventEmitter {
         break;
       case InitActionCreator.READY:
         console.log('Ready');
+        setTimeout(() => this.sculptureActionCreator.sendRestarted(), 0);
         break;
       default:
       }
