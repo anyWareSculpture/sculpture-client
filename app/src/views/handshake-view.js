@@ -150,7 +150,6 @@ export default class HandshakeView {
       color,
       easing,
     });
-    console.log(commandString);
     this.serialManager.dispatchCommand(commandString);
   }
 
