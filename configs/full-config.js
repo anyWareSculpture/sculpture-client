@@ -14,7 +14,9 @@ anyware_config = {
   // Will enter alone mode after this number of seconds
   ALONE_MODE_SECONDS: 60,
   // Space between games (in black/off state)
-  SPACE_BETWEEN_GAMES_SECONDS: 10,
+  SPACE_BETWEEN_GAMES_SECONDS: 5,
+  // Space after transitioning into art state
+  ART_STATE_SPACE_SECONDS: 5,
 
   // These settings effect the default behaviour of panels outside of
   // any custom logic in any of the games
@@ -54,9 +56,10 @@ anyware_config = {
   },
 
   DISK_GAME: {
-    OWNERSHIP_TIMEOUT: 2000, // milliseconds
+    OWNERSHIP_TIMEOUT: 3000, // milliseconds
+    TAP_TIMEOUT: 1500, // milliseconds
     SPEED: 21, // degrees/sec
-    SINGLE_DISK_TOLERANCE: 10, // tolerance (in degrees) for locking a single disk into place
+    SINGLE_DISK_TOLERANCE: 15, // tolerance (in degrees) for locking a single disk into place
     // The intensity of the panels that the user can use to play the sequence
     CONTROL_PANEL_COLOR: 'white',
     CONTROL_PANEL_INTENSITY: 10,
