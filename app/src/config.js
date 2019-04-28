@@ -16,10 +16,9 @@ class Config extends DefaultConfig {
       default: {
         username: "anyware",
         password: "anyware",
-//        protocol: "ws",
-//        host: "broker.shiftr.io"
         protocol: "wss",
-        host: "excellent-model.cloudmqtt.com",
+        host: "broker.shiftr.io"
+//        host: "excellent-model.cloudmqtt.com",
       },
       credentials: {
         sculpture1: '3ca778a7d51ac0ea4717d09ea7e97150',
