@@ -18,6 +18,12 @@ Note: If using local dev versions of libraries:
 
 ## Build and run release version for sculptures
 
+### Update version
+
+NB! We need to update the version both in package.json and manifest.json
+
+### Build and deploy
+
     npm run build
     ./scripts/anyware.sh publish [<sculptureId>]
 
