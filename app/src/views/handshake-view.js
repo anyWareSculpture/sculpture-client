@@ -77,19 +77,19 @@ export default class HandshakeView {
   }
 
   _pulseLocationPanel(sculptureId) {
-      const locationPanel = this.config.HANDSHAKE_HARDWARE.LOCATION_PANELS[sculptureId];
-      this._beginPulsing(locationPanel, 1000, () => {
-          const color = this.config.getLocationColor(sculptureId);
-          const intensity = this.config.HANDSHAKE_HARDWARE.LOCATION_PANEL_ON_INTENSITY;
-          this._handshakePanelSet(locationPanel, {intensity, color});
-          if (sculptureId === this.store.me) {
-              this._handshakePanelSet(this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL, {intensity, color});
-          }
-          this._handshakePanelPulse(locationPanel, {intensity: 50, easing: 'pulse'});
-          if (sculptureId === this.store.me) {
-              this._handshakePanelPulse(this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL, {intensity: 50, easing: 'pulse'});
-          }
-      });
+    const locationPanel = this.config.HANDSHAKE_HARDWARE.LOCATION_PANELS[sculptureId];
+    this._beginPulsing(locationPanel, 1000, () => {
+      const color = this.config.getLocationColor(sculptureId);
+      const intensity = this.config.HANDSHAKE_HARDWARE.LOCATION_PANEL_ON_INTENSITY;
+      this._handshakePanelSet(locationPanel, {intensity, color});
+      if (sculptureId === this.store.me) {
+        this._handshakePanelSet(this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL, {intensity, color});
+      }
+      this._handshakePanelPulse(locationPanel, {intensity: 50, easing: 'pulse'});
+      if (sculptureId === this.store.me) {
+        this._handshakePanelPulse(this.config.HANDSHAKE_HARDWARE.MIDDLE_PANEL, {intensity: 50, easing: 'pulse'});
+      }
+    });
   }
 
   _activateLocationPanel(sculptureId) {
@@ -169,9 +169,9 @@ export default class HandshakeView {
   _updateHandshakeVibrationIntensity() {
     const handshakes = this._getHandshakes();
     const numUsers = Array.from(handshakes).reduce((total, sculptureId) => {
-        return total +
-            (handshakes.get(sculptureId) === HandshakeGameLogic.HANDSHAKE_ACTIVATING ? 1 : 0) +
-            (handshakes.get(sculptureId) === HandshakeGameLogic.HANDSHAKE_ACTIVE ? 1 : 0);
+      return total +
+        (handshakes.get(sculptureId) === HandshakeGameLogic.HANDSHAKE_ACTIVATING ? 1 : 0) +
+        (handshakes.get(sculptureId) === HandshakeGameLogic.HANDSHAKE_ACTIVE ? 1 : 0);
     }, 0);
     const commandString = SerialProtocolCommandBuilder.buildHandshake({ numUsers });
     this.serialManager.dispatchCommand(commandString);
