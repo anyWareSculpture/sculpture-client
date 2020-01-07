@@ -2,6 +2,7 @@ import GAMES from 'anyware/lib/game-logic/constants/games';
 import SculptureStore from 'anyware/lib/game-logic/sculpture-store';
 import HandshakeGameLogic from 'anyware/lib/game-logic/logic/handshake-game-logic';
 import SculptureActionCreator from 'anyware/lib/game-logic/actions/sculpture-action-creator';
+import * as AudioAPI from 'anyware/lib/views/audio-api';
 
 import SerialManager from '../serial/serial-manager';
 import * as SerialProtocol from '../serial/serial-protocol';
@@ -23,6 +24,7 @@ export default class HandshakeView {
 
     this._pulseIntervals = {};
     this._activityTimeout = null;
+    this._sleepTimeout = null;
 
     this.store.on(SculptureStore.EVENT_CHANGE, this._handleChanges.bind(this));
 
@@ -195,6 +197,7 @@ export default class HandshakeView {
 
   _refreshActivityTimeout() {
     if (this._activityTimeout) clearTimeout(this._activityTimeout);
+    if (this._sleepTimeout) clearTimeout(this._sleepTimeout);
     this._activityTimeout = setTimeout(this._activityTimeoutCB.bind(this),
                                        this.config.ALONE_MODE_SECONDS * 1000);
   }
@@ -202,6 +205,18 @@ export default class HandshakeView {
   _activityTimeoutCB() {
     this._activityTimeout = null;
     this.sculptureActionCreator.sendHandshakeAction(this.store.me, HandshakeGameLogic.HANDSHAKE_OFF);
+    this._refreshSleepTimeout();
+  }
+
+  _refreshSleepTimeout() {
+    if (this._sleepTimeout) clearTimeout(this._sleepTimeout);
+    this._sleepTimeout = setTimeout(this._sleepTimeoutCB.bind(this),
+                                    this.config.SLEEP_MODE_SECONDS * 1000);
+  }
+
+  _sleepTimeoutCB() {
+    this._sleepTimeout = null;
+    AudioAPI.setMasterVolume(this.config.SLEEP_VOLUME);
   }
 
   // Command from serial
