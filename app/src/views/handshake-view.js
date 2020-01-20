@@ -211,7 +211,7 @@ export default class HandshakeView {
   _refreshSleepTimeout() {
     if (this._sleepTimeout) clearTimeout(this._sleepTimeout);
     this._sleepTimeout = setTimeout(this._sleepTimeoutCB.bind(this),
-                                    this.config.SLEEP_MODE_SECONDS * 1000);
+                                    this.config.SLEEP_SECONDS * 1000);
   }
 
   _sleepTimeoutCB() {
